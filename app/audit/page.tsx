@@ -1,5 +1,5 @@
 import { Suspense } from 'react';
-import AuditContent from '../../components/AuditContent';
+import AuditContent from '../components/AuditContent';
 
 export default function AuditPage() {
   return (
