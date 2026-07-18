@@ -2,7 +2,6 @@
 
 import { createClient } from '@supabase/supabase-js';
 import { redirect } from 'next/navigation';
-import 'dotenv/config';
 
 export async function handleAuditSubmit(formData: FormData) {
   const rawUrl = formData.get('url') as string;
@@ -13,8 +12,10 @@ export async function handleAuditSubmit(formData: FormData) {
     .replace(/^www\./, '')
     .replace(/\/$/, '');
 
-  // Using hard-coded keys to bypass environment variable loading issues
-  const supabaseUrl = 'https://dcjjbebsydbzerzxdjcx.supabase.co';
+  // 1. HARDCODE THE URL DIRECTLY
+  const supabaseUrl = "https://dcjjbebsydbzerzxdjcx.supabase.co"; 
+  
+  // 2. KEEP THE KEY AS AN ENV VARIABLE (Never hardcode secrets!)
   const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
 
   const supabase = createClient(supabaseUrl, supabaseServiceKey);
@@ -26,7 +27,6 @@ export async function handleAuditSubmit(formData: FormData) {
     .insert([
       {
         target_url: cleanUrl,
-        // Default values to satisfy potential NOT NULL constraints
         business_name: 'Pending Audit',
         contact_email: 'n/a'
       }
@@ -37,7 +37,6 @@ export async function handleAuditSubmit(formData: FormData) {
     console.error('❌ Supabase Insert Error:', error);
   } else {
     console.log('✅ Success! Data inserted:', data);
-    // Route the user
     redirect(`/audit?url=${encodeURIComponent(cleanUrl)}`);
   }
 }
