@@ -78,22 +78,27 @@ export default function Home() {
           </div>
         </div>
 
-        {/* --- FIXED FORM SECTION --- */}
-        <form action={handleAuditSubmit} noValidate className="mt-8 sm:mt-12 flex flex-col items-center space-y-5 sm:space-y-6 max-w-2xl mx-auto w-full group px-2 relative">
+        {/* --- FIXED FORM SECTION (noValidate REMOVED) --- */}
+        <form action={handleAuditSubmit} className="mt-8 sm:mt-12 flex flex-col items-center space-y-5 sm:space-y-6 max-w-2xl mx-auto w-full group px-2 relative">
           <div className="relative flex items-center w-full bg-[#07070f]/90 border border-zinc-800/90 group-focus-within:border-cyan-400 rounded-xl sm:rounded-2xl p-2 sm:p-2.5 transition-all duration-300 backdrop-blur-2xl ring-1 ring-zinc-900/50 group-focus-within:ring-2 group-focus-within:ring-cyan-500/20 shadow-[0_0_15px_rgba(6,182,212,0.12)] hover:shadow-[0_0_25px_rgba(6,182,212,0.22)] group-focus-within:shadow-[0_0_30px_rgba(6,182,212,0.35),_inset_0_0_12px_rgba(6,182,212,0.15)] transform hover:-translate-y-1 hover:scale-[1.012] group-focus-within:-translate-y-1 group-focus-within:scale-[1.012] hover:bg-[#090916]">
             <div className="pl-3 pr-1 sm:pl-4 sm:pr-2 text-zinc-500 group-focus-within:text-cyan-400 transition-colors">
               <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
               </svg>
             </div>
+            
+            {/* --- UPDATED INPUT FIELD WITH VALIDATION --- */}
             <input 
               type="text" 
               name="url" 
               required 
+              pattern="^(https?:\/\/)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{2,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)$"
+              title="Please enter a valid website (e.g., google.com, www.google.com, https://google.com)"
               autoComplete="off"
               placeholder="Enter your gym website URL..." 
               className="w-full bg-transparent py-3 sm:py-3.5 px-2 text-zinc-100 placeholder-zinc-600 focus:outline-none text-sm font-normal tracking-wide" 
             />
+            
             <div className="hidden sm:flex items-center gap-2 bg-[#0d111c]/90 border border-zinc-800 rounded-lg px-3 py-1.5 mr-1 font-mono text-[10px] tracking-widest text-zinc-500 uppercase transition-all duration-300 group-focus-within:border-cyan-500/20 group-focus-within:text-cyan-400">
               <span className="relative flex h-1.5 w-1.5"><span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400/60 opacity-75"></span><span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-cyan-500"></span></span>
               READY
@@ -175,4 +180,3 @@ export default function Home() {
     </main>
   );
 }
-

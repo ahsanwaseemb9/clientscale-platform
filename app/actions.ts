@@ -5,17 +5,22 @@ import { redirect } from 'next/navigation';
 
 export async function handleAuditSubmit(formData: FormData) {
   const rawUrl = formData.get('url') as string;
-  if (!rawUrl) return;
+  
+  // 1. Strict URL Regex Validation (Backend Security)
+  const urlRegex = /^(https?:\/\/)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{2,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)$/;
+  
+  if (!rawUrl || !urlRegex.test(rawUrl)) {
+    console.error('❌ Validation Error: Invalid URL format submitted.');
+    return; // Completely stops the execution right here
+  }
 
   const cleanUrl = rawUrl
     .replace(/^https?:\/\//, '')
     .replace(/^www\./, '')
     .replace(/\/$/, '');
 
-  // 1. HARDCODE THE URL DIRECTLY
-  const supabaseUrl = "https://dcjjbebsydbzerzxdjcx.supabase.co"; 
-  
-  // 2. KEEP THE KEY AS AN ENV VARIABLE (Never hardcode secrets!)
+  // 2. Connect to Supabase using your safe environment variables
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
   const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
 
   const supabase = createClient(supabaseUrl, supabaseServiceKey);
@@ -37,6 +42,7 @@ export async function handleAuditSubmit(formData: FormData) {
     console.error('❌ Supabase Insert Error:', error);
   } else {
     console.log('✅ Success! Data inserted:', data);
+    // Route the user
     redirect(`/audit?url=${encodeURIComponent(cleanUrl)}`);
   }
 }
