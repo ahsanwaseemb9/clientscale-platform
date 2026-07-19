@@ -44,9 +44,14 @@ export default function AuditContent() {
     <main className="min-h-screen bg-[#050505] text-[#00FF41] font-mono p-3 sm:p-12 overflow-hidden flex flex-col">
       <div className="w-full max-w-5xl mx-auto border border-[#1a1a1a] bg-[#0a0a0a] p-4 sm:p-8 shadow-2xl rounded-sm">
         <div className="flex flex-col items-center mb-6 sm:mb-8">
-          <div className="mb-4 w-full overflow-hidden text-center flex justify-center">
+          
+          {/* --- THE FIX IS HERE --- */}
+          {/* This wrapper forces the logo onto one line and scales it down on small screens */}
+          <div className="mb-4 w-full flex justify-center text-center whitespace-nowrap transform scale-[0.70] sm:scale-100 origin-center">
             <DecryptedLogo text="ANALYZING TECHNICAL DATA" />
           </div>
+          {/* ----------------------- */}
+
           <div className="w-full flex justify-between items-center border-b border-[#1a1a1a] pb-4">
             <span className="text-[10px] sm:text-sm md:text-base uppercase tracking-[0.1em] sm:tracking-[0.2em] text-[#333]">
               {isComplete ? 'AUDIT COMPLETE' : 'SYSTEM SCANNING...'}
