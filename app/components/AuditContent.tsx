@@ -72,7 +72,7 @@ const steps = [
               <span className="text-[#333] select-none text-[10px] sm:text-sm whitespace-nowrap">
                 [{new Date().toLocaleTimeString()}]
               </span>
-              <span className="animate-in fade-in slide-in-from-left-2 break-all sm:break-words">
+              <span className="animate-in fade-in slide-in-from-left-2 break-words">
                 {log}
               </span>
             </div>
