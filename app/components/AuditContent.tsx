@@ -20,7 +20,7 @@ export default function AuditContent() {
 const steps = [
       { msg: `TARGETING: ${targetUrl}`, delay: 500 },
       { msg: 'ESTABLISHING SECURE CONNECTION TO CDN...', delay: 1200 },
-      { msg: 'SECURITY_PROTOCOLS: VERIFYING_DMARC_SPF_RECORDS...', delay: 1800},
+      { msg: 'SECURITY_PROTOCOLS: VERIFYING_DMARC_SPF_RECORDS..', delay: 1800},
       { msg: 'PARSING DOM_STRUCTURE_ANALYSIS...', delay: 2500 },
       { msg: 'META_GRAPH: EXTRACTING_SOCIAL_PREVIEW_DATA...', delay: 3100 },
       { msg: 'LATENCY_METRICS: EVALUATING_TBT_INP...', delay: 3800 },
