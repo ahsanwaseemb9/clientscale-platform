@@ -20,12 +20,13 @@ export default function AuditContent() {
     const steps = [
       { msg: `TARGETING: ${targetUrl}`, delay: 500 },
       { msg: 'ESTABLISHING SECURE CONNECTION TO CDN...', delay: 1200 },
-      { msg: 'PARSING DOM_STRUCTURE_ANALYSIS...', delay: 1800 },
-      { msg: 'LATENCY_METRICS: EVALUATING_TBT_INP...', delay: 2500 },
-      { msg: 'FINGERPRINTING: STACK_TECHNOLOGY_IDENTIFIED...', delay: 3200 },
-      { msg: 'CONVERSION_FUNNEL: LEAKAGE_POINTS_DETECTED...', delay: 4000 },
-      { msg: 'COMPILING_FULL_ENGINEER_REPORT...', delay: 4800 },
-      { msg: '>>> DIAGNOSTIC_SEQUENCE_COMPLETE', delay: 5500 }
+      { msg: 'SECURITY_PROTOCOLS: VERIFYING_DMARC_SPF_RECORDS...', delay: 1800},
+      { msg: 'PARSING DOM_STRUCTURE_ANALYSIS...', delay: 2500 },
+      { msg: 'LATENCY_METRICS: EVALUATING_TBT_INP...', delay: 3200 },
+      { msg: 'FINGERPRINTING: STACK_TECHNOLOGY_IDENTIFIED...', delay: 4000 },
+      { msg: 'CONVERSION_FUNNEL: LEAKAGE_POINTS_DETECTED...', delay: 4800 },
+      { msg: 'COMPILING_FULL_ENGINEER_REPORT...', delay: 5500 },
+      { msg: '>>> DIAGNOSTIC_SEQUENCE_COMPLETE', delay: 6200 }
     ];
 
     steps.forEach((step) => {
