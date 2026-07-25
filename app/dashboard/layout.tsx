@@ -12,10 +12,10 @@ export default function DashboardLayout({
   const [isMobileOpen, setIsMobileOpen] = useState(false);
 
   return (
-    <div className="flex flex-col md:flex-row h-screen bg-[#09090b] text-gray-200 font-sans selection:bg-cyan-500/30 overflow-hidden">
+    <div className="flex flex-col md:flex-row h-[100dvh] bg-[#09090b] text-gray-200 font-sans selection:bg-cyan-500/30 overflow-hidden">
       
       {/* Mobile Top Navigation Bar */}
-      <div className="md:hidden flex items-center justify-between p-4 border-b border-gray-800 bg-[#0f0f12] z-50 relative">
+      <div className="md:hidden flex items-center justify-between p-4 h-[72px] border-b border-gray-800 bg-[#0f0f12] z-50 relative shrink-0">
         <h2 className="text-lg font-bold tracking-widest text-white uppercase">
           Client<span className="text-cyan-400">Scale</span>
         </h2>
@@ -31,18 +31,18 @@ export default function DashboardLayout({
       <aside className={`
         ${isMobileOpen ? 'flex' : 'hidden'} 
         md:flex 
-        absolute md:relative 
-        top-[65px] md:top-0 
+        fixed md:relative 
+        top-[72px] md:top-0 
+        bottom-0
         left-0 
         w-full md:w-72 
-        h-[calc(100vh-65px)] md:h-screen 
         border-r border-gray-800 bg-[#0f0f12] 
         flex-col 
         z-40
       `}>
         
         {/* Branding Header - Hidden on mobile as it moves to the top bar */}
-        <div className="hidden md:block p-6 border-b border-gray-800">
+        <div className="hidden md:block p-6 border-b border-gray-800 shrink-0">
           <h2 className="text-xl font-bold tracking-widest text-white uppercase">
             Client<span className="text-cyan-400">Scale</span>
           </h2>
@@ -66,7 +66,7 @@ export default function DashboardLayout({
         </nav>
 
         {/* Admin/User Footer */}
-        <div className="p-4 border-t border-gray-800 bg-[#0f0f12]">
+        <div className="p-4 border-t border-gray-800 bg-[#0f0f12] shrink-0">
            <button className="w-full py-2.5 px-4 bg-gray-900 text-gray-300 border border-gray-700 rounded-md hover:bg-gray-800 hover:text-white transition-all text-sm font-medium flex items-center justify-center space-x-2">
              <span>System Settings</span>
            </button>
