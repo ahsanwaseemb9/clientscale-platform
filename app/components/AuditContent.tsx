@@ -1,18 +1,18 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { useSearchParams, useRouter } from 'next/navigation'; // Added useRouter
+import { useSearchParams, useRouter } from 'next/navigation';
 import DecryptedLogo from './DecryptedLogo';
 
 export default function AuditContent() {
   const searchParams = useSearchParams();
-  const router = useRouter(); // Initialize router
+  const router = useRouter(); 
   
   const targetUrl = searchParams.get('url') || 'your domain';
   
   const [logs, setLogs] = useState<string[]>(['INITIALIZING_CORE_DIAGNOSTICS...']);
   const [isComplete, setIsComplete] = useState(false);
-  const [auditData, setAuditData] = useState<any>(null); // State to hold the backend JSON
+  const [auditData, setAuditData] = useState<any>(null); 
 
   const hasRun = useRef(false);
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -59,14 +59,12 @@ export default function AuditContent() {
 
   // 3. The Transition Handler
   const handleViewResults = () => {
-    // If the background fetch finished, save it. Otherwise, pass a fallback.
     if (auditData) {
       sessionStorage.setItem('clientScale_auditData', JSON.stringify(auditData));
     } else {
       sessionStorage.setItem('clientScale_auditData', JSON.stringify({ targetUrl, status: 'processing_delayed' }));
     }
     
-    // Push into the enterprise dashboard shell
     router.push('/dashboard/report');
   };
 
@@ -107,13 +105,23 @@ export default function AuditContent() {
 
         {isComplete && (
           <div className="mt-8 pt-6 border-t border-[#1a1a1a] animate-in zoom-in-95 duration-500">
-            {/* 4. Attach the onClick handler to your button */}
-            <button 
-              onClick={handleViewResults}
-              className="w-full sm:w-auto bg-[#00FF41] text-black font-bold px-4 sm:px-10 py-3.5 sm:py-4 text-[11px] sm:text-base uppercase tracking-wider sm:tracking-widest hover:bg-white transition-colors"
-            >
-              Access Full Audit Results
-            </button>
+            {/* --- NEW BUTTON LOGIC: Forces user to wait for the API to finish --- */}
+            {auditData ? (
+              <button 
+                onClick={handleViewResults}
+                className="w-full sm:w-auto bg-[#00FF41] text-black font-bold px-4 sm:px-10 py-3.5 sm:py-4 text-[11px] sm:text-base uppercase tracking-wider sm:tracking-widest hover:bg-white transition-colors"
+              >
+                Access Full Audit Results
+              </button>
+            ) : (
+              <button 
+                disabled
+                className="w-full sm:w-auto bg-[#1a1a1a] text-[#00FF41] opacity-50 font-bold px-4 sm:px-10 py-3.5 sm:py-4 text-[11px] sm:text-base uppercase tracking-wider sm:tracking-widest cursor-not-allowed flex items-center justify-center space-x-2"
+              >
+                <div className="w-4 h-4 border-2 border-[#00FF41] border-t-transparent rounded-full animate-spin"></div>
+                <span>Compiling Final Report...</span>
+              </button>
+            )}
           </div>
         )}
       </div>
