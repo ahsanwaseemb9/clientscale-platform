@@ -35,7 +35,7 @@ export default function AuditReportPage() {
             Diagnostic Forensics
           </h1>
           <p className="text-gray-400 mt-1 md:mt-2 text-xs md:text-sm truncate">
-            Live pipeline intelligence for <span className="text-cyan-400">{auditData?.targetUrl || 'Target Domain'}</span>
+            Live pipeline intelligence for <span className="text-cyan-400">{auditData?.target || 'Target Domain'}</span>
           </p>
         </div>
         
