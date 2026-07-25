@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { Activity, Zap, Cpu, Search, ShieldCheck, Brain, Menu, X } from 'lucide-react'; 
 
 export default function DashboardLayout({
@@ -10,6 +11,7 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   const [isMobileOpen, setIsMobileOpen] = useState(false);
+  const pathname = usePathname() || ''; // Retrieves the current URL path
 
   return (
     <div className="flex flex-col md:flex-row h-[100dvh] bg-[#09090b] text-gray-200 font-sans selection:bg-cyan-500/30 overflow-hidden">
@@ -41,7 +43,7 @@ export default function DashboardLayout({
         z-40
       `}>
         
-        {/* Branding Header - Hidden on mobile as it moves to the top bar */}
+        {/* Branding Header */}
         <div className="hidden md:block p-6 border-b border-gray-800 shrink-0">
           <h2 className="text-xl font-bold tracking-widest text-white uppercase">
             Client<span className="text-cyan-400">Scale</span>
@@ -57,12 +59,13 @@ export default function DashboardLayout({
             System Modules
           </div>
           
-          <SidebarLink icon={<Activity size={18} />} label="Growth Traffic Intelligence" active={true} />
-          <SidebarLink icon={<Zap size={18} />} label="Captured & Ghost Leads" />
-          <SidebarLink icon={<Cpu size={18} />} label="Autonomous Code Healing" />
-          <SidebarLink icon={<Search size={18} />} label="Technical SEO & Marketing" />
-          <SidebarLink icon={<Brain size={18} />} label="Orchestrated AI Infrastructure" />
-          <SidebarLink icon={<ShieldCheck size={18} />} label="Isolated Tenant Access" />
+          {/* We now pass actual hrefs and compare them to the current pathname */}
+          <SidebarLink href="/dashboard/report" icon={<Activity size={18} />} label="Growth Traffic Intelligence" active={pathname.includes('/dashboard/report')} />
+          <SidebarLink href="/dashboard/leads" icon={<Zap size={18} />} label="Captured & Ghost Leads" active={pathname.includes('/dashboard/leads')} />
+          <SidebarLink href="/dashboard/healing" icon={<Cpu size={18} />} label="Autonomous Code Healing" active={pathname.includes('/dashboard/healing')} />
+          <SidebarLink href="/dashboard/seo" icon={<Search size={18} />} label="Technical SEO & Marketing" active={pathname.includes('/dashboard/seo')} />
+          <SidebarLink href="/dashboard/ai" icon={<Brain size={18} />} label="Orchestrated AI Infrastructure" active={pathname.includes('/dashboard/ai')} />
+          <SidebarLink href="/dashboard/tenant" icon={<ShieldCheck size={18} />} label="Isolated Tenant Access" active={pathname.includes('/dashboard/tenant')} />
         </nav>
 
         {/* Admin/User Footer */}
@@ -84,11 +87,11 @@ export default function DashboardLayout({
   );
 }
 
-// Reusable Sidebar Link Component
-function SidebarLink({ icon, label, active = false }: { icon: React.ReactNode, label: string, active?: boolean }) {
+// Reusable Sidebar Link Component now strictly accepts an href
+function SidebarLink({ href, icon, label, active = false }: { href: string, icon: React.ReactNode, label: string, active?: boolean }) {
   return (
     <Link 
-      href="#" 
+      href={href} 
       className={`flex items-center space-x-3 px-3 py-2.5 rounded-lg transition-all duration-200 ${
         active 
           ? 'bg-cyan-900/10 text-cyan-400 border border-cyan-900/30' 
