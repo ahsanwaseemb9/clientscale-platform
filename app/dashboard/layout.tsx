@@ -1,19 +1,48 @@
+'use client';
+
+import { useState } from 'react';
 import Link from 'next/link';
-import { Activity, Zap, Cpu, Search, ShieldCheck, Brain } from 'lucide-react'; // Added Brain icon
+import { Activity, Zap, Cpu, Search, ShieldCheck, Brain, Menu, X } from 'lucide-react'; 
 
 export default function DashboardLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const [isMobileOpen, setIsMobileOpen] = useState(false);
+
   return (
-    <div className="flex h-screen bg-[#09090b] text-gray-200 font-sans selection:bg-cyan-500/30">
+    <div className="flex flex-col md:flex-row h-screen bg-[#09090b] text-gray-200 font-sans selection:bg-cyan-500/30 overflow-hidden">
       
+      {/* Mobile Top Navigation Bar */}
+      <div className="md:hidden flex items-center justify-between p-4 border-b border-gray-800 bg-[#0f0f12] z-50 relative">
+        <h2 className="text-lg font-bold tracking-widest text-white uppercase">
+          Client<span className="text-cyan-400">Scale</span>
+        </h2>
+        <button 
+          onClick={() => setIsMobileOpen(!isMobileOpen)} 
+          className="text-gray-400 hover:text-white transition-colors p-1"
+        >
+          {isMobileOpen ? <X size={24} /> : <Menu size={24} />}
+        </button>
+      </div>
+
       {/* Enterprise Sidebar Navigation */}
-      <aside className="w-72 border-r border-gray-800 bg-[#0f0f12] flex flex-col">
+      <aside className={`
+        ${isMobileOpen ? 'flex' : 'hidden'} 
+        md:flex 
+        absolute md:relative 
+        top-[65px] md:top-0 
+        left-0 
+        w-full md:w-72 
+        h-[calc(100vh-65px)] md:h-screen 
+        border-r border-gray-800 bg-[#0f0f12] 
+        flex-col 
+        z-40
+      `}>
         
-        {/* Branding Header */}
-        <div className="p-6 border-b border-gray-800">
+        {/* Branding Header - Hidden on mobile as it moves to the top bar */}
+        <div className="hidden md:block p-6 border-b border-gray-800">
           <h2 className="text-xl font-bold tracking-widest text-white uppercase">
             Client<span className="text-cyan-400">Scale</span>
           </h2>
@@ -32,10 +61,7 @@ export default function DashboardLayout({
           <SidebarLink icon={<Zap size={18} />} label="Captured & Ghost Leads" />
           <SidebarLink icon={<Cpu size={18} />} label="Autonomous Code Healing" />
           <SidebarLink icon={<Search size={18} />} label="Technical SEO & Marketing" />
-          
-          {/* --- Added AI Module --- */}
           <SidebarLink icon={<Brain size={18} />} label="Orchestrated AI Infrastructure" />
-          
           <SidebarLink icon={<ShieldCheck size={18} />} label="Isolated Tenant Access" />
         </nav>
 
@@ -48,9 +74,8 @@ export default function DashboardLayout({
       </aside>
 
       {/* Main Forensic Data Canvas */}
-      <main className="flex-1 overflow-y-auto bg-[url('/grid-pattern.svg')] bg-repeat bg-center">
-        {/* The specific page content (like the audit report) will be injected here */}
-        <div className="max-w-6xl mx-auto p-8">
+      <main className="flex-1 overflow-y-auto bg-[url('/grid-pattern.svg')] bg-repeat bg-center relative z-0">
+        <div className="max-w-6xl mx-auto p-4 md:p-8">
             {children}
         </div>
       </main>
