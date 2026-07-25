@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { Activity, Zap, Cpu, Search, ShieldCheck } from 'lucide-react'; // Ensure you have lucide-react installed
+import { Activity, Zap, Cpu, Search, ShieldCheck, Brain } from 'lucide-react'; // Added Brain icon
 
 export default function DashboardLayout({
   children,
@@ -32,6 +32,10 @@ export default function DashboardLayout({
           <SidebarLink icon={<Zap size={18} />} label="Captured & Ghost Leads" />
           <SidebarLink icon={<Cpu size={18} />} label="Autonomous Code Healing" />
           <SidebarLink icon={<Search size={18} />} label="Technical SEO & Marketing" />
+          
+          {/* --- Added AI Module --- */}
+          <SidebarLink icon={<Brain size={18} />} label="Orchestrated AI Infrastructure" />
+          
           <SidebarLink icon={<ShieldCheck size={18} />} label="Isolated Tenant Access" />
         </nav>
 
