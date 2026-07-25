@@ -1,33 +1,48 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, useRouter } from 'next/navigation'; // Added useRouter
 import DecryptedLogo from './DecryptedLogo';
 
 export default function AuditContent() {
   const searchParams = useSearchParams();
+  const router = useRouter(); // Initialize router
+  
   const targetUrl = searchParams.get('url') || 'your domain';
   
   const [logs, setLogs] = useState<string[]>(['INITIALIZING_CORE_DIAGNOSTICS...']);
   const [isComplete, setIsComplete] = useState(false);
+  const [auditData, setAuditData] = useState<any>(null); // State to hold the backend JSON
+
   const hasRun = useRef(false);
   const scrollRef = useRef<HTMLDivElement>(null);
 
+  // 1. Fetch the actual audit data in the background
+  useEffect(() => {
+    if (targetUrl === 'your domain') return;
+    
+    fetch(`/api/audit?url=${encodeURIComponent(targetUrl)}`)
+      .then((res) => res.json())
+      .then((data) => setAuditData(data))
+      .catch((err) => console.error("Failed to fetch audit data:", err));
+  }, [targetUrl]);
+
+  // 2. Terminal Animation Logic
   useEffect(() => {
     if (hasRun.current) return;
     hasRun.current = true;
 
-const steps = [
-      { msg: `TARGETING: ${targetUrl}`, delay: 500 },
-      { msg: 'ESTABLISHING SECURE CONNECTION TO CDN...', delay: 1200 },
-      { msg: 'SECURITY_PROTOCOLS: VERIFYING_DMARC_SPF_RECORDS..', delay: 1800},
-      { msg: 'PARSING DOM_STRUCTURE_ANALYSIS...', delay: 2500 },
+    const steps = [
+      { msg: `TARGETING_FACILITY_DOMAIN: ${targetUrl}`, delay: 500 },
+      { msg: 'ESTABLISHING_LOCAL_TRAFFIC_PIPELINE...', delay: 1200 },
+      { msg: 'NURTURE_SEQUENCE: VERIFYING_DMARC_SPF_RECORDS..', delay: 1800},
+      { msg: 'PARSING_FRONTEND_BOOKING_ARCHITECTURE...', delay: 2500 },
       { msg: 'META_GRAPH: EXTRACTING_SOCIAL_PREVIEW_DATA...', delay: 3100 },
-      { msg: 'LATENCY_METRICS: EVALUATING_TBT_INP...', delay: 3800 },
-      { msg: 'FINGERPRINTING: STACK_TECHNOLOGY_IDENTIFIED...', delay: 4600 },
-      { msg: 'CONVERSION_FUNNEL: LEAKAGE_POINTS_DETECTED...', delay: 5400 },
-      { msg: 'COMPILING_FULL_ENGINEER_REPORT...', delay: 6100 },
-      { msg: '>>> DIAGNOSTIC_SEQUENCE_COMPLETE', delay: 6800 }
+      { msg: 'LOCAL_SEO_LATENCY: EVALUATING_TBT_INP...', delay: 3800 },
+      { msg: 'CRM_FINGERPRINTING: STACK_TECHNOLOGY_IDENTIFIED...', delay: 4600 },
+      { msg: 'GHOST_LEAD_ANALYSIS: LEAKAGE_POINTS_DETECTED...', delay: 5400 },
+      { msg: 'COMPILING_FACILITY_SCALING_BLUEPRINT...', delay: 6100 },
+      { msg: '>>> PIPELINE_DIAGNOSTIC_COMPLETE', delay: 6800 }
     ];
 
     steps.forEach((step) => {
@@ -42,17 +57,27 @@ const steps = [
     if (scrollRef.current) scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
   }, [logs]);
 
+  // 3. The Transition Handler
+  const handleViewResults = () => {
+    // If the background fetch finished, save it. Otherwise, pass a fallback.
+    if (auditData) {
+      sessionStorage.setItem('clientScale_auditData', JSON.stringify(auditData));
+    } else {
+      sessionStorage.setItem('clientScale_auditData', JSON.stringify({ targetUrl, status: 'processing_delayed' }));
+    }
+    
+    // Push into the enterprise dashboard shell
+    router.push('/dashboard/report');
+  };
+
   return (
     <main className="min-h-screen bg-[#050505] text-[#00FF41] font-mono p-3 sm:p-12 overflow-hidden flex flex-col">
       <div className="w-full max-w-5xl mx-auto border border-[#1a1a1a] bg-[#0a0a0a] p-4 sm:p-8 shadow-2xl rounded-sm">
         <div className="flex flex-col items-center mb-6 sm:mb-8">
           
-          {/* --- THE FIX IS HERE --- */}
-          {/* This wrapper forces the logo onto one line and scales it down on small screens */}
           <div className="mb-4 w-full flex justify-center text-center whitespace-nowrap transform scale-[0.70] sm:scale-100 origin-center">
             <DecryptedLogo text="ANALYZING TECHNICAL DATA" />
           </div>
-          {/* ----------------------- */}
 
           <div className="w-full flex justify-between items-center border-b border-[#1a1a1a] pb-4">
             <span className="text-[10px] sm:text-sm md:text-base uppercase tracking-[0.1em] sm:tracking-[0.2em] text-[#333]">
@@ -82,7 +107,11 @@ const steps = [
 
         {isComplete && (
           <div className="mt-8 pt-6 border-t border-[#1a1a1a] animate-in zoom-in-95 duration-500">
-            <button className="w-full sm:w-auto bg-[#00FF41] text-black font-bold px-4 sm:px-10 py-3.5 sm:py-4 text-[11px] sm:text-base uppercase tracking-wider sm:tracking-widest hover:bg-white transition-colors">
+            {/* 4. Attach the onClick handler to your button */}
+            <button 
+              onClick={handleViewResults}
+              className="w-full sm:w-auto bg-[#00FF41] text-black font-bold px-4 sm:px-10 py-3.5 sm:py-4 text-[11px] sm:text-base uppercase tracking-wider sm:tracking-widest hover:bg-white transition-colors"
+            >
               Access Full Audit Results
             </button>
           </div>
