@@ -36,7 +36,8 @@ export default function AuditReportPage() {
   const isMapPenalized = rawInp > 200;
   
   // Simulating DMARC/SPF check from payload (defaults to vulnerable if not found)
-  const hasDmarc = auditData?.diagnostics?.security?.dmarc === true; 
+  // const hasDmarc = auditData?.diagnostics?.security?.dmarc === true; 
+  const hasDmarc = auditData?.security?.dmarcConfigured === true;
   const isEmailVulnerable = !hasDmarc;
 
   // 1. Estimated Revenue Leakage
