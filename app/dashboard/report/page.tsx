@@ -31,7 +31,7 @@ export default function AuditReportPage() {
     );
   }
 
-  // --- BUSINESS FRICTION ALGORITHMS (Frontend Calculations) ---
+  // --- BUZINESS FRICTION ALGORITHMS (Frontend Calculations) ---
   const perfScore = auditData?.diagnostics?.performanceScore || 50;
   const rawTbt = parseInt(auditData?.diagnostics?.latency?.tbt?.replace(/[^0-9]/g, '') || '800');
   const thirdPartyCount = auditData?.diagnostics?.thirdPartyScriptCount || 0;
