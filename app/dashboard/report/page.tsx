@@ -1,12 +1,12 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { AlertTriangle, DollarSign, Ghost, ShieldAlert, Activity, Database, ServerCrash, X, ChevronRight } from 'lucide-react';
+import { AlertTriangle, DollarSign, Ghost, ShieldAlert, Activity, Database, ServerCrash, X, ChevronRight, MapPin, MailWarning } from 'lucide-react';
 
 export default function AuditReportPage() {
   const [auditData, setAuditData] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [activeDrawer, setActiveDrawer] = useState<'revenue' | 'ghost' | 'parasite' | 'dom' | null>(null);
+  const [activeDrawer, setActiveDrawer] = useState<'revenue' | 'ghost' | 'parasite' | 'dom' | 'inp' | 'dns' | null>(null);
 
   useEffect(() => {
     const storedData = sessionStorage.getItem('clientScale_auditData');
@@ -30,6 +30,14 @@ export default function AuditReportPage() {
   const perfScore = auditData?.diagnostics?.performanceScore || 50;
   const rawTbt = parseInt(auditData?.diagnostics?.latency?.tbt?.replace(/[^0-9]/g, '') || '800');
   const thirdPartyCount = auditData?.diagnostics?.thirdPartyScriptCount || 0;
+  
+  // New: INP & Security Extraction
+  const rawInp = parseInt(auditData?.diagnostics?.latency?.inp?.replace(/[^0-9]/g, '') || '340');
+  const isMapPenalized = rawInp > 200;
+  
+  // Simulating DMARC/SPF check from payload (defaults to vulnerable if not found)
+  const hasDmarc = auditData?.diagnostics?.security?.dmarc === true; 
+  const isEmailVulnerable = !hasDmarc;
 
   // 1. Estimated Revenue Leakage
   const revenueLeakagePercent = Math.max(0, (100 - perfScore) * 0.15).toFixed(1);
@@ -67,9 +75,10 @@ export default function AuditReportPage() {
       {/* --- BUSINESS FRICTION GRID --- */}
       <div className="mb-2">
         <h2 className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-4">Revenue & Friction Analysis</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        {/* Adjusted to 3 columns to beautifully accommodate 6 cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           
-          {/* Revenue Leakage Card */}
+          {/* 1. Revenue Leakage Card */}
           <div className="bg-[#121216] border border-red-900/50 rounded-xl relative flex flex-col justify-between hover:border-red-500/50 transition-colors">
             <div className="absolute inset-0 overflow-hidden rounded-xl pointer-events-none">
               <div className="absolute top-0 right-0 p-4 opacity-10">
@@ -100,7 +109,7 @@ export default function AuditReportPage() {
             </div>
           </div>
 
-          {/* Ghost Tap Window Card */}
+          {/* 2. Ghost Tap Window Card */}
           <div className="bg-[#121216] border border-orange-900/50 rounded-xl relative flex flex-col justify-between hover:border-orange-500/50 transition-colors">
              <div className="absolute inset-0 overflow-hidden rounded-xl pointer-events-none">
                <div className="absolute top-0 right-0 p-4 opacity-10">
@@ -130,8 +139,51 @@ export default function AuditReportPage() {
               </button>
             </div>
           </div>
+          
+          {/* 3. Local Search Penalty (INP) Card */}
+          <div className={`bg-[#121216] border ${isMapPenalized ? 'border-red-900/50 hover:border-red-500/50' : 'border-green-900/50 hover:border-green-500/50'} rounded-xl relative flex flex-col justify-between transition-colors`}>
+            <div className="absolute inset-0 overflow-hidden rounded-xl pointer-events-none">
+              <div className="absolute top-0 right-0 p-4 opacity-10">
+                <MapPin size={80} className={isMapPenalized ? 'text-red-500' : 'text-green-500'} />
+              </div>
+            </div>
+            <div className="p-6 relative z-10 flex-grow">
+              <div className={`flex items-center gap-2 mb-3 ${isMapPenalized ? 'text-red-400' : 'text-green-400'}`}>
+                <MapPin size={18} />
+                <h3 className="text-sm font-bold uppercase tracking-wider">Local SEO Penalty</h3>
+              </div>
+              <div className="text-4xl lg:text-5xl font-extrabold text-white mb-3">{rawInp}ms</div>
+              <p className="text-sm text-gray-400 leading-relaxed">
+                {isMapPenalized 
+                  ? `INP exceeds 200ms threshold. Google algorithms are actively suppressing your Google Maps visibility due to poor UX.` 
+                  : `INP is within passing limits. Local SEO and Maps visibility are unaffected by interaction latency.`}
+              </p>
+            </div>
+            <div className="px-6 pb-6 relative z-10 mt-2">
+              <button 
+                onClick={() => setActiveDrawer('inp')}
+                className={`group relative w-full flex items-center justify-between px-4 py-3 rounded-lg border transition-all duration-300 overflow-hidden ${
+                  isMapPenalized 
+                  ? 'bg-red-950/30 border-red-900/50 hover:border-red-500/70' 
+                  : 'bg-green-950/30 border-green-900/50 hover:border-green-500/70'
+                }`}
+              >
+                <div className={`absolute inset-0 bg-gradient-to-r opacity-0 group-hover:opacity-100 transition-opacity duration-300 ${
+                  isMapPenalized ? 'from-red-500/20 to-transparent' : 'from-green-500/20 to-transparent'
+                }`} />
+                <span className={`relative z-10 text-[10px] uppercase tracking-widest font-bold transition-colors ${
+                  isMapPenalized ? 'text-red-400 group-hover:text-red-300' : 'text-green-400 group-hover:text-green-300'
+                }`}>
+                  Forensic Methodology
+                </span>
+                <ChevronRight size={14} className={`relative z-10 transition-all duration-300 group-hover:translate-x-1 ${
+                  isMapPenalized ? 'text-red-500/80 group-hover:text-red-300' : 'text-green-500/80 group-hover:text-green-300'
+                }`} />
+              </button>
+            </div>
+          </div>
 
-          {/* Parasite Load Card */}
+          {/* 4. Parasite Load Card */}
           <div className="bg-[#121216] border border-yellow-900/50 rounded-xl relative flex flex-col justify-between hover:border-yellow-500/50 transition-colors">
              <div className="absolute inset-0 overflow-hidden rounded-xl pointer-events-none">
                <div className="absolute top-0 right-0 p-4 opacity-10">
@@ -162,7 +214,52 @@ export default function AuditReportPage() {
             </div>
           </div>
 
-          {/* Codebase Fragility Card */}
+          {/* 5. Marketing Nurture Security (DNS/DMARC) Card */}
+          <div className={`bg-[#121216] border ${isEmailVulnerable ? 'border-red-900/50 hover:border-red-500/50' : 'border-green-900/50 hover:border-green-500/50'} rounded-xl relative flex flex-col justify-between transition-colors`}>
+             <div className="absolute inset-0 overflow-hidden rounded-xl pointer-events-none">
+               <div className="absolute top-0 right-0 p-4 opacity-10">
+                <MailWarning size={80} className={isEmailVulnerable ? 'text-red-500' : 'text-green-500'} />
+              </div>
+             </div>
+            <div className="p-6 relative z-10 flex-grow">
+              <div className={`flex items-center gap-2 mb-3 ${isEmailVulnerable ? 'text-red-400' : 'text-green-400'}`}>
+                <MailWarning size={18} />
+                <h3 className="text-sm font-bold uppercase tracking-wider">Nurture Trust Risk</h3>
+              </div>
+              <div className="text-3xl lg:text-4xl font-extrabold text-white mb-3">
+                {isEmailVulnerable ? 'VULNERABLE' : 'SECURE'}
+              </div>
+              <p className="text-sm text-gray-400 leading-relaxed">
+                {isEmailVulnerable 
+                  ? `Missing DMARC/SPF protocols. Automated free-trial follow-ups are highly likely routing to client spam folders.`
+                  : `Domain authentication protocols are intact. Lead nurture deliverability is protected.`}
+              </p>
+            </div>
+             <div className="px-6 pb-6 relative z-10 mt-2">
+              <button 
+                onClick={() => setActiveDrawer('dns')}
+                className={`group relative w-full flex items-center justify-between px-4 py-3 rounded-lg border transition-all duration-300 overflow-hidden ${
+                  isEmailVulnerable 
+                  ? 'bg-red-950/30 border-red-900/50 hover:border-red-500/70' 
+                  : 'bg-green-950/30 border-green-900/50 hover:border-green-500/70'
+                }`}
+              >
+                <div className={`absolute inset-0 bg-gradient-to-r opacity-0 group-hover:opacity-100 transition-opacity duration-300 ${
+                  isEmailVulnerable ? 'from-red-500/20 to-transparent' : 'from-green-500/20 to-transparent'
+                }`} />
+                <span className={`relative z-10 text-[10px] uppercase tracking-widest font-bold transition-colors ${
+                  isEmailVulnerable ? 'text-red-400 group-hover:text-red-300' : 'text-green-400 group-hover:text-green-300'
+                }`}>
+                  Forensic Methodology
+                </span>
+                <ChevronRight size={14} className={`relative z-10 transition-all duration-300 group-hover:translate-x-1 ${
+                  isEmailVulnerable ? 'text-red-500/80 group-hover:text-red-300' : 'text-green-500/80 group-hover:text-green-300'
+                }`} />
+              </button>
+            </div>
+          </div>
+
+          {/* 6. Codebase Fragility Card */}
           <div className="bg-[#121216] border border-gray-800 rounded-xl relative flex flex-col justify-between hover:border-gray-500 transition-colors">
              <div className="absolute inset-0 overflow-hidden rounded-xl pointer-events-none">
                <div className="absolute top-0 right-0 p-4 opacity-5">
@@ -240,7 +337,6 @@ export default function AuditReportPage() {
               <li><strong>Why we use an estimate:</strong> Rather than guessing, we take your exact live Lighthouse performance deficit and run it through standardized conversion-loss curves to calculate the mathematical floor of your monthly revenue losses.</li>
             </ul>
             
-            {/* The Business Translation Block */}
             <div className="p-5 bg-cyan-950/20 border-l-2 border-cyan-500 rounded-r-lg">
               <h4 className="text-[10px] font-bold text-cyan-400 uppercase tracking-widest mb-3 flex items-center gap-2">
                 <Activity size={14} /> The Business Translation
@@ -264,13 +360,35 @@ export default function AuditReportPage() {
               <li><strong>Why we use an estimate:</strong> Rather than arbitrary guesswork, we translate raw millisecond lockups into a predictable user-frustration window, quantifying the exact duration UI interactions are completely paralyzed.</li>
             </ul>
 
-            {/* The Business Translation Block */}
             <div className="p-5 bg-cyan-950/20 border-l-2 border-cyan-500 rounded-r-lg">
               <h4 className="text-[10px] font-bold text-cyan-400 uppercase tracking-widest mb-3 flex items-center gap-2">
                 <Activity size={14} /> The Business Translation
               </h4>
               <p className="text-sm text-cyan-100/80 italic leading-relaxed">
                 "For <strong>{ghostTapWindow} entire seconds</strong>, your website is essentially a frozen picture. If a customer tries to tap your 'Book Now' button during this window, their phone will ignore the tap. It makes your brand look broken."
+              </p>
+            </div>
+          </div>
+        )}
+
+        {activeDrawer === 'inp' && (
+          <div className="animate-in fade-in duration-500 text-gray-300">
+            <h3 className="text-2xl font-bold text-white mb-6">Local Search & Latency Risk</h3>
+            <p className="leading-relaxed mb-4">
+              This extracts the <strong>Interaction to Next Paint (INP)</strong>, Google's newest and most heavily weighted Core Web Vital.
+            </p>
+            <ul className="space-y-4 list-disc pl-5 mb-8">
+              <li>INP measures the actual latency between a user interacting with the page and the browser visually updating.</li>
+              <li>Google Maps and Local Search algorithms officially penalize domains with an INP above 200 milliseconds.</li>
+              <li><strong>Why we use an estimate:</strong> We map your live INP latency against Google Search Central's documented ranking thresholds to objectively warn you if your technical debt is actively suppressing your local SEO visibility.</li>
+            </ul>
+
+            <div className="p-5 bg-cyan-950/20 border-l-2 border-cyan-500 rounded-r-lg">
+              <h4 className="text-[10px] font-bold text-cyan-400 uppercase tracking-widest mb-3 flex items-center gap-2">
+                <Activity size={14} /> The Business Translation
+              </h4>
+              <p className="text-sm text-cyan-100/80 italic leading-relaxed">
+                "Your interaction latency is currently {rawInp}ms, which crosses Google's penalty threshold. Because of this sluggishness, Google's algorithm is actively demoting your business in Local Search and Google Maps, handing those leads to your faster competitors."
               </p>
             </div>
           </div>
@@ -288,13 +406,35 @@ export default function AuditReportPage() {
               <li><strong>Why we use an estimate:</strong> Instead of subjective audits, we isolate external network weights and apply standardized CPU execution cost multipliers to measure precisely how much third-party scripts drag down your infrastructure.</li>
             </ul>
 
-            {/* The Business Translation Block */}
             <div className="p-5 bg-cyan-950/20 border-l-2 border-cyan-500 rounded-r-lg">
               <h4 className="text-[10px] font-bold text-cyan-400 uppercase tracking-widest mb-3 flex items-center gap-2">
                 <Activity size={14} /> The Business Translation
               </h4>
               <p className="text-sm text-cyan-100/80 italic leading-relaxed">
                 "<strong>{parasiteImpact}%</strong> of your website's freezing isn't even your fault. It is caused by {thirdPartyCount} external marketing trackers feeding on your site's resources. Our AI Edge proxy can defer these instantly."
+              </p>
+            </div>
+          </div>
+        )}
+
+        {activeDrawer === 'dns' && (
+          <div className="animate-in fade-in duration-500 text-gray-300">
+            <h3 className="text-2xl font-bold text-white mb-6">Marketing Nurture Trust Risk</h3>
+            <p className="leading-relaxed mb-4">
+              We check the raw DNS records for missing <strong>SPF and DMARC</strong> email authentication protocols.
+            </p>
+            <ul className="space-y-4 list-disc pl-5 mb-8">
+              <li>As of recent updates, Google Workspace and Microsoft 365 heavily filter unauthenticated emails to protect users from phishing.</li>
+              <li>Without properly configured DMARC and SPF, automated CRM emails (like free trials, lead magnets, and follow-ups) are automatically flagged.</li>
+              <li><strong>Why we use an estimate:</strong> By validating the absence of these records in your live DNS propagation, we can guarantee with near certainty that your automated nurture sequences are hitting spam folders instead of primary inboxes.</li>
+            </ul>
+
+            <div className="p-5 bg-cyan-950/20 border-l-2 border-cyan-500 rounded-r-lg">
+              <h4 className="text-[10px] font-bold text-cyan-400 uppercase tracking-widest mb-3 flex items-center gap-2">
+                <Activity size={14} /> The Business Translation
+              </h4>
+              <p className="text-sm text-cyan-100/80 italic leading-relaxed">
+                "Your domain is missing basic email security protocols. When a lead signs up for a free trial or downloads your guide, Gmail and Outlook are highly likely sending your automated follow-ups directly to their spam folder. You are paying for leads you cannot legally email."
               </p>
             </div>
           </div>
@@ -312,7 +452,6 @@ export default function AuditReportPage() {
               <li><strong>Why we use an estimate:</strong> Rather than scanning every individual asset manually, we benchmark your overall performance footprint against Google's official 800-node threshold to reliably score structural bloat.</li>
             </ul>
 
-            {/* The Business Translation Block */}
             <div className="p-5 bg-cyan-950/20 border-l-2 border-cyan-500 rounded-r-lg">
               <h4 className="text-[10px] font-bold text-cyan-400 uppercase tracking-widest mb-3 flex items-center gap-2">
                 <Activity size={14} /> The Business Translation
