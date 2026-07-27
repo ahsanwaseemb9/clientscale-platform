@@ -1,7 +1,12 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { AlertTriangle, DollarSign, Ghost, ShieldAlert, Activity, Database, ServerCrash, X, ChevronRight, MapPin, MailWarning } from 'lucide-react';
+import { 
+  AlertTriangle, DollarSign, Ghost, ShieldAlert, Activity, 
+  Database, ServerCrash, X, ChevronRight, MapPin, MailWarning,
+  ListOrdered, Layers, Globe, Image as ImageIcon, Accessibility, 
+  CheckCircle, AlertCircle, Cpu
+} from 'lucide-react';
 
 export default function AuditReportPage() {
   const [auditData, setAuditData] = useState<any>(null);
@@ -30,31 +35,27 @@ export default function AuditReportPage() {
   const perfScore = auditData?.diagnostics?.performanceScore || 50;
   const rawTbt = parseInt(auditData?.diagnostics?.latency?.tbt?.replace(/[^0-9]/g, '') || '800');
   const thirdPartyCount = auditData?.diagnostics?.thirdPartyScriptCount || 0;
-  
-  // New: INP & Security Extraction
   const rawInp = parseInt(auditData?.diagnostics?.latency?.inp?.replace(/[^0-9]/g, '') || '340');
+  
+  // Security & Thresholds
   const isMapPenalized = rawInp > 200;
-  
-  // Simulating DMARC/SPF check from payload (defaults to vulnerable if not found)
-  // const hasDmarc = auditData?.diagnostics?.security?.dmarc === true; 
-  const hasDmarc = auditData?.security?.dmarcConfigured === true;
+  const hasDmarc = auditData?.security?.dmarcConfigured === true; 
   const isEmailVulnerable = !hasDmarc;
-
-  // 1. Estimated Revenue Leakage
   const revenueLeakagePercent = Math.max(0, (100 - perfScore) * 0.15).toFixed(1);
-  
-  // 2. The "Ghost Tap" Window 
   const ghostTapWindow = (rawTbt / 1000).toFixed(1); 
-  
-  // 3. Parasite Weight 
   const parasiteImpact = Math.min(95, (thirdPartyCount * 12)).toFixed(0);
-
-  // 4. Codebase Fragility
   const domSize = perfScore < 50 ? '3,450+' : '1,200';
   const isFragile = perfScore < 50;
 
+  // --- NEW: EXTRACTIONS FOR BOTTOM SECTIONS ---
+  const infrastructure = auditData?.infrastructure || [];
+  const funnel = auditData?.conversionFunnel || {};
+  const leakagePoints = funnel.primaryLeakagePoints || [];
+  const meta = auditData?.metaAndSocial || {};
+  const a11y = auditData?.accessibility || {};
+
   return (
-    <div className="space-y-6 relative overflow-x-hidden min-h-screen">
+    <div className="space-y-6 relative overflow-x-hidden min-h-screen pb-12">
       
       {/* Page Header */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 md:gap-0 border-b border-gray-800 pb-6 overflow-hidden">
@@ -73,10 +74,9 @@ export default function AuditReportPage() {
         </button>
       </div>
 
-      {/* --- BUSINESS FRICTION GRID --- */}
-      <div className="mb-2">
+      {/* --- BUSINESS FRICTION GRID (Top 6 Cards) --- */}
+      <div className="mb-8">
         <h2 className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-4">Revenue & Friction Analysis</h2>
-        {/* Adjusted to 3 columns to beautifully accommodate 6 cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           
           {/* 1. Revenue Leakage Card */}
@@ -294,8 +294,124 @@ export default function AuditReportPage() {
         </div>
       </div>
 
+      {/* --- NEW MODULE: PRIMARY LEAKAGE POINTS --- */}
+      {leakagePoints.length > 0 && (
+        <div className="mb-8 bg-[#121216] border border-gray-800 rounded-xl p-6">
+          <div className="flex items-center justify-between mb-6 border-b border-gray-800/50 pb-4">
+            <div className="flex items-center gap-3">
+              <ListOrdered className="text-cyan-500" size={20} />
+              <h2 className="text-sm font-bold text-gray-300 uppercase tracking-widest">Primary Leakage Checklist</h2>
+            </div>
+            <div className="flex items-center gap-3">
+              <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Risk Tier</span>
+              <span className={`px-3 py-1 text-xs font-bold rounded-full uppercase tracking-wider ${
+                funnel.severityTier === 'HIGH' ? 'bg-red-500/10 text-red-400 border border-red-500/20' : 
+                funnel.severityTier === 'MODERATE' ? 'bg-orange-500/10 text-orange-400 border border-orange-500/20' : 
+                'bg-yellow-500/10 text-yellow-400 border border-yellow-500/20'
+              }`}>
+                {funnel.severityTier || 'ANALYZING'}
+              </span>
+            </div>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {leakagePoints.map((point: string, idx: number) => (
+              <div key={idx} className="flex items-start gap-3 p-4 bg-[#0a0a0c] border border-gray-800/50 rounded-lg">
+                <AlertCircle className="text-red-500 shrink-0 mt-0.5" size={16} />
+                <p className="text-sm text-gray-300 font-medium leading-relaxed">{point}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* --- NEW MODULE: BRAND COMPLIANCE & TECH STACK --- */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+        
+        {/* Brand Impression & Accessibility */}
+        <div className="bg-[#121216] border border-gray-800 rounded-xl p-6 flex flex-col justify-between">
+          <div>
+            <div className="flex items-center gap-3 mb-6">
+              <Globe className="text-indigo-400" size={20} />
+              <h2 className="text-sm font-bold text-gray-300 uppercase tracking-widest">Brand & Compliance Index</h2>
+            </div>
+            
+            <div className="space-y-5">
+              {/* Meta Data */}
+              <div>
+                <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-2 block">Social Link Preview (OpenGraph)</span>
+                <div className="p-4 bg-[#0a0a0c] border border-gray-800/50 rounded-lg space-y-2">
+                  <div className="flex justify-between items-start">
+                    <p className="text-sm text-gray-200 font-medium line-clamp-1">{meta.title || 'No Title Found'}</p>
+                    {meta.isValid ? (
+                       <CheckCircle size={14} className="text-green-500 shrink-0" />
+                    ) : (
+                       <AlertCircle size={14} className="text-red-500 shrink-0" />
+                    )}
+                  </div>
+                  <p className="text-xs text-gray-500 line-clamp-2">{meta.description || 'Missing description data.'}</p>
+                  <div className="flex items-center gap-2 pt-2 text-xs">
+                    <ImageIcon size={12} className={meta.image === null ? 'text-red-400' : 'text-green-400'} />
+                    <span className={meta.image === null ? 'text-red-400' : 'text-green-400'}>
+                      {meta.image === null ? 'Missing OpenGraph Image (Links appear broken on social)' : 'Valid OpenGraph Image detected'}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Accessibility */}
+              <div>
+                 <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-2 block">Accessibility Compliance</span>
+                 <div className="flex items-center justify-between p-4 bg-[#0a0a0c] border border-gray-800/50 rounded-lg">
+                    <div className="flex items-center gap-3">
+                      <Accessibility size={16} className="text-blue-400" />
+                      <div className="flex flex-col">
+                        <span className="text-sm text-gray-200">Alt-Text Validation</span>
+                        <span className="text-xs text-gray-500">{a11y.totalImages || 0} Images Scanned</span>
+                      </div>
+                    </div>
+                    <div className="text-right flex flex-col items-end">
+                      <span className={`text-sm font-bold ${a11y.missingAlt > 0 ? 'text-yellow-400' : 'text-green-400'}`}>
+                        {a11y.missingAlt || 0} Missing
+                      </span>
+                      <span className="text-[10px] font-bold text-gray-500">Score: {a11y.a11yComplianceScore || 100}</span>
+                    </div>
+                 </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Tech Stack Fingerprint */}
+        <div className="bg-[#121216] border border-gray-800 rounded-xl p-6">
+          <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center gap-3">
+              <Layers className="text-purple-400" size={20} />
+              <h2 className="text-sm font-bold text-gray-300 uppercase tracking-widest">Tech Stack Fingerprint</h2>
+            </div>
+            <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">{infrastructure.length} Technologies Detected</span>
+          </div>
+          
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
+            {infrastructure.length > 0 ? infrastructure.map((tech: any, idx: number) => (
+              <div key={idx} className="flex items-start gap-3 p-3 bg-[#0a0a0c] border border-gray-800/50 rounded-lg hover:border-purple-500/30 transition-colors">
+                <Cpu className="text-gray-500 mt-0.5 shrink-0" size={14} />
+                <div className="min-w-0 flex-1">
+                  <p className="text-sm text-gray-200 font-bold truncate">{tech.name}</p>
+                  <p className="text-[10px] text-gray-500 truncate mt-0.5 uppercase tracking-widest">{tech.categories?.[0] || 'Infrastructure'}</p>
+                </div>
+              </div>
+            )) : (
+              <div className="col-span-2 text-center py-8 text-gray-500 text-sm">
+                No infrastructure footprint detected.
+              </div>
+            )}
+          </div>
+        </div>
+
+      </div>
+
       {/* --- STANDARD TECHNICAL DATA --- */}
-      <div className="pt-4">
+      <div className="pt-4 border-t border-gray-800/50">
          <h2 className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-4">Raw Diagnostic Output</h2>
          
          <div className="bg-[#0f0f12] border border-gray-800 rounded-lg p-4 overflow-hidden shadow-inner">
