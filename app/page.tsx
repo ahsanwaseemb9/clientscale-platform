@@ -40,13 +40,14 @@ export default function Home() {
         <div className="max-w-3xl mx-auto flex flex-col items-center">
           
           {/* --- REIMAGINED NAVIGATION DOCK --- */}
-          <div className="flex items-center p-1.5 mb-8 sm:mb-12 bg-[#07070f]/90 border border-zinc-800/90 rounded-full backdrop-blur-xl shadow-[0_0_30px_rgba(0,0,0,0.8)] z-50 transition-all duration-300 hover:border-zinc-700/80">
+          {/* Increased gap using mb-12 sm:mb-16 */}
+          <div className="flex items-center p-1.5 mb-12 sm:mb-16 bg-[#07070f]/90 border border-zinc-800/90 rounded-full backdrop-blur-xl shadow-[0_0_30px_rgba(0,0,0,0.8)] z-50 transition-all duration-300 hover:border-zinc-700/80">
             <button 
               onClick={() => setActiveSection(activeSection === 'features' ? 'none' : 'features')} 
               className={`px-5 sm:px-7 py-2 sm:py-2.5 rounded-full transition-all duration-300 text-[10px] sm:text-xs font-mono font-semibold tracking-[0.15em] uppercase outline-none
                 ${activeSection === 'features' 
                   ? 'bg-cyan-500/10 border border-cyan-500/40 text-cyan-400 shadow-[inset_0_0_15px_rgba(6,182,212,0.15)]' 
-                  : 'bg-transparent border border-transparent text-zinc-300 hover:text-white hover:bg-zinc-800/40'}`}
+                  : 'bg-zinc-800/40 border border-zinc-700/50 text-zinc-100 hover:text-white hover:bg-zinc-700/60'}`}
             >
               {activeSection === 'features' ? '✕ Close' : 'What We Do'}
             </button>
@@ -59,7 +60,7 @@ export default function Home() {
               className={`px-5 sm:px-7 py-2 sm:py-2.5 rounded-full transition-all duration-300 text-[10px] sm:text-xs font-mono font-semibold tracking-[0.15em] uppercase outline-none
                 ${activeSection === 'pricing' 
                   ? 'bg-cyan-500/10 border border-cyan-500/40 text-cyan-400 shadow-[inset_0_0_15px_rgba(6,182,212,0.15)]' 
-                  : 'bg-transparent border border-transparent text-zinc-300 hover:text-white hover:bg-zinc-800/40'}`}
+                  : 'bg-zinc-800/40 border border-zinc-700/50 text-zinc-100 hover:text-white hover:bg-zinc-700/60'}`}
             >
               {activeSection === 'pricing' ? '✕ Close' : 'Pricing'}
             </button>
@@ -70,7 +71,6 @@ export default function Home() {
             <DecryptedLogo text="Client Scale Systems" />
           </div>
 
-          {/* UPDATED TEXT SIZING FOR MOBILE: Changed text-xs to text-sm */}
           <div className="text-zinc-300 text-sm md:text-base tracking-wider max-w-[90vw] sm:max-w-2xl mx-auto pt-0 leading-relaxed px-4 antialiased font-light uppercase">
             <span className="font-mono block sm:inline whitespace-normal sm:whitespace-nowrap">
               The ultimate <span className="text-cyan-400 font-semibold drop-shadow-[0_0_15px_rgba(6,182,212,0.4)] normal-case">Client Growth Platform</span> & <span className="text-blue-400 font-semibold drop-shadow-[0_0_15px_rgba(59,130,246,0.4)] normal-case">Automated Maintenance Engine</span>
