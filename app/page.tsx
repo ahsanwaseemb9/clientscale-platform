@@ -7,19 +7,9 @@ import DecryptedLogo from './components/DecryptedLogo';
 export default function Home() {
   // Navigation states: 'none' | 'features' | 'pricing'
   const [activeSection, setActiveSection] = useState<'none' | 'features' | 'pricing'>('none');
-  // Custom cursor state
-  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
 
   // Create a reference to the content area for scrolling
   const contentRef = useRef<HTMLDivElement>(null);
-
-  // useEffect(() => {
-  //   const updateMousePosition = (e: MouseEvent) => {
-  //     setMousePosition({ x: e.clientX, y: e.clientY });
-  //   };
-  //   window.addEventListener('mousemove', updateMousePosition);
-  //   return () => window.removeEventListener('mousemove', updateMousePosition);
-  // }, []);
 
   // Auto-scroll effect when a section is opened
   useEffect(() => {
@@ -36,13 +26,6 @@ export default function Home() {
 
   return (
     <main className="flex min-h-screen flex-col items-center bg-[#020205] text-white antialiased selection:bg-cyan-500/30 selection:text-cyan-200 overflow-x-hidden pb-24 relative">
-      {/* Custom Animated Cursor */}
-      <div
-        className="fixed top-0 left-0 w-8 h-8 rounded-full border border-cyan-500/50 pointer-events-none z-50 mix-blend-screen transition-transform duration-75 ease-out"
-        style={{
-          transform: `translate(${mousePosition.x - 16}px, ${mousePosition.y - 16}px)`
-        }}
-      />
 
       {/* --- SPACE AGENCY TELEMETRY LAYERS --- */}
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_-20%,rgba(16,24,48,0.85),rgba(2,2,5,1)_65%)] pointer-events-none z-0" />
@@ -55,30 +38,20 @@ export default function Home() {
       {/* Hero Section Container */}
       <div className="w-full max-w-5xl px-4 pt-10 sm:pt-28 pb-0 text-center z-10 space-y-8 sm:space-y-10 animate-fade-in">
         <div className="max-w-3xl mx-auto flex flex-col items-center">
+          
           {/* Animated Logo Replaces the Static h2 */}
-          <div className="mt-6 mb-12 sm:mt-8 sm:mb-16">
+          <div className="mt-6 mb-8 sm:mt-8 sm:mb-10">
             <DecryptedLogo text="Client Scale Systems" />
           </div>
 
-          {/* <div className="flex mt-4 items-center">
-            <h1 className="text-xl sm:text-3xl font-semibold tracking-tight text-white leading-[1.3] sm:leading-[1.25]">
-              We turn fitness websites into <span className="font-bold text-white border-b-2 border-cyan-400 pb-0.5 whitespace-nowrap">client acquisition machines.</span>
-            </h1>
-          </div> */}
-          <div className="text-zinc-300 text-xs sm:text-sm md:text-base tracking-wider max-w-[90vw] sm:max-w-2xl mx-auto pt-8 leading-relaxed px-4 antialiased font-light uppercase">
+          <div className="text-zinc-300 text-xs sm:text-sm md:text-base tracking-wider max-w-[90vw] sm:max-w-2xl mx-auto pt-0 leading-relaxed px-4 antialiased font-light uppercase">
             <span className="font-mono block sm:inline whitespace-normal sm:whitespace-nowrap">
               The ultimate <span className="text-cyan-400 font-semibold drop-shadow-[0_0_15px_rgba(6,182,212,0.4)] normal-case">Client Growth Platform</span> & <span className="text-blue-400 font-semibold drop-shadow-[0_0_15px_rgba(59,130,246,0.4)] normal-case">Automated Maintenance Engine</span>
             </span>
-
-            {/* <div className="mt-4 font-mono">
-              Designed exclusively for high-end fitness clubs,
-              <br className="hidden sm:block" />
-              gyms and wellness collectives.
-            </div> */}
           </div>
         </div>
 
-        {/* --- FIXED FORM SECTION (noValidate REMOVED) --- */}
+        {/* --- FIXED FORM SECTION --- */}
         <form action={handleAuditSubmit} className="mt-8 sm:mt-12 flex flex-col items-center space-y-5 sm:space-y-6 max-w-2xl mx-auto w-full group px-2 relative">
           <div className="relative flex items-center w-full bg-[#07070f]/90 border border-zinc-800/90 group-focus-within:border-cyan-400 rounded-xl sm:rounded-2xl p-2 sm:p-2.5 transition-all duration-300 backdrop-blur-2xl ring-1 ring-zinc-900/50 group-focus-within:ring-2 group-focus-within:ring-cyan-500/20 shadow-[0_0_15px_rgba(6,182,212,0.12)] hover:shadow-[0_0_25px_rgba(6,182,212,0.22)] group-focus-within:shadow-[0_0_30px_rgba(6,182,212,0.35),_inset_0_0_12px_rgba(6,182,212,0.15)] transform hover:-translate-y-1 hover:scale-[1.012] group-focus-within:-translate-y-1 group-focus-within:scale-[1.012] hover:bg-[#090916]">
             <div className="pl-3 pr-1 sm:pl-4 sm:pr-2 text-zinc-500 group-focus-within:text-cyan-400 transition-colors">
@@ -87,7 +60,6 @@ export default function Home() {
               </svg>
             </div>
             
-            {/* --- UPDATED INPUT FIELD WITH VALIDATION --- */}
             <input 
               type="text" 
               name="url" 
@@ -95,7 +67,7 @@ export default function Home() {
               pattern="^(https?:\/\/)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{2,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)$"
               title="Please enter a valid website (e.g., google.com, www.google.com, https://google.com)"
               autoComplete="off"
-              placeholder="Enter your gym website URL..." 
+              placeholder="Target URL (e.g., https://yourfacility.com)" 
               className="w-full bg-transparent py-3 sm:py-3.5 px-2 text-zinc-100 placeholder-zinc-600 focus:outline-none text-sm font-normal tracking-wide" 
             />
             
@@ -105,7 +77,7 @@ export default function Home() {
             </div>
           </div>
           <button type="submit" className="w-full sm:w-auto bg-gradient-to-b from-zinc-900 to-zinc-950 border border-zinc-800 hover:border-cyan-500/50 active:border-cyan-500/50 text-zinc-300 hover:text-cyan-400 active:text-cyan-400 font-semibold px-4 sm:px-8 py-3.5 sm:py-4 rounded-xl transition-all duration-300 shadow-xl text-[11px] xs:text-xs sm:text-sm tracking-widest uppercase active:scale-[0.98] whitespace-nowrap">
-            Audit Conversion Leakage & System Latency
+            Initialize Diagnostic Scan
           </button>
         </form>
       </div>
