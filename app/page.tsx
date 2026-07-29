@@ -36,15 +36,42 @@ export default function Home() {
       <div className="absolute inset-0 bg-[radial-gradient(1.5px_1.5px_at_45px_210px,#fff,transparent_100%),radial-gradient(1px_1px_at_180px_80px,rgba(255,255,255,0.8),transparent_100%),radial-gradient(1px_1px_at_290px_190px,#fff,transparent_100%)] bg-[size:400px_400px] opacity-25 pointer-events-none z-0 animate-pulse [animation-duration:12s]" />
 
       {/* Hero Section Container */}
-      <div className="w-full max-w-5xl px-4 pt-10 sm:pt-28 pb-0 text-center z-10 space-y-8 sm:space-y-10 animate-fade-in">
+      <div className="w-full max-w-5xl px-4 pt-16 sm:pt-24 pb-0 text-center z-10 space-y-8 sm:space-y-10 animate-fade-in">
         <div className="max-w-3xl mx-auto flex flex-col items-center">
           
-          {/* Animated Logo Replaces the Static h2 */}
-          <div className="mt-6 mb-8 sm:mt-8 sm:mb-10">
+          {/* --- REIMAGINED NAVIGATION DOCK --- */}
+          <div className="flex items-center p-1.5 mb-8 sm:mb-12 bg-[#07070f]/90 border border-zinc-800/90 rounded-full backdrop-blur-xl shadow-[0_0_30px_rgba(0,0,0,0.8)] z-50 transition-all duration-300 hover:border-zinc-700/80">
+            <button 
+              onClick={() => setActiveSection(activeSection === 'features' ? 'none' : 'features')} 
+              className={`px-5 sm:px-7 py-2 sm:py-2.5 rounded-full transition-all duration-300 text-[10px] sm:text-xs font-mono font-semibold tracking-[0.15em] uppercase outline-none
+                ${activeSection === 'features' 
+                  ? 'bg-cyan-500/10 border border-cyan-500/40 text-cyan-400 shadow-[inset_0_0_15px_rgba(6,182,212,0.15)]' 
+                  : 'bg-transparent border border-transparent text-zinc-300 hover:text-white hover:bg-zinc-800/40'}`}
+            >
+              {activeSection === 'features' ? '✕ Close' : 'What We Do'}
+            </button>
+            
+            {/* Tiny separator dot */}
+            <div className="w-1 h-1 rounded-full bg-zinc-700 mx-1"></div>
+
+            <button 
+              onClick={() => setActiveSection(activeSection === 'pricing' ? 'none' : 'pricing')} 
+              className={`px-5 sm:px-7 py-2 sm:py-2.5 rounded-full transition-all duration-300 text-[10px] sm:text-xs font-mono font-semibold tracking-[0.15em] uppercase outline-none
+                ${activeSection === 'pricing' 
+                  ? 'bg-cyan-500/10 border border-cyan-500/40 text-cyan-400 shadow-[inset_0_0_15px_rgba(6,182,212,0.15)]' 
+                  : 'bg-transparent border border-transparent text-zinc-300 hover:text-white hover:bg-zinc-800/40'}`}
+            >
+              {activeSection === 'pricing' ? '✕ Close' : 'Pricing'}
+            </button>
+          </div>
+
+          {/* Animated Logo */}
+          <div className="mt-0 mb-8 sm:mb-10">
             <DecryptedLogo text="Client Scale Systems" />
           </div>
 
-          <div className="text-zinc-300 text-xs sm:text-sm md:text-base tracking-wider max-w-[90vw] sm:max-w-2xl mx-auto pt-0 leading-relaxed px-4 antialiased font-light uppercase">
+          {/* UPDATED TEXT SIZING FOR MOBILE: Changed text-xs to text-sm */}
+          <div className="text-zinc-300 text-sm md:text-base tracking-wider max-w-[90vw] sm:max-w-2xl mx-auto pt-0 leading-relaxed px-4 antialiased font-light uppercase">
             <span className="font-mono block sm:inline whitespace-normal sm:whitespace-nowrap">
               The ultimate <span className="text-cyan-400 font-semibold drop-shadow-[0_0_15px_rgba(6,182,212,0.4)] normal-case">Client Growth Platform</span> & <span className="text-blue-400 font-semibold drop-shadow-[0_0_15px_rgba(59,130,246,0.4)] normal-case">Automated Maintenance Engine</span>
             </span>
@@ -85,15 +112,6 @@ export default function Home() {
       {/* --- REMAINDER OF PAGE --- */}
       <div className="w-full max-w-5xl h-[1px] bg-gradient-to-r from-transparent via-zinc-800 to-transparent relative my-10">
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-80 h-[1px] bg-gradient-to-r from-transparent via-cyan-400 to-transparent shadow-[0_0_12px_rgba(34,211,238,0.6)]" />
-      </div>
-
-      <div className="flex flex-row items-center justify-center gap-3 sm:gap-6 z-20 pb-16 w-full max-w-xl px-4">
-        <button onClick={() => setActiveSection(activeSection === 'features' ? 'none' : 'features')} className={`w-1/2 px-3 sm:px-8 py-4 rounded-xl border text-xs sm:text-sm font-bold tracking-wider uppercase transition-all duration-300 transform active:scale-95 whitespace-nowrap shadow-[0_0_15px_rgba(6,182,212,0.2)] hover:shadow-[0_0_25px_rgba(6,182,212,0.4)] ${activeSection === 'features' ? 'bg-cyan-950/40 border-cyan-400 text-white shadow-[0_0_30px_rgba(6,182,212,0.4)] ring-2 ring-cyan-500 scale-[1.02]' : 'bg-zinc-900/80 border-zinc-700 text-zinc-200 hover:text-white hover:border-cyan-500/70 hover:bg-zinc-800'}`}>
-          {activeSection === 'features' ? '✕ Hide' : '🧭 What We Do'}
-        </button>
-        <button onClick={() => setActiveSection(activeSection === 'pricing' ? 'none' : 'pricing')} className={`w-1/2 px-3 sm:px-8 py-4 rounded-xl border text-xs sm:text-sm font-bold tracking-wider uppercase transition-all duration-300 transform active:scale-95 whitespace-nowrap shadow-[0_0_15px_rgba(6,182,212,0.2)] hover:shadow-[0_0_25px_rgba(6,182,212,0.4)] ${activeSection === 'pricing' ? 'bg-cyan-950/40 border-cyan-400 text-white shadow-[0_0_30px_rgba(6,182,212,0.4)] ring-2 ring-cyan-500 scale-[1.02]' : 'bg-zinc-900/80 border-zinc-700 text-zinc-200 hover:text-white hover:border-cyan-500/70 hover:bg-zinc-800'}`}>
-          {activeSection === 'pricing' ? '✕ Hide' : '💳 Pricing'}
-        </button>
       </div>
 
       <div ref={contentRef} className="w-full flex justify-center scroll-mt-24">
