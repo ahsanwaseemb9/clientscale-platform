@@ -76,7 +76,7 @@ export default function Home() {
               READY
             </div>
           </div>
-          <button type="submit" className="w-full sm:w-auto bg-gradient-to-b from-zinc-900 to-zinc-950 border border-zinc-800 hover:border-cyan-500/50 active:border-cyan-500/50 text-zinc-300 hover:text-cyan-400 active:text-cyan-400 font-semibold px-4 sm:px-8 py-3.5 sm:py-4 rounded-xl transition-all duration-300 shadow-xl text-[11px] xs:text-xs sm:text-sm tracking-widest uppercase active:scale-[0.98] whitespace-nowrap">
+          <button type="submit" className="w-auto bg-gradient-to-b from-zinc-900 to-zinc-950 border border-zinc-800 hover:border-cyan-500/50 active:border-cyan-500/50 text-zinc-300 hover:text-cyan-400 active:text-cyan-400 font-semibold px-6 sm:px-8 py-3.5 sm:py-4 rounded-xl transition-all duration-300 shadow-xl text-[11px] xs:text-xs sm:text-sm tracking-widest uppercase active:scale-[0.98] whitespace-nowrap">
             Initialize Diagnostic Scan
           </button>
         </form>
