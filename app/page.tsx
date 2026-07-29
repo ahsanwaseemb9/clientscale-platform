@@ -13,13 +13,13 @@ export default function Home() {
   // Create a reference to the content area for scrolling
   const contentRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    const updateMousePosition = (e: MouseEvent) => {
-      setMousePosition({ x: e.clientX, y: e.clientY });
-    };
-    window.addEventListener('mousemove', updateMousePosition);
-    return () => window.removeEventListener('mousemove', updateMousePosition);
-  }, []);
+  // useEffect(() => {
+  //   const updateMousePosition = (e: MouseEvent) => {
+  //     setMousePosition({ x: e.clientX, y: e.clientY });
+  //   };
+  //   window.addEventListener('mousemove', updateMousePosition);
+  //   return () => window.removeEventListener('mousemove', updateMousePosition);
+  // }, []);
 
   // Auto-scroll effect when a section is opened
   useEffect(() => {
@@ -60,21 +60,21 @@ export default function Home() {
             <DecryptedLogo text="Client Scale Systems" />
           </div>
 
-          <div className="flex mt-4 items-center">
+          {/* <div className="flex mt-4 items-center">
             <h1 className="text-xl sm:text-3xl font-semibold tracking-tight text-white leading-[1.3] sm:leading-[1.25]">
               We turn fitness websites into <span className="font-bold text-white border-b-2 border-cyan-400 pb-0.5 whitespace-nowrap">client acquisition machines.</span>
             </h1>
-          </div>
+          </div> */}
           <div className="text-zinc-300 text-xs sm:text-sm md:text-base tracking-wider max-w-[90vw] sm:max-w-2xl mx-auto pt-8 leading-relaxed px-4 antialiased font-light uppercase">
             <span className="font-mono block sm:inline whitespace-normal sm:whitespace-nowrap">
               The ultimate <span className="text-cyan-400 font-semibold drop-shadow-[0_0_15px_rgba(6,182,212,0.4)] normal-case">Client Growth Platform</span> & <span className="text-blue-400 font-semibold drop-shadow-[0_0_15px_rgba(59,130,246,0.4)] normal-case">Automated Maintenance Engine</span>
             </span>
 
-            <div className="mt-4 font-mono">
+            {/* <div className="mt-4 font-mono">
               Designed exclusively for high-end fitness clubs,
               <br className="hidden sm:block" />
               gyms and wellness collectives.
-            </div>
+            </div> */}
           </div>
         </div>
 
