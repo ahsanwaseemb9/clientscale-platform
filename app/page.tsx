@@ -39,27 +39,27 @@ export default function Home() {
       <div className="w-full max-w-5xl px-4 pt-16 sm:pt-24 pb-0 text-center z-10 space-y-8 sm:space-y-10 animate-fade-in">
         <div className="max-w-3xl mx-auto flex flex-col items-center">
           
-          {/* --- REIMAGINED NAVIGATION DOCK (FROSTED LENS) --- */}
-          <div className="flex items-center mb-12 sm:mb-16 z-50">
+          {/* --- UNIFIED NAVIGATION DOCK (MASTER PILL) --- */}
+          <div className="flex items-center p-1 mb-12 sm:mb-16 bg-[#07070f]/90 border border-zinc-800/90 rounded-full backdrop-blur-xl shadow-[0_0_20px_rgba(6,182,212,0.15)] z-50 transition-all duration-300 hover:border-cyan-500/30 hover:shadow-[0_0_30px_rgba(6,182,212,0.25)]">
             <button 
               onClick={() => setActiveSection(activeSection === 'features' ? 'none' : 'features')} 
               className={`px-5 sm:px-7 py-2 sm:py-2.5 rounded-full transition-all duration-500 ease-out border text-[10px] sm:text-xs font-mono font-bold tracking-[0.15em] uppercase outline-none
                 ${activeSection === 'features' 
-                  ? 'bg-cyan-400/20 border-cyan-300 text-white shadow-[0_0_40px_rgba(34,211,238,0.6),0_0_80px_rgba(34,211,238,0.3),inset_0_0_20px_rgba(34,211,238,0.5)]' 
-                  : 'bg-black/30 backdrop-blur-md border-white/10 text-zinc-300 shadow-[0_0_25px_rgba(255,255,255,0.08),inset_0_0_15px_rgba(255,255,255,0.05)] hover:bg-white/5 hover:border-white/30 hover:text-white hover:shadow-[0_0_35px_rgba(255,255,255,0.2),inset_0_0_20px_rgba(255,255,255,0.1)]'}`}
+                  ? 'bg-cyan-400/20 border-cyan-400/50 text-white shadow-[0_0_20px_rgba(34,211,238,0.4),0_0_40px_rgba(34,211,238,0.2),inset_0_0_15px_rgba(34,211,238,0.3)]' 
+                  : 'bg-transparent border-transparent text-zinc-300 hover:text-white hover:bg-white/5 hover:border-white/20 hover:shadow-[0_0_20px_rgba(255,255,255,0.2),0_0_40px_rgba(255,255,255,0.1),inset_0_0_15px_rgba(255,255,255,0.15)]'}`}
             >
               {activeSection === 'features' ? '✕ Close' : 'What We Do'}
             </button>
             
-            {/* Center glowing LED dot */}
-            <div className="w-1.5 h-1.5 rounded-full bg-zinc-400 shadow-[0_0_12px_rgba(255,255,255,0.4)] mx-3"></div>
+            {/* Center flickering blue/cyan LED dot */}
+            <div className="w-1.5 h-1.5 rounded-full bg-cyan-200 mx-2 shadow-[0_0_10px_rgba(6,182,212,0.9),0_0_15px_rgba(59,130,246,0.7)] animate-pulse [animation-duration:0.8s]"></div>
 
             <button 
               onClick={() => setActiveSection(activeSection === 'pricing' ? 'none' : 'pricing')} 
               className={`px-5 sm:px-7 py-2 sm:py-2.5 rounded-full transition-all duration-500 ease-out border text-[10px] sm:text-xs font-mono font-bold tracking-[0.15em] uppercase outline-none
                 ${activeSection === 'pricing' 
-                  ? 'bg-cyan-400/20 border-cyan-300 text-white shadow-[0_0_40px_rgba(34,211,238,0.6),0_0_80px_rgba(34,211,238,0.3),inset_0_0_20px_rgba(34,211,238,0.5)]' 
-                  : 'bg-black/30 backdrop-blur-md border-white/10 text-zinc-300 shadow-[0_0_25px_rgba(255,255,255,0.08),inset_0_0_15px_rgba(255,255,255,0.05)] hover:bg-white/5 hover:border-white/30 hover:text-white hover:shadow-[0_0_35px_rgba(255,255,255,0.2),inset_0_0_20px_rgba(255,255,255,0.1)]'}`}
+                  ? 'bg-cyan-400/20 border-cyan-400/50 text-white shadow-[0_0_20px_rgba(34,211,238,0.4),0_0_40px_rgba(34,211,238,0.2),inset_0_0_15px_rgba(34,211,238,0.3)]' 
+                  : 'bg-transparent border-transparent text-zinc-300 hover:text-white hover:bg-white/5 hover:border-white/20 hover:shadow-[0_0_20px_rgba(255,255,255,0.2),0_0_40px_rgba(255,255,255,0.1),inset_0_0_15px_rgba(255,255,255,0.15)]'}`}
             >
               {activeSection === 'pricing' ? '✕ Close' : 'Pricing'}
             </button>
