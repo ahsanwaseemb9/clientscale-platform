@@ -13,7 +13,8 @@ export default function BusinessCard() {
         <div className="absolute inset-0 bg-[linear-gradient(to_right,#f4f4f5_2px,transparent_2px),linear-gradient(to_bottom,#f4f4f5_2px,transparent_2px)] bg-[size:4rem_4rem] opacity-70 pointer-events-none z-0" />
         
         <div className="z-10 flex flex-col items-center text-center">
-          <h1 className="text-6xl font-bold tracking-[0.15em] text-zinc-900 uppercase mb-6">
+          {/* Increased margin-bottom from mb-6 to mb-12 */}
+          <h1 className="text-6xl font-bold tracking-[0.15em] text-zinc-900 uppercase mb-12">
             Client Scale Systems
           </h1>
           <h2 className="text-xl font-mono text-cyan-600 tracking-wider font-semibold uppercase">

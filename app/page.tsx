@@ -35,36 +35,36 @@ export default function Home() {
       <div className="absolute inset-0 bg-[radial-gradient(1px_1px_at_20px_30px,#fff,transparent_100%),radial-gradient(1px_1px_at_75px_140px,rgba(255,255,255,0.7),transparent_100%),radial-gradient(1.5px_1.5px_at_120px_50px,#fff,transparent_100%),radial-gradient(1px_1px_at_240px_320px,rgba(255,255,255,0.5),transparent_100%)] bg-[size:300px_300px] opacity-40 pointer-events-none z-0 animate-pulse [animation-duration:8s]" />
       <div className="absolute inset-0 bg-[radial-gradient(1.5px_1.5px_at_45px_210px,#fff,transparent_100%),radial-gradient(1px_1px_at_180px_80px,rgba(255,255,255,0.8),transparent_100%),radial-gradient(1px_1px_at_290px_190px,#fff,transparent_100%)] bg-[size:400px_400px] opacity-25 pointer-events-none z-0 animate-pulse [animation-duration:12s]" />
 
+      {/* --- FIXED NAVIGATION DOCK (FLOATS OVER EVERYTHING) --- */}
+      <div className="fixed top-6 sm:top-10 left-1/2 -translate-x-1/2 flex items-center p-1 bg-[#07070f]/90 border border-zinc-800/90 rounded-full backdrop-blur-xl shadow-[0_0_20px_rgba(6,182,212,0.15)] z-[100] transition-all duration-300 hover:border-cyan-500/30 hover:shadow-[0_0_30px_rgba(6,182,212,0.25)] w-max">
+        <button 
+          onClick={() => setActiveSection(activeSection === 'features' ? 'none' : 'features')} 
+          className={`px-5 sm:px-7 py-2 sm:py-2.5 rounded-full transition-all duration-500 ease-out border text-[10px] sm:text-xs font-mono font-bold tracking-[0.15em] uppercase outline-none
+            ${activeSection === 'features' 
+              ? 'bg-cyan-400/20 border-cyan-400/50 text-white shadow-[0_0_20px_rgba(34,211,238,0.4),0_0_40px_rgba(34,211,238,0.2),inset_0_0_15px_rgba(34,211,238,0.3)]' 
+              : 'bg-transparent border-transparent text-zinc-300 hover:text-white hover:bg-white/5 hover:border-white/20 hover:shadow-[0_0_20px_rgba(255,255,255,0.2),0_0_40px_rgba(255,255,255,0.1),inset_0_0_15px_rgba(255,255,255,0.15)]'}`}
+        >
+          {activeSection === 'features' ? '✕ Close' : 'What We Do'}
+        </button>
+        
+        {/* Center flickering blue/cyan LED dot */}
+        <div className="w-1.5 h-1.5 rounded-full bg-cyan-200 mx-2 shadow-[0_0_10px_rgba(6,182,212,0.9),0_0_15px_rgba(59,130,246,0.7)] animate-pulse [animation-duration:0.8s]"></div>
+
+        <button 
+          onClick={() => setActiveSection(activeSection === 'pricing' ? 'none' : 'pricing')} 
+          className={`px-5 sm:px-7 py-2 sm:py-2.5 rounded-full transition-all duration-500 ease-out border text-[10px] sm:text-xs font-mono font-bold tracking-[0.15em] uppercase outline-none
+            ${activeSection === 'pricing' 
+              ? 'bg-cyan-400/20 border-cyan-400/50 text-white shadow-[0_0_20px_rgba(34,211,238,0.4),0_0_40px_rgba(34,211,238,0.2),inset_0_0_15px_rgba(34,211,238,0.3)]' 
+              : 'bg-transparent border-transparent text-zinc-300 hover:text-white hover:bg-white/5 hover:border-white/20 hover:shadow-[0_0_20px_rgba(255,255,255,0.2),0_0_40px_rgba(255,255,255,0.1),inset_0_0_15px_rgba(255,255,255,0.15)]'}`}
+        >
+          {activeSection === 'pricing' ? '✕ Close' : 'Pricing'}
+        </button>
+      </div>
+
       {/* Hero Section Container */}
-      <div className="w-full max-w-5xl px-4 pt-16 sm:pt-24 pb-0 text-center z-10 space-y-8 sm:space-y-10 animate-fade-in">
+      <div className="w-full max-w-5xl px-4 pt-32 sm:pt-48 pb-0 text-center z-10 space-y-8 sm:space-y-10 animate-fade-in">
         <div className="max-w-3xl mx-auto flex flex-col items-center">
           
-          {/* --- UNIFIED NAVIGATION DOCK (MASTER PILL) --- */}
-          <div className="flex items-center p-1 mb-16 sm:mb-24 bg-[#07070f]/90 border border-zinc-800/90 rounded-full backdrop-blur-xl shadow-[0_0_20px_rgba(6,182,212,0.15)] z-50 transition-all duration-300 hover:border-cyan-500/30 hover:shadow-[0_0_30px_rgba(6,182,212,0.25)]">
-            <button 
-              onClick={() => setActiveSection(activeSection === 'features' ? 'none' : 'features')} 
-              className={`px-5 sm:px-7 py-2 sm:py-2.5 rounded-full transition-all duration-500 ease-out border text-[10px] sm:text-xs font-mono font-bold tracking-[0.15em] uppercase outline-none
-                ${activeSection === 'features' 
-                  ? 'bg-cyan-400/20 border-cyan-400/50 text-white shadow-[0_0_20px_rgba(34,211,238,0.4),0_0_40px_rgba(34,211,238,0.2),inset_0_0_15px_rgba(34,211,238,0.3)]' 
-                  : 'bg-transparent border-transparent text-zinc-300 hover:text-white hover:bg-white/5 hover:border-white/20 hover:shadow-[0_0_20px_rgba(255,255,255,0.2),0_0_40px_rgba(255,255,255,0.1),inset_0_0_15px_rgba(255,255,255,0.15)]'}`}
-            >
-              {activeSection === 'features' ? '✕ Close' : 'What We Do'}
-            </button>
-            
-            {/* Center flickering blue/cyan LED dot */}
-            <div className="w-1.5 h-1.5 rounded-full bg-cyan-200 mx-2 shadow-[0_0_10px_rgba(6,182,212,0.9),0_0_15px_rgba(59,130,246,0.7)] animate-pulse [animation-duration:0.8s]"></div>
-
-            <button 
-              onClick={() => setActiveSection(activeSection === 'pricing' ? 'none' : 'pricing')} 
-              className={`px-5 sm:px-7 py-2 sm:py-2.5 rounded-full transition-all duration-500 ease-out border text-[10px] sm:text-xs font-mono font-bold tracking-[0.15em] uppercase outline-none
-                ${activeSection === 'pricing' 
-                  ? 'bg-cyan-400/20 border-cyan-400/50 text-white shadow-[0_0_20px_rgba(34,211,238,0.4),0_0_40px_rgba(34,211,238,0.2),inset_0_0_15px_rgba(34,211,238,0.3)]' 
-                  : 'bg-transparent border-transparent text-zinc-300 hover:text-white hover:bg-white/5 hover:border-white/20 hover:shadow-[0_0_20px_rgba(255,255,255,0.2),0_0_40px_rgba(255,255,255,0.1),inset_0_0_15px_rgba(255,255,255,0.15)]'}`}
-            >
-              {activeSection === 'pricing' ? '✕ Close' : 'Pricing'}
-            </button>
-          </div>
-
           {/* Animated Logo */}
           <div className="mt-0 mb-8 sm:mb-10">
             <DecryptedLogo text="Client Scale Systems" />
