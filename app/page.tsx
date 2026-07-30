@@ -1,28 +1,12 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState } from 'react';
 import { handleAuditSubmit } from './actions';
 import DecryptedLogo from './components/DecryptedLogo';
 
 export default function Home() {
   // Navigation states: 'none' | 'features' | 'pricing'
   const [activeSection, setActiveSection] = useState<'none' | 'features' | 'pricing'>('none');
-
-  // Create a reference to the content area for scrolling
-  const contentRef = useRef<HTMLDivElement>(null);
-
-  // Auto-scroll effect when a section is opened
-  useEffect(() => {
-    if (activeSection !== 'none' && contentRef.current) {
-      // Small timeout ensures the DOM has updated before scrolling
-      setTimeout(() => {
-        contentRef.current?.scrollIntoView({
-          behavior: 'smooth',
-          block: 'start'
-        });
-      }, 100);
-    }
-  }, [activeSection]);
 
   return (
     <main className="flex min-h-screen flex-col items-center bg-[#020205] text-white antialiased selection:bg-cyan-500/30 selection:text-cyan-200 overflow-x-hidden pb-24 relative">
@@ -60,6 +44,70 @@ export default function Home() {
           {activeSection === 'pricing' ? '✕ Close' : 'Pricing'}
         </button>
       </div>
+
+      {/* --- SIDE PANEL DRAWER (REPLACES BOTTOM SCROLLING) --- */}
+      <div 
+        className={`fixed top-0 right-0 h-full w-full sm:w-[450px] bg-[#050508] border-l border-zinc-800/50 shadow-2xl z-[200] transform transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] overflow-y-auto flex flex-col
+          ${activeSection !== 'none' ? 'translate-x-0' : 'translate-x-full'}`}
+      >
+        <div className="flex items-center justify-between p-6 border-b border-zinc-800/50 sticky top-0 bg-[#050508]/90 backdrop-blur-md z-10">
+          <h2 className="text-[11px] font-bold tracking-[0.2em] text-zinc-300 uppercase">
+            {activeSection === 'pricing' ? 'Deployment Options' : 'System Modules'}
+          </h2>
+          <button 
+            onClick={() => setActiveSection('none')}
+            className="flex items-center justify-center w-8 h-8 rounded-full bg-zinc-900/80 border border-zinc-800 text-zinc-400 hover:text-white hover:bg-zinc-800 transition-colors outline-none"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+          </button>
+        </div>
+
+        <div className="p-6 sm:p-8 flex-grow">
+          {activeSection === 'features' && (
+            <div className="space-y-4 animate-fade-in">
+              {[
+                { icon: '📡', title: 'Growth Traffic Intelligence', desc: 'Track multi-channel client acquisition pipelines. Pinpoint exact member locations through localized GPS/Geo-IP tracking to see where your marketing dollars match membership signups.' },
+                { icon: '📊', title: 'Captured & Ghost Leads', desc: 'Full pipeline clarity. Log fully completed membership forms as Captured Leads while tracking real-time form inputs on-change to salvage Ghost Leads who drop off midway.' },
+                { icon: '🔧', title: 'Autonomous Code Healing', desc: 'Continuous diagnostic sweeps find structural errors, latency bottle-necks, and core performance deficiencies—fixing layout script bugs automatically.' },
+                { icon: '🔍', title: 'Technical SEO & Digital Marketing', desc: 'Track where your ad traffic comes from and fix slow landing pages so you don’t waste your marketing budget. Automatically update your site\'s code so your gym ranks #1 on Google Maps when local members search for fitness clubs.' },
+                { icon: '🛡️', title: 'Isolated Multi-Tenant Dashboards', desc: 'Complete administrative access via secure admin/tenantID portals. Grant staff members operational visibility over isolated data grids safely.' },
+                { icon: '🤖', title: 'Orchestrated AI Infrastructure', desc: 'Automated AI logic models continuously process server architecture latency data, rewriting sub-optimal code and auto-generating high-intent landing copies.' }
+              ].map((card, idx) => (
+                <div key={idx} className="bg-[#0a0a0f] border border-zinc-800/80 p-5 rounded-xl space-y-3 hover:border-cyan-500/30 hover:bg-zinc-900/50 transition-all duration-300 group shadow-md">
+                  <div className="text-xl filter brightness-90 group-hover:brightness-110 group-hover:scale-110 transition-all origin-left">{card.icon}</div>
+                  <h3 className="text-sm font-semibold text-zinc-100 group-hover:text-cyan-400 transition-colors">{card.title}</h3>
+                  <p className="text-xs text-zinc-400 leading-relaxed font-light">{card.desc}</p>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {activeSection === 'pricing' && (
+            <div className="space-y-4 animate-fade-in">
+              {[
+                { phase: 'Phase 01', title: 'Engine Integration', sub: 'Setup Fee', desc: 'Covers deep technical analysis, pixel script deployment, secure administrative database provisioning, and initial custom multi-tenant configuration.' },
+                { phase: 'Phase 02', title: 'SaaS Allocation', sub: 'Software Platform', desc: 'Unlocks continuous 24/7 access to your multi-tenant dashboard tracking engines, real-time ghost lead forensics, automated technical healing, and AI diagnostic workflows.' },
+                { phase: 'Full Service', title: 'Done-For-You Scaling', sub: 'Managed Growth Engine', desc: 'We take total execution control. Our marketing team runs hyper-targeted Meta/Google ads based on your geo-insights, executes technical local SEO optimization, and deploys high-converting ghost lead retrieval campaigns directly on behalf.' }
+              ].map((plan, idx) => (
+                <div key={idx} className={`${idx === 2 ? 'bg-[#05050c]/70 border-cyan-500/20' : 'bg-[#0a0a0f] border-zinc-800/80'} border p-5 rounded-xl relative overflow-hidden flex flex-col justify-between hover:bg-zinc-900/50 hover:border-cyan-500/30 transition-all duration-300 shadow-md group`}>
+                  <div>
+                    <div className={`absolute top-0 right-0 ${idx === 2 ? 'bg-cyan-950/60 text-cyan-400 border-l border-b border-cyan-500/20' : 'bg-zinc-900 text-zinc-400 border-l border-b border-zinc-800/80'} text-[8px] font-bold uppercase tracking-wider px-2 py-1 rounded-bl-lg`}>{plan.phase}</div>
+                    <h4 className="text-[10px] font-bold text-zinc-500 tracking-wider uppercase mt-1">{plan.title}</h4>
+                    <h3 className="text-lg font-bold text-zinc-100 mt-1 transition-colors group-hover:text-cyan-400">{plan.sub}</h3>
+                    <p className="text-xs text-zinc-400 mt-3 leading-relaxed font-light">{plan.desc}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Dimming overlay when drawer is open */}
+      <div 
+        onClick={() => setActiveSection('none')}
+        className={`fixed inset-0 bg-black/40 backdrop-blur-[2px] z-[150] transition-opacity duration-500 ${activeSection !== 'none' ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}
+      />
 
       {/* Hero Section Container */}
       <div className="w-full max-w-5xl px-4 pt-40 sm:pt-56 pb-0 text-center z-10 space-y-8 sm:space-y-10 animate-fade-in">
@@ -108,64 +156,9 @@ export default function Home() {
         </form>
       </div>
 
-      {/* --- REMAINDER OF PAGE --- */}
-      <div className="w-full max-w-5xl h-[1px] bg-gradient-to-r from-transparent via-zinc-800 to-transparent relative my-10">
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-80 h-[1px] bg-gradient-to-r from-transparent via-cyan-400 to-transparent shadow-[0_0_12px_rgba(34,211,238,0.6)]" />
-      </div>
-
-      <div ref={contentRef} className="w-full flex justify-center scroll-mt-24">
-        {activeSection === 'features' && (
-          <div className="w-full max-w-5xl px-4 py-4 z-10 space-y-12 animate-fade-in">
-            <div className="text-center space-y-4 max-w-3xl mx-auto px-4">
-              <h3 className="text-sm sm:text-base font-extrabold font-mono tracking-[0.35em] text-cyan-400 uppercase">System Modules</h3>
-              <h2 className="text-xl sm:text-2xl font-semibold tracking-wide text-zinc-200 leading-relaxed balance">Automated software tools built to turn your website traffic into high-value members.</h2>
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-              {[
-                { icon: '📡', title: 'Growth Traffic Intelligence', desc: 'Track multi-channel client acquisition pipelines. Pinpoint exact member locations through localized GPS/Geo-IP tracking to see where your marketing dollars match membership signups.' },
-                { icon: '📊', title: 'Captured & Ghost Leads', desc: 'Full pipeline clarity. Log fully completed membership forms as Captured Leads while tracking real-time form inputs on-change to salvage Ghost Leads who drop off midway.' },
-                { icon: '🔧', title: 'Autonomous Code Healing', desc: 'Continuous diagnostic sweeps find structural errors, latency bottle-necks, and core performance deficiencies—fixing layout script bugs automatically.' },
-                { icon: '🔍', title: 'Technical SEO & Digital Marketing', desc: 'Track where your ad traffic comes from and fix slow landing pages so you don’t waste your marketing budget. Automatically update your site\'s code so your gym ranks #1 on Google Maps when local members search for fitness clubs.' },
-                { icon: '🛡️', title: 'Isolated Multi-Tenant Dashboards', desc: 'Complete administrative access via secure admin/tenantID portals. Grant staff members operational visibility over isolated data grids safely.' },
-                { icon: '🤖', title: 'Orchestrated AI Infrastructure', desc: 'Automated AI logic models continuously process server architecture latency data, rewriting sub-optimal code and auto-generating high-intent landing copies.' }
-              ].map((card, idx) => (
-                <div key={idx} className="bg-[#05050c]/80 border border-zinc-800/80 p-5 sm:p-6 rounded-xl sm:rounded-2xl space-y-3 sm:space-y-4 hover:border-cyan-500/30 hover:bg-zinc-900/50 backdrop-blur-md transition-all duration-300 group shadow-xl">
-                  <div className="text-xl sm:text-2xl filter brightness-90 group-hover:brightness-110 group-hover:scale-105 transition-all">{card.icon}</div>
-                  <h3 className="text-base sm:text-lg font-semibold text-zinc-100 group-hover:text-cyan-400 transition-colors">{card.title}</h3>
-                  <p className="text-sm sm:text-base text-zinc-400 leading-relaxed font-light">{card.desc}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {activeSection === 'pricing' && (
-          <div className="w-full max-w-5xl px-4 py-4 z-10 text-center space-y-12 animate-fade-in">
-            <div className="space-y-3">
-              <h3 className="text-sm sm:text-base font-extrabold font-mono tracking-[0.35em] text-cyan-400 uppercase">
-                Pricing Core
-              </h3>
-              <h2 className="text-2xl sm:text-4xl font-extrabold tracking-tight text-zinc-100">Deployment Options</h2>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 pt-4 text-left">
-              {[
-                { phase: 'Phase 01', title: 'Engine Integration', sub: 'Setup Fee', desc: 'Covers deep technical analysis, pixel script deployment, secure administrative database provisioning, and initial custom multi-tenant configuration.' },
-                { phase: 'Phase 02', title: 'SaaS Allocation', sub: 'Software Platform', desc: 'Unlocks continuous 24/7 access to your multi-tenant dashboard tracking engines, real-time ghost lead forensics, automated technical healing, and AI diagnostic workflows.' },
-                { phase: 'Full Service', title: 'Done-For-You Scaling', sub: 'Managed Growth Engine', desc: 'We take total execution control. Our marketing team runs hyper-targeted Meta/Google ads based on your geo-insights, executes technical local SEO optimization, and deploys high-converting ghost lead retrieval campaigns directly on behalf.' }
-              ].map((plan, idx) => (
-                <div key={idx} className={`${idx === 2 ? 'bg-[#05050c]/70 border-cyan-500/20' : 'bg-[#05050c]/50 border-zinc-800/80'} border p-5 sm:p-6 rounded-xl sm:rounded-2xl relative overflow-hidden flex flex-col justify-between hover:bg-zinc-900/50 hover:border-cyan-500/30 backdrop-blur-md transition-all duration-300 shadow-xl group`}>
-                  <div>
-                    <div className={`absolute top-0 right-0 ${idx === 2 ? 'bg-cyan-950/60 text-cyan-400 border-l border-b border-cyan-500/20' : 'bg-zinc-900 text-zinc-400 border-l border-b border-zinc-800/80'} text-[8px] sm:text-[9px] font-bold uppercase tracking-wider px-3 py-1 rounded-bl-xl`}>{plan.phase}</div>
-                    <h4 className="text-[10px] sm:text-xs font-bold text-zinc-500 tracking-wider uppercase">{plan.title}</h4>
-                    <h3 className="text-xl sm:text-2xl font-bold text-zinc-100 mt-1 sm:mt-2 transition-colors group-hover:text-cyan-400">{plan.sub}</h3>
-                    <p className="text-sm sm:text-base text-zinc-400 mt-3 sm:mt-4 leading-relaxed font-light">{plan.desc}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-      </div>
     </main>
   );
 }
+
+
+                                                                      
