@@ -36,7 +36,7 @@ export default function Home() {
       <div className="absolute inset-0 bg-[radial-gradient(1.5px_1.5px_at_45px_210px,#fff,transparent_100%),radial-gradient(1px_1px_at_180px_80px,rgba(255,255,255,0.8),transparent_100%),radial-gradient(1px_1px_at_290px_190px,#fff,transparent_100%)] bg-[size:400px_400px] opacity-25 pointer-events-none z-0 animate-pulse [animation-duration:12s]" />
 
       {/* --- FIXED NAVIGATION DOCK (FLOATS OVER EVERYTHING) --- */}
-      <div className="fixed top-6 sm:top-10 left-1/2 -translate-x-1/2 flex items-center p-1 bg-[#07070f]/90 border border-zinc-800/90 rounded-full backdrop-blur-xl shadow-[0_0_20px_rgba(6,182,212,0.15)] z-[100] transition-all duration-300 hover:border-cyan-500/30 hover:shadow-[0_0_30px_rgba(6,182,212,0.25)] w-max">
+      <div className="fixed top-12 sm:top-16 left-1/2 -translate-x-1/2 flex items-center p-1 bg-[#07070f]/90 border border-zinc-800/90 rounded-full backdrop-blur-xl shadow-[0_0_20px_rgba(6,182,212,0.15)] z-[100] transition-all duration-300 hover:border-cyan-500/30 hover:shadow-[0_0_30px_rgba(6,182,212,0.25)] w-max">
         <button 
           onClick={() => setActiveSection(activeSection === 'features' ? 'none' : 'features')} 
           className={`px-5 sm:px-7 py-2 sm:py-2.5 rounded-full transition-all duration-500 ease-out border text-[10px] sm:text-xs font-mono font-bold tracking-[0.15em] uppercase outline-none
@@ -62,7 +62,7 @@ export default function Home() {
       </div>
 
       {/* Hero Section Container */}
-      <div className="w-full max-w-5xl px-4 pt-32 sm:pt-48 pb-0 text-center z-10 space-y-8 sm:space-y-10 animate-fade-in">
+      <div className="w-full max-w-5xl px-4 pt-40 sm:pt-56 pb-0 text-center z-10 space-y-8 sm:space-y-10 animate-fade-in">
         <div className="max-w-3xl mx-auto flex flex-col items-center">
           
           {/* Animated Logo */}
