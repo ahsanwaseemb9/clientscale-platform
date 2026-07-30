@@ -40,7 +40,7 @@ export default function Home() {
         <div className="max-w-3xl mx-auto flex flex-col items-center">
           
           {/* --- UNIFIED NAVIGATION DOCK (MASTER PILL) --- */}
-          <div className="flex items-center p-1 mb-12 sm:mb-16 bg-[#07070f]/90 border border-zinc-800/90 rounded-full backdrop-blur-xl shadow-[0_0_20px_rgba(6,182,212,0.15)] z-50 transition-all duration-300 hover:border-cyan-500/30 hover:shadow-[0_0_30px_rgba(6,182,212,0.25)]">
+          <div className="flex items-center p-1 mb-16 sm:mb-24 bg-[#07070f]/90 border border-zinc-800/90 rounded-full backdrop-blur-xl shadow-[0_0_20px_rgba(6,182,212,0.15)] z-50 transition-all duration-300 hover:border-cyan-500/30 hover:shadow-[0_0_30px_rgba(6,182,212,0.25)]">
             <button 
               onClick={() => setActiveSection(activeSection === 'features' ? 'none' : 'features')} 
               className={`px-5 sm:px-7 py-2 sm:py-2.5 rounded-full transition-all duration-500 ease-out border text-[10px] sm:text-xs font-mono font-bold tracking-[0.15em] uppercase outline-none

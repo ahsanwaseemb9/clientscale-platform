@@ -16,8 +16,8 @@ export default function BusinessCard() {
           <h1 className="text-6xl font-bold tracking-[0.15em] text-zinc-900 uppercase mb-6">
             Client Scale Systems
           </h1>
-          <h2 className="text-2xl font-mono text-cyan-600 tracking-wider font-semibold uppercase">
-            Enterprise Pipeline Intelligence & Edge Infrastructure
+          <h2 className="text-xl font-mono text-cyan-600 tracking-wider font-semibold uppercase">
+            The ultimate Client Growth Platform & Automated Maintenance Engine
           </h2>
         </div>
       </div>
