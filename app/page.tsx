@@ -39,28 +39,27 @@ export default function Home() {
       <div className="w-full max-w-5xl px-4 pt-16 sm:pt-24 pb-0 text-center z-10 space-y-8 sm:space-y-10 animate-fade-in">
         <div className="max-w-3xl mx-auto flex flex-col items-center">
           
-          {/* --- REIMAGINED NAVIGATION DOCK --- */}
-          {/* Increased gap using mb-12 sm:mb-16 */}
+          {/* --- REIMAGINED NAVIGATION DOCK (HEADLIGHTS ALWAYS ON) --- */}
           <div className="flex items-center p-1.5 mb-12 sm:mb-16 bg-[#07070f]/90 border border-zinc-800/90 rounded-full backdrop-blur-xl shadow-[0_0_30px_rgba(0,0,0,0.8)] z-50 transition-all duration-300 hover:border-zinc-700/80">
             <button 
               onClick={() => setActiveSection(activeSection === 'features' ? 'none' : 'features')} 
-              className={`px-5 sm:px-7 py-2 sm:py-2.5 rounded-full transition-all duration-300 text-[10px] sm:text-xs font-mono font-semibold tracking-[0.15em] uppercase outline-none
+              className={`px-5 sm:px-7 py-2 sm:py-2.5 rounded-full transition-all duration-500 ease-out border text-[10px] sm:text-xs font-mono font-bold tracking-[0.15em] uppercase outline-none
                 ${activeSection === 'features' 
-                  ? 'bg-cyan-500/10 border border-cyan-500/40 text-cyan-400 shadow-[inset_0_0_15px_rgba(6,182,212,0.15)]' 
-                  : 'bg-zinc-800/40 border border-zinc-700/50 text-zinc-100 hover:text-white hover:bg-zinc-700/60'}`}
+                  ? 'bg-cyan-400/20 border-cyan-300 text-white shadow-[0_0_40px_rgba(34,211,238,0.6),0_0_80px_rgba(34,211,238,0.3),inset_0_0_20px_rgba(34,211,238,0.5)]' 
+                  : 'bg-white/10 border-white/30 text-white shadow-[0_0_25px_rgba(255,255,255,0.15),inset_0_0_15px_rgba(255,255,255,0.08)] hover:bg-white/20 hover:border-white/50 hover:shadow-[0_0_40px_rgba(255,255,255,0.25),inset_0_0_20px_rgba(255,255,255,0.15)]'}`}
             >
               {activeSection === 'features' ? '✕ Close' : 'What We Do'}
             </button>
             
-            {/* Tiny separator dot */}
-            <div className="w-1 h-1 rounded-full bg-zinc-700 mx-1"></div>
+            {/* Center glowing LED dot */}
+            <div className="w-1.5 h-1.5 rounded-full bg-zinc-400 shadow-[0_0_12px_rgba(255,255,255,0.4)] mx-2"></div>
 
             <button 
               onClick={() => setActiveSection(activeSection === 'pricing' ? 'none' : 'pricing')} 
-              className={`px-5 sm:px-7 py-2 sm:py-2.5 rounded-full transition-all duration-300 text-[10px] sm:text-xs font-mono font-semibold tracking-[0.15em] uppercase outline-none
+              className={`px-5 sm:px-7 py-2 sm:py-2.5 rounded-full transition-all duration-500 ease-out border text-[10px] sm:text-xs font-mono font-bold tracking-[0.15em] uppercase outline-none
                 ${activeSection === 'pricing' 
-                  ? 'bg-cyan-500/10 border border-cyan-500/40 text-cyan-400 shadow-[inset_0_0_15px_rgba(6,182,212,0.15)]' 
-                  : 'bg-zinc-800/40 border border-zinc-700/50 text-zinc-100 hover:text-white hover:bg-zinc-700/60'}`}
+                  ? 'bg-cyan-400/20 border-cyan-300 text-white shadow-[0_0_40px_rgba(34,211,238,0.6),0_0_80px_rgba(34,211,238,0.3),inset_0_0_20px_rgba(34,211,238,0.5)]' 
+                  : 'bg-white/10 border-white/30 text-white shadow-[0_0_25px_rgba(255,255,255,0.15),inset_0_0_15px_rgba(255,255,255,0.08)] hover:bg-white/20 hover:border-white/50 hover:shadow-[0_0_40px_rgba(255,255,255,0.25),inset_0_0_20px_rgba(255,255,255,0.15)]'}`}
             >
               {activeSection === 'pricing' ? '✕ Close' : 'Pricing'}
             </button>
