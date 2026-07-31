@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import DecryptedLogo from './components/DecryptedLogo';
 
-const FREE_EMAIL_PROVIDERS = ['gmail.com', 'yahoo.com', 'hotmail.com', 'outlook.com', 'aol.com', 'icloud.com'];
+const FREE_EMAIL_SUBSTRINGS = ['gmail', 'gmall', 'gmai', 'yahoo', 'yaho', 'hotmail', 'hotmai', 'outlook', 'outlok', 'aol', 'icloud', 'iclud', 'proton', 'zoho', 'live', 'msn'];
 
 export default function Home() {
   // Navigation states: 'none' | 'features' | 'pricing'
@@ -14,11 +14,11 @@ export default function Home() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   
-  // Real-time email validation states
+  // Real-time email validation states (using substring matching to catch typos like gmall.co)
   const [emailValue, setEmailValue] = useState('');
-  const domain = emailValue.split('@')[1]?.toLowerCase();
-  const hasValidFormat = emailValue.includes('@') && domain?.includes('.');
-  const isFreeProvider = FREE_EMAIL_PROVIDERS.includes(domain || '');
+  const domain = emailValue.split('@')[1]?.toLowerCase() || '';
+  const hasValidFormat = emailValue.includes('@') && domain.includes('.');
+  const isFreeProvider = FREE_EMAIL_SUBSTRINGS.some(substring => domain.includes(substring));
   const isCorporateValid = hasValidFormat && !isFreeProvider;
 
   // Create a reference to the content area for scrolling
@@ -193,7 +193,7 @@ export default function Home() {
             />
           </div>
 
-          {/* Work Email Input (Live Validated) */}
+          {/* Work Email Input (Live Validated with Substring Typos Catch) */}
           <div className={`relative flex items-center w-full bg-[#07070f]/90 border ${isFreeProvider ? 'border-red-500/50 focus-within:border-red-500/80' : 'border-zinc-800/90 focus-within:border-cyan-400'} rounded-xl sm:rounded-2xl p-2 sm:p-2.5 transition-all duration-300 backdrop-blur-2xl ring-1 ring-zinc-900/50 ${isFreeProvider ? 'focus-within:ring-red-500/20 shadow-[0_0_15px_rgba(239,68,68,0.12)]' : 'focus-within:ring-cyan-500/20 shadow-[0_0_15px_rgba(6,182,212,0.12)]'} hover:shadow-[0_0_25px_rgba(6,182,212,0.22)] transform hover:-translate-y-1 hover:scale-[1.012] focus-within:-translate-y-1 focus-within:scale-[1.012] hover:bg-[#090916]`}>
             <div className={`pl-3 pr-1 sm:pl-4 sm:pr-2 transition-colors ${isFreeProvider ? 'text-red-400' : 'text-zinc-500 focus-within:text-cyan-400'}`}>
               <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
