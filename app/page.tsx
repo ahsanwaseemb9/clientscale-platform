@@ -193,7 +193,7 @@ export default function Home() {
             />
           </div>
 
-          {/* Work Email Input (Live Validated with Substring Typos Catch) */}
+          {/* Work Email Input (Live Validated) */}
           <div className={`relative flex items-center w-full bg-[#07070f]/90 border ${isFreeProvider ? 'border-red-500/50 focus-within:border-red-500/80' : 'border-zinc-800/90 focus-within:border-cyan-400'} rounded-xl sm:rounded-2xl p-2 sm:p-2.5 transition-all duration-300 backdrop-blur-2xl ring-1 ring-zinc-900/50 ${isFreeProvider ? 'focus-within:ring-red-500/20 shadow-[0_0_15px_rgba(239,68,68,0.12)]' : 'focus-within:ring-cyan-500/20 shadow-[0_0_15px_rgba(6,182,212,0.12)]'} hover:shadow-[0_0_25px_rgba(6,182,212,0.22)] transform hover:-translate-y-1 hover:scale-[1.012] focus-within:-translate-y-1 focus-within:scale-[1.012] hover:bg-[#090916]`}>
             <div className={`pl-3 pr-1 sm:pl-4 sm:pr-2 transition-colors ${isFreeProvider ? 'text-red-400' : 'text-zinc-500 focus-within:text-cyan-400'}`}>
               <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -209,8 +209,8 @@ export default function Home() {
               placeholder="Work Email (Required)" 
               className="w-full bg-transparent py-3 sm:py-3.5 px-2 text-zinc-100 placeholder-zinc-600 focus:outline-none text-sm font-normal tracking-wide [&:-webkit-autofill]:[-webkit-text-fill-color:#fff] [&:-webkit-autofill]:[transition:background-color_5000s_ease-in-out_0s]" 
             />
-            {/* Dynamic Status Indicator */}
-            <div className={`hidden sm:flex items-center gap-2 bg-[#0d111c]/90 border border-zinc-800 rounded-lg px-3 py-1.5 mr-1 font-mono text-[10px] tracking-widest uppercase transition-all duration-300 ${isFreeProvider ? 'text-red-500 border-red-500/20' : isCorporateValid ? 'text-cyan-400 border-cyan-500/20' : 'text-zinc-500'}`}>
+            {/* Dynamic Status Indicator (Always visible on mobile & desktop) */}
+            <div className={`flex items-center gap-2 bg-[#0d111c]/90 border border-zinc-800 rounded-lg px-2.5 sm:px-3 py-1.5 mr-1 font-mono text-[9px] sm:text-[10px] tracking-widest uppercase transition-all duration-300 shrink-0 ${isFreeProvider ? 'text-red-500 border-red-500/20' : isCorporateValid ? 'text-cyan-400 border-cyan-500/20' : 'text-zinc-500'}`}>
               <span className="relative flex h-1.5 w-1.5">
                 <span className={`animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 ${isCorporateValid ? 'bg-cyan-400/60' : 'hidden'}`}></span>
                 <span className={`relative inline-flex rounded-full h-1.5 w-1.5 ${isFreeProvider ? 'bg-red-500' : isCorporateValid ? 'bg-cyan-500 shadow-[0_0_10px_rgba(6,182,212,0.8)]' : 'bg-cyan-500 shadow-[0_0_8px_rgba(6,182,212,0.6)] animate-pulse'}`}></span>
