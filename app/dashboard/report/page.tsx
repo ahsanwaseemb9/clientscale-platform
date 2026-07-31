@@ -5,7 +5,7 @@ import {
   AlertTriangle, DollarSign, Ghost, ShieldAlert, Activity, 
   Database, ServerCrash, X, ChevronRight, MapPin, MailWarning,
   ListOrdered, Layers, Globe, Image as ImageIcon, Accessibility, 
-  CheckCircle, AlertCircle, Cpu, Lock, Unlock, ShieldCheck
+  CheckCircle, AlertCircle, Cpu, Lock, Unlock, ShieldCheck, Search
 } from 'lucide-react';
 
 // --- UPGRADE MAPPING DICTIONARY ---
@@ -47,7 +47,14 @@ export default function AuditReportPage() {
   useEffect(() => {
     const storedData = sessionStorage.getItem('clientScale_auditData');
     if (storedData) {
-      setAuditData(JSON.parse(storedData));
+      try {
+        const parsed = JSON.parse(storedData);
+        if (parsed && parsed.target) {
+          setAuditData(parsed);
+        }
+      } catch (e) {
+        setAuditData(null);
+      }
     }
     setIsLoading(false);
   }, []);
@@ -58,6 +65,30 @@ export default function AuditReportPage() {
         <div className="text-cyan-400 animate-pulse text-sm tracking-widest uppercase">
           Hydrating Enterprise Dashboard...
         </div>
+      </div>
+    );
+  }
+
+  // --- EMPTY STATE: NO TARGET DOMAIN DETECTED ---
+  if (!auditData || !auditData.target) {
+    return (
+      <div className="space-y-6 relative overflow-x-hidden min-h-[80vh] flex flex-col items-center justify-center pb-12 px-4 max-w-4xl mx-auto text-center">
+        <div className="w-16 h-16 rounded-full bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-400 mb-2 shadow-[0_0_20px_rgba(8,145,178,0.3)]">
+          <Search size={28} />
+        </div>
+        <h1 className="text-2xl sm:text-3xl font-bold text-white tracking-tight">
+          No Target Domain Audited
+        </h1>
+        <p className="text-gray-400 text-sm max-w-md leading-relaxed">
+          No active pipeline telemetry detected in storage. Please scan a prospect URL to initialize live diagnostic forensics.
+        </p>
+        <button 
+          onClick={() => window.location.href = '/'}
+          className="bg-cyan-600 hover:bg-cyan-500 text-white px-6 py-3 rounded-md font-medium text-sm transition-colors shadow-[0_0_15px_rgba(8,145,178,0.4)] flex items-center gap-2 mt-2"
+        >
+          <Activity size={16} />
+          Launch New Prospect Scan
+        </button>
       </div>
     );
   }
