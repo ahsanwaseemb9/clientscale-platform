@@ -28,7 +28,14 @@ const TECH_UPGRADES: Record<string, { upgrade: string; reason: string }> = {
   
   // Servers / Misc
   "Apache": { upgrade: "Vercel Edge Network", reason: "Shifts compute to the edge for instant Time-to-First-Byte globally." },
-  "Nginx": { upgrade: "Vercel Edge Network", reason: "Shifts compute to the edge for instant Time-to-First-Byte globally." }
+  "Nginx": { upgrade: "Vercel Edge Network", reason: "Shifts compute to the edge for instant Time-to-First-Byte globally." },
+
+  // Maps & Location
+  "Apple MapKit JS": { upgrade: "Lazy-Loaded Native Maps", reason: "Defers map rendering until the user scrolls, saving bandwidth and initial load time." },
+  "Google Maps": { upgrade: "Static Edge Maps API", reason: "Replaces heavy interactive iframes with static placeholders to eliminate JS execution lag." },
+
+  // Security & Headers
+  "HSTS": { upgrade: "Edge Node Routing", reason: "Maintains strict transport security while distributing server load across global edge nodes." },
 };
 
 export default function AuditReportPage() {
@@ -419,10 +426,10 @@ export default function AuditReportPage() {
           <div className="space-y-4 overflow-y-auto pr-2 custom-scrollbar">
             {infrastructure.length > 0 ? infrastructure.map((tech: any, idx: number) => {
               
-              // Map to known upgrade or fallback to generic
+              // Map to known upgrade or fallback to the new generic Edge Offloading message
               const recommendation = TECH_UPGRADES[tech.name] || {
-                upgrade: "Custom API Integration",
-                reason: "Optimize for seamless data flow and reduced main-thread blocking."
+                upgrade: "Edge Compute Offloading",
+                reason: "Shifts the processing weight of this tool to our edge servers, preventing mobile browser freezing."
               };
 
               return (
