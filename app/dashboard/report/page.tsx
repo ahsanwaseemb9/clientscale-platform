@@ -8,6 +8,29 @@ import {
   CheckCircle, AlertCircle, Cpu
 } from 'lucide-react';
 
+// --- UPGRADE MAPPING DICTIONARY ---
+const TECH_UPGRADES: Record<string, { upgrade: string; reason: string }> = {
+  // CMS & Builders
+  "WordPress": { upgrade: "Next.js / React Architecture", reason: "Eliminates plugin bloat and achieves sub-200ms load times." },
+  "Wix": { upgrade: "ClientScale Core Framework", reason: "Removes proprietary lock-in and dramatically reduces DOM fragility." },
+  "Squarespace": { upgrade: "Custom Next.js Frontend", reason: "Unlocks advanced local SEO capabilities previously blocked by platform limits." },
+  "Shopify": { upgrade: "Headless Commerce API", reason: "Separates the frontend presentation from backend inventory for instant page loads." },
+  
+  // Analytics & Tracking
+  "Google Analytics": { upgrade: "Server-Side Tracking", reason: "Bypasses iOS ad-blockers to capture 'Ghost Leads' normally lost to privacy settings." },
+  "Meta Pixel": { upgrade: "Conversion API (CAPI)", reason: "Direct server-to-server tracking for 100% accurate client acquisition costs." },
+  "TikTok Pixel": { upgrade: "Server-Side Events", reason: "Prevents client-side script execution from blocking the main thread." },
+
+  // Widgets & Chat
+  "Intercom": { upgrade: "Automated AI Lead Nurture", reason: "Replaces expensive human latency with instant AI triage for mid-sized operations." },
+  "Mindbody": { upgrade: "Headless Booking API", reason: "Removes third-party iframe lag to keep users inside your optimized conversion funnel." },
+  "Calendly": { upgrade: "Native API Scheduling", reason: "Prevents external CSS/JS injection and keeps the user on your domain." },
+  
+  // Servers / Misc
+  "Apache": { upgrade: "Vercel Edge Network", reason: "Shifts compute to the edge for instant Time-to-First-Byte globally." },
+  "Nginx": { upgrade: "Vercel Edge Network", reason: "Shifts compute to the edge for instant Time-to-First-Byte globally." }
+};
+
 export default function AuditReportPage() {
   const [auditData, setAuditData] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -47,7 +70,7 @@ export default function AuditReportPage() {
   const domSize = perfScore < 50 ? '3,450+' : '1,200';
   const isFragile = perfScore < 50;
 
-  // --- NEW: EXTRACTIONS FOR BOTTOM SECTIONS ---
+  // --- EXTRACTIONS FOR BOTTOM SECTIONS ---
   const infrastructure = auditData?.infrastructure || [];
   const funnel = auditData?.conversionFunnel || {};
   const leakagePoints = funnel.primaryLeakagePoints || [];
@@ -324,11 +347,11 @@ export default function AuditReportPage() {
         </div>
       )}
 
-      {/* --- NEW MODULE: BRAND COMPLIANCE & TECH STACK --- */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+      {/* --- BRAND COMPLIANCE & TECH STACK SIDE-BY-SIDE --- */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8 items-start">
         
         {/* Brand Impression & Accessibility */}
-        <div className="bg-[#121216] border border-gray-800 rounded-xl p-6 flex flex-col justify-between">
+        <div className="bg-[#121216] border border-gray-800 rounded-xl p-6 flex flex-col h-full">
           <div>
             <div className="flex items-center gap-3 mb-6">
               <Globe className="text-indigo-400" size={20} />
@@ -381,27 +404,66 @@ export default function AuditReportPage() {
           </div>
         </div>
 
-        {/* Tech Stack Fingerprint */}
-        <div className="bg-[#121216] border border-gray-800 rounded-xl p-6">
-          <div className="flex items-center justify-between mb-6">
+        {/* --- UPGRADED: TECH STACK FINGERPRINT & UPGRADE PATH --- */}
+        <div className="bg-[#121216] border border-gray-800 rounded-xl p-6 flex flex-col max-h-[600px]">
+          <div className="flex justify-between items-center mb-6 border-b border-gray-800/50 pb-4">
             <div className="flex items-center gap-3">
               <Layers className="text-purple-400" size={20} />
-              <h2 className="text-sm font-bold text-gray-300 uppercase tracking-widest">Tech Stack Fingerprint</h2>
+              <h2 className="text-sm font-bold text-gray-300 uppercase tracking-widest">Tech Stack & Upgrade Path</h2>
             </div>
-            <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">{infrastructure.length} Technologies Detected</span>
+            <span className="text-[10px] text-gray-500 uppercase tracking-widest">
+              {infrastructure.length} Technologies Detected
+            </span>
           </div>
-          
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
-            {infrastructure.length > 0 ? infrastructure.map((tech: any, idx: number) => (
-              <div key={idx} className="flex items-start gap-3 p-3 bg-[#0a0a0c] border border-gray-800/50 rounded-lg hover:border-purple-500/30 transition-colors">
-                <Cpu className="text-gray-500 mt-0.5 shrink-0" size={14} />
-                <div className="min-w-0 flex-1">
-                  <p className="text-sm text-gray-200 font-bold truncate">{tech.name}</p>
-                  <p className="text-[10px] text-gray-500 truncate mt-0.5 uppercase tracking-widest">{tech.categories?.[0] || 'Infrastructure'}</p>
+
+          <div className="space-y-4 overflow-y-auto pr-2 custom-scrollbar">
+            {infrastructure.length > 0 ? infrastructure.map((tech: any, idx: number) => {
+              
+              // Map to known upgrade or fallback to generic
+              const recommendation = TECH_UPGRADES[tech.name] || {
+                upgrade: "Custom API Integration",
+                reason: "Optimize for seamless data flow and reduced main-thread blocking."
+              };
+
+              return (
+                <div key={idx} className="flex flex-col sm:flex-row gap-4 p-4 bg-[#0a0a0c] border border-gray-800/50 rounded-xl relative overflow-hidden group hover:border-cyan-500/30 transition-colors">
+                  
+                  {/* LEFT: What they currently have (Detected) */}
+                  <div className="flex-1 border-b sm:border-b-0 sm:border-r border-gray-800/50 pb-4 sm:pb-0 sm:pr-4">
+                    <div className="text-[9px] font-bold text-gray-500 uppercase tracking-wider mb-2 flex items-center gap-1.5">
+                      <span className="w-1.5 h-1.5 rounded-full bg-red-500/80"></span>
+                      Detected Infrastructure
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <div className="flex flex-col">
+                        <span className="text-sm font-bold text-gray-200">{tech.name}</span>
+                        <span className="text-[10px] text-gray-500 mt-0.5 uppercase tracking-widest">
+                          {tech.categories?.[0] || 'Infrastructure'}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* RIGHT: What you recommend (The Upgrade) */}
+                  <div className="flex-1 pt-2 sm:pt-0 sm:pl-2">
+                     <div className="text-[9px] font-bold text-cyan-500 uppercase tracking-wider mb-2 flex items-center gap-1.5">
+                      <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse"></span>
+                      Recommended Upgrade
+                    </div>
+                    <div className="flex flex-col">
+                      <span className="text-sm font-bold text-white drop-shadow-[0_0_8px_rgba(34,211,238,0.4)]">
+                        {recommendation.upgrade}
+                      </span>
+                      <span className="text-xs text-gray-400 mt-1.5 leading-relaxed font-light">
+                        {recommendation.reason}
+                      </span>
+                    </div>
+                  </div>
+
                 </div>
-              </div>
-            )) : (
-              <div className="col-span-2 text-center py-8 text-gray-500 text-sm">
+              );
+            }) : (
+              <div className="text-center py-8 text-gray-500 text-sm">
                 No infrastructure footprint detected.
               </div>
             )}
