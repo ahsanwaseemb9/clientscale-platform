@@ -231,12 +231,11 @@ export default function Home() {
                 {isLoading ? 'Establishing Connection...' : 'Initialize Diagnostic Scan'}
               </button>
             ) : (
-              <div className="flex items-center justify-center bg-zinc-900/40 border border-zinc-800/50 rounded-xl px-6 py-4 w-full sm:w-auto animate-fade-in">
-                <p className={`text-[10px] sm:text-xs font-mono tracking-widest uppercase text-center ${isFreeProvider ? 'text-red-400' : 'text-zinc-400'}`}>
-                  {isFreeProvider 
-                    ? "⚠ Free email providers are not accepted." 
-                    : "In order to use this facility you must enter a valid corporate email."}
-                </p>
+              <div className="flex items-center justify-center gap-2 px-4 py-3 bg-cyan-950/30 border border-cyan-500/30 rounded-xl text-cyan-400 text-xs tracking-wide w-full sm:w-auto animate-fade-in">
+                <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse"></span>
+                {isFreeProvider 
+                  ? "⚠ Free email providers are not accepted." 
+                  : "Enterprise telemetry requires a verified corporate domain."}
               </div>
             )}
           </div>
