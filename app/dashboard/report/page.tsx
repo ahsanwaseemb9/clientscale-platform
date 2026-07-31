@@ -138,32 +138,42 @@ export default function AuditReportPage() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           
           {/* 1. Revenue Leakage Card */}
-          <div className="bg-[#121216] border border-red-900/50 rounded-xl relative flex flex-col justify-between hover:border-red-500/50 transition-colors">
+          <div className={`bg-[#121216] border ${parseFloat(revenueLeakagePercent) === 0 ? 'border-green-900/50 hover:border-green-500/50' : 'border-red-900/50 hover:border-red-500/50'} rounded-xl relative flex flex-col justify-between transition-colors`}>
             <div className="absolute inset-0 overflow-hidden rounded-xl pointer-events-none">
               <div className="absolute top-0 right-0 p-4 opacity-10">
-                <DollarSign size={80} className="text-red-500" />
+                <DollarSign size={80} className={parseFloat(revenueLeakagePercent) === 0 ? 'text-green-500' : 'text-red-500'} />
               </div>
             </div>
             <div className="p-5 sm:p-6 relative z-10 flex-grow">
-              <div className="flex items-center gap-2 mb-3 text-red-400">
+              <div className={`flex items-center gap-2 mb-3 ${parseFloat(revenueLeakagePercent) === 0 ? 'text-green-400' : 'text-red-400'}`}>
                 <AlertTriangle size={18} />
                 <h3 className="text-sm font-bold uppercase tracking-wider">Revenue Leakage</h3>
               </div>
               <div className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white mb-3">{revenueLeakagePercent}%</div>
               <p className="text-xs sm:text-sm text-gray-400 leading-relaxed">
-                Latency is actively deflating your conversion rate. Traffic is abandoning the pipeline before checkout.
+                {parseFloat(revenueLeakagePercent) === 0 
+                  ? 'Performance is fully optimized. Zero estimated revenue leakage due to latency.'
+                  : 'Latency is actively deflating your conversion rate. Traffic is abandoning the pipeline before checkout.'}
               </p>
             </div>
             <div className="px-5 sm:px-6 pb-5 sm:pb-6 relative z-10 mt-2">
               <button 
                 onClick={() => setActiveDrawer('revenue')}
-                className="group relative w-full flex items-center justify-between px-4 py-3 bg-red-950/30 rounded-lg border border-red-900/50 hover:border-red-500/70 transition-all duration-300 overflow-hidden"
+                className={`group relative w-full flex items-center justify-between px-4 py-3 rounded-lg border transition-all duration-300 overflow-hidden ${
+                  parseFloat(revenueLeakagePercent) === 0 ? 'bg-green-950/30 border-green-900/50 hover:border-green-500/70' : 'bg-red-950/30 border-red-900/50 hover:border-red-500/70'
+                }`}
               >
-                <div className="absolute inset-0 bg-gradient-to-r from-red-500/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                <span className="relative z-10 text-[10px] uppercase tracking-widest font-bold text-red-400 group-hover:text-red-300 transition-colors">
+                <div className={`absolute inset-0 bg-gradient-to-r opacity-0 group-hover:opacity-100 transition-opacity duration-300 ${
+                  parseFloat(revenueLeakagePercent) === 0 ? 'from-green-500/20 to-transparent' : 'from-red-500/20 to-transparent'
+                }`} />
+                <span className={`relative z-10 text-[10px] uppercase tracking-widest font-bold transition-colors ${
+                  parseFloat(revenueLeakagePercent) === 0 ? 'text-green-400 group-hover:text-green-300' : 'text-red-400 group-hover:text-red-300'
+                }`}>
                   Forensic Methodology
                 </span>
-                <ChevronRight size={14} className="relative z-10 text-red-500/80 group-hover:text-red-300 group-hover:translate-x-1 transition-all duration-300" />
+                <ChevronRight size={14} className={`relative z-10 transition-all duration-300 group-hover:translate-x-1 ${
+                  parseFloat(revenueLeakagePercent) === 0 ? 'text-green-500/80 group-hover:text-green-300' : 'text-red-500/80 group-hover:text-red-300'
+                }`} />
               </button>
             </div>
           </div>
@@ -243,32 +253,42 @@ export default function AuditReportPage() {
           </div>
 
           {/* 4. Parasite Load Card */}
-          <div className="bg-[#121216] border border-yellow-900/50 rounded-xl relative flex flex-col justify-between hover:border-yellow-500/50 transition-colors">
+          <div className={`bg-[#121216] border ${parseFloat(parasiteImpact) === 0 ? 'border-green-900/50 hover:border-green-500/50' : 'border-yellow-900/50 hover:border-yellow-500/50'} rounded-xl relative flex flex-col justify-between transition-colors`}>
              <div className="absolute inset-0 overflow-hidden rounded-xl pointer-events-none">
                <div className="absolute top-0 right-0 p-4 opacity-10">
-                <ShieldAlert size={80} className="text-yellow-500" />
+                <ShieldAlert size={80} className={parseFloat(parasiteImpact) === 0 ? 'text-green-500' : 'text-yellow-500'} />
               </div>
              </div>
             <div className="p-5 sm:p-6 relative z-10 flex-grow">
-              <div className="flex items-center gap-2 mb-3 text-yellow-400">
+              <div className={`flex items-center gap-2 mb-3 ${parseFloat(parasiteImpact) === 0 ? 'text-green-400' : 'text-yellow-400'}`}>
                 <ServerCrash size={18} />
                 <h3 className="text-sm font-bold uppercase tracking-wider">Parasite Load</h3>
               </div>
               <div className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white mb-3">{parasiteImpact}%</div>
               <p className="text-xs sm:text-sm text-gray-400 leading-relaxed">
-                {thirdPartyCount} external marketing scripts are responsible for {parasiteImpact}% of your mobile lag.
+                {parseFloat(parasiteImpact) === 0
+                  ? 'Zero external tracking scripts detected. Pipeline resource consumption is clean.'
+                  : `${thirdPartyCount} external marketing scripts are responsible for ${parasiteImpact}% of your mobile lag.`}
               </p>
             </div>
              <div className="px-5 sm:px-6 pb-5 sm:pb-6 relative z-10 mt-2">
               <button 
                 onClick={() => setActiveDrawer('parasite')}
-                className="group relative w-full flex items-center justify-between px-4 py-3 bg-yellow-950/30 rounded-lg border border-yellow-900/50 hover:border-yellow-500/70 transition-all duration-300 overflow-hidden"
+                className={`group relative w-full flex items-center justify-between px-4 py-3 rounded-lg border transition-all duration-300 overflow-hidden ${
+                  parseFloat(parasiteImpact) === 0 ? 'bg-green-950/30 border-green-900/50 hover:border-green-500/70' : 'bg-yellow-950/30 border-yellow-900/50 hover:border-yellow-500/70'
+                }`}
               >
-                <div className="absolute inset-0 bg-gradient-to-r from-yellow-500/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                <span className="relative z-10 text-[10px] uppercase tracking-widest font-bold text-yellow-400 group-hover:text-yellow-300 transition-colors">
+                <div className={`absolute inset-0 bg-gradient-to-r opacity-0 group-hover:opacity-100 transition-opacity duration-300 ${
+                  parseFloat(parasiteImpact) === 0 ? 'from-green-500/20 to-transparent' : 'from-yellow-500/20 to-transparent'
+                }`} />
+                <span className={`relative z-10 text-[10px] uppercase tracking-widest font-bold transition-colors ${
+                  parseFloat(parasiteImpact) === 0 ? 'text-green-400 group-hover:text-green-300' : 'text-yellow-400 group-hover:text-yellow-300'
+                }`}>
                   Forensic Methodology
                 </span>
-                <ChevronRight size={14} className="relative z-10 text-yellow-500/80 group-hover:text-yellow-300 group-hover:translate-x-1 transition-all duration-300" />
+                <ChevronRight size={14} className={`relative z-10 transition-all duration-300 group-hover:translate-x-1 ${
+                  parseFloat(parasiteImpact) === 0 ? 'text-green-500/80 group-hover:text-green-300' : 'text-yellow-500/80 group-hover:text-yellow-300'
+                }`} />
               </button>
             </div>
           </div>
@@ -577,23 +597,40 @@ export default function AuditReportPage() {
         {activeDrawer === 'revenue' && (
           <div className="animate-in fade-in duration-500 text-gray-300">
             <h3 className="text-xl sm:text-2xl font-bold text-white mb-6">Revenue Leakage Algorithm</h3>
-            <p className="text-xs sm:text-sm leading-relaxed mb-4">
-              This calculation is strictly derived from the <strong>Deloitte & Google "Milliseconds Make Millions" baseline study</strong>.
-            </p>
-            <ul className="space-y-4 list-disc pl-5 mb-8 text-xs sm:text-sm">
-              <li>Retail and lead-generation conversion rates are mathematically bound to rendering latency.</li>
-              <li>The study proved conclusively that a mere <strong>0.1-second delay</strong> in mobile load times directly causes up to an <strong>8.4% drop in conversions</strong>.</li>
-              <li><strong>Why we use an estimate:</strong> Rather than guessing, we take your exact live Lighthouse performance deficit and run it through standardized conversion-loss curves to calculate the mathematical floor of your monthly revenue losses.</li>
-            </ul>
-            
-            <div className="p-4 sm:p-5 bg-cyan-950/20 border-l-2 border-cyan-500 rounded-r-lg">
-              <h4 className="text-[10px] font-bold text-cyan-400 uppercase tracking-widest mb-3 flex items-center gap-2">
-                <Activity size={14} className="shrink-0" /> The Business Translation
-              </h4>
-              <p className="text-xs sm:text-sm text-cyan-100/80 italic leading-relaxed">
-                "Because your website is technically unoptimized, we estimate that <strong>{revenueLeakagePercent}%</strong> of your traffic is getting frustrated and abandoning the pipeline before they ever submit a lead or make a purchase."
-              </p>
-            </div>
+            {parseFloat(revenueLeakagePercent) === 0 ? (
+              <>
+                <p className="text-xs sm:text-sm leading-relaxed mb-4">
+                  Your website performance score has reached optimal levels, neutralizing latency-driven conversion drops according to the <strong>Deloitte & Google "Milliseconds Make Millions" baseline study</strong>.
+                </p>
+                <div className="p-4 sm:p-5 bg-green-950/20 border-l-2 border-green-500 rounded-r-lg">
+                  <h4 className="text-[10px] font-bold text-green-400 uppercase tracking-widest mb-3 flex items-center gap-2">
+                    <CheckCircle size={14} className="shrink-0" /> Optimized Status
+                  </h4>
+                  <p className="text-xs sm:text-sm text-green-100/80 italic leading-relaxed">
+                    "Zero revenue leakage detected. Your site's loading velocity is fully optimized, allowing traffic to move smoothly through the conversion pipeline without latency friction."
+                  </p>
+                </div>
+              </>
+            ) : (
+              <>
+                <p className="text-xs sm:text-sm leading-relaxed mb-4">
+                  This calculation is strictly derived from the <strong>Deloitte & Google "Milliseconds Make Millions" baseline study</strong>.
+                </p>
+                <ul className="space-y-4 list-disc pl-5 mb-8 text-xs sm:text-sm">
+                  <li>Retail and lead-generation conversion rates are mathematically bound to rendering latency.</li>
+                  <li>The study proved conclusively that a mere <strong>0.1-second delay</strong> in mobile load times directly causes up to an <strong>8.4% drop in conversions</strong>.</li>
+                  <li><strong>Why we use an estimate:</strong> Rather than guessing, we take your exact live Lighthouse performance deficit and run it through standardized conversion-loss curves to calculate the mathematical floor of your monthly revenue losses.</li>
+                </ul>
+                <div className="p-4 sm:p-5 bg-cyan-950/20 border-l-2 border-cyan-500 rounded-r-lg">
+                  <h4 className="text-[10px] font-bold text-cyan-400 uppercase tracking-widest mb-3 flex items-center gap-2">
+                    <Activity size={14} className="shrink-0" /> The Business Translation
+                  </h4>
+                  <p className="text-xs sm:text-sm text-cyan-100/80 italic leading-relaxed">
+                    "Because your website is technically unoptimized, we estimate that <strong>{revenueLeakagePercent}%</strong> of your traffic is getting frustrated and abandoning the pipeline before they ever submit a lead or make a purchase."
+                  </p>
+                </div>
+              </>
+            )}
           </div>
         )}
 
@@ -646,53 +683,67 @@ export default function AuditReportPage() {
         {activeDrawer === 'parasite' && (
           <div className="animate-in fade-in duration-500 text-gray-300">
             <h3 className="text-xl sm:text-2xl font-bold text-white mb-6">Parasite Load Tracking</h3>
-            <p className="text-xs sm:text-sm leading-relaxed mb-4">
-              A forensic extraction of third-party network requests hijacking your local rendering pipeline.
-            </p>
-
-            <div className="p-4 sm:p-5 bg-cyan-950/20 border-l-2 border-cyan-500 rounded-r-lg mb-8">
-              <h4 className="text-[10px] font-bold text-cyan-400 uppercase tracking-widest mb-3 flex items-center gap-2">
-                <Activity size={14} className="shrink-0" /> The Business Translation
-              </h4>
-              <p className="text-xs sm:text-sm text-cyan-100/80 italic leading-relaxed">
-                "<strong>{parasiteImpact}%</strong> of your website's freezing isn't even your fault. It is caused by {thirdPartyCount} external marketing trackers feeding on your site's resources. Our AI Edge proxy can defer these instantly."
-              </p>
-            </div>
-
-            {/* --- DETECTED NETWORK HIJACKERS LIST --- */}
-            <div className="mb-8">
-               <h4 className="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-4 flex items-center gap-2">
-                <ShieldAlert size={14} className="text-yellow-500 shrink-0" /> Detected Network Hijackers
-              </h4>
-              
-              {thirdPartyScripts.length > 0 ? (
-                <div className="space-y-2 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
-                  {thirdPartyScripts.map((script: any, idx: number) => (
-                    <div key={idx} className="flex items-center justify-between p-3 bg-[#0a0a0c] border border-gray-800/50 rounded-lg gap-2">
-                      <div className="flex items-center gap-3 min-w-0 pr-2">
-                         <span className="w-1.5 h-1.5 rounded-full bg-yellow-500/80 shrink-0"></span>
-                         <span className="text-xs sm:text-sm text-gray-300 truncate">{script.name || script.url || 'Unknown Tracker'}</span>
-                      </div>
-                      {script.mainThreadTime > 0 && (
-                        <span className="text-[10px] text-yellow-500/80 font-mono shrink-0">
-                          {Math.round(script.mainThreadTime)}ms block
-                        </span>
-                      )}
+            {parseFloat(parasiteImpact) === 0 ? (
+              <>
+                <p className="text-xs sm:text-sm leading-relaxed mb-4">
+                  A forensic extraction confirms zero unmanaged third-party network requests or marketing scripts hijacking your local rendering pipeline.
+                </p>
+                <div className="p-4 sm:p-5 bg-green-950/20 border-l-2 border-green-500 rounded-r-lg mb-8">
+                  <h4 className="text-[10px] font-bold text-green-400 uppercase tracking-widest mb-3 flex items-center gap-2">
+                    <CheckCircle size={14} className="shrink-0" /> Clean Architecture
+                  </h4>
+                  <p className="text-xs sm:text-sm text-green-100/80 italic leading-relaxed">
+                    "Your rendering pipeline is completely pristine. No external marketing trackers or heavy scripts are burdening the mobile browser's main thread."
+                  </p>
+                </div>
+              </>
+            ) : (
+              <>
+                <p className="text-xs sm:text-sm leading-relaxed mb-4">
+                  A forensic extraction of third-party network requests hijacking your local rendering pipeline.
+                </p>
+                <div className="p-4 sm:p-5 bg-cyan-950/20 border-l-2 border-cyan-500 rounded-r-lg mb-8">
+                  <h4 className="text-[10px] font-bold text-cyan-400 uppercase tracking-widest mb-3 flex items-center gap-2">
+                    <Activity size={14} className="shrink-0" /> The Business Translation
+                  </h4>
+                  <p className="text-xs sm:text-sm text-cyan-100/80 italic leading-relaxed">
+                    "<strong>{parasiteImpact}%</strong> of your website's freezing isn't even your fault. It is caused by {thirdPartyCount} external marketing trackers feeding on your site's resources. Our AI Edge proxy can defer these instantly."
+                  </p>
+                </div>
+                {/* --- DETECTED NETWORK HIJACKERS LIST --- */}
+                <div className="mb-8">
+                   <h4 className="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-4 flex items-center gap-2">
+                    <ShieldAlert size={14} className="text-yellow-500 shrink-0" /> Detected Network Hijackers
+                  </h4>
+                  {thirdPartyScripts.length > 0 ? (
+                    <div className="space-y-2 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
+                      {thirdPartyScripts.map((script: any, idx: number) => (
+                        <div key={idx} className="flex items-center justify-between p-3 bg-[#0a0a0c] border border-gray-800/50 rounded-lg gap-2">
+                          <div className="flex items-center gap-3 min-w-0 pr-2">
+                             <span className="w-1.5 h-1.5 rounded-full bg-yellow-500/80 shrink-0"></span>
+                             <span className="text-xs sm:text-sm text-gray-300 truncate">{script.name || script.url || 'Unknown Tracker'}</span>
+                          </div>
+                          {script.mainThreadTime > 0 && (
+                            <span className="text-[10px] text-yellow-500/80 font-mono shrink-0">
+                              {Math.round(script.mainThreadTime)}ms block
+                            </span>
+                          )}
+                        </div>
+                      ))}
                     </div>
-                  ))}
+                  ) : (
+                    <div className="p-4 bg-[#0a0a0c] border border-gray-800/50 rounded-lg text-xs sm:text-sm text-gray-500 italic text-center">
+                      Script identities protected by enterprise firewall or not detected.
+                    </div>
+                  )}
                 </div>
-              ) : (
-                <div className="p-4 bg-[#0a0a0c] border border-gray-800/50 rounded-lg text-xs sm:text-sm text-gray-500 italic text-center">
-                  Script identities protected by enterprise firewall or not detected.
-                </div>
-              )}
-            </div>
-
-            <ul className="space-y-4 list-disc pl-5 text-xs sm:text-sm">
-              <li>Modern sites are bloated with external scripts: Facebook Pixels, live chat widgets, Google Analytics, and CRM trackers.</li>
-              <li>These "parasite" scripts force the mobile browser to pause rendering your core website while it reaches out to external servers to download code you do not control.</li>
-              <li><strong>Why we use an estimate:</strong> Instead of subjective audits, we isolate external network weights and apply standardized CPU execution cost multipliers to measure precisely how much third-party scripts drag down your infrastructure.</li>
-            </ul>
+                <ul className="space-y-4 list-disc pl-5 text-xs sm:text-sm">
+                  <li>Modern sites are bloated with external scripts: Facebook Pixels, live chat widgets, Google Analytics, and CRM trackers.</li>
+                  <li>These "parasite" scripts force the mobile browser to pause rendering your core website while it reaches out to external servers to download code you do not control.</li>
+                  <li><strong>Why we use an estimate:</strong> Instead of subjective audits, we isolate external network weights and apply standardized CPU execution cost multipliers to measure precisely how much third-party scripts drag down your infrastructure.</li>
+                </ul>
+              </>
+            )}
           </div>
         )}
 
