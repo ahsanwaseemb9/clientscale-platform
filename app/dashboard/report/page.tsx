@@ -526,7 +526,7 @@ export default function AuditReportPage() {
               <div>
                 <h4 className="text-sm font-bold text-white uppercase tracking-wider mb-1">Upgrade Paths & Migration Blueprints Locked</h4>
                 <p className="text-xs text-gray-400 max-w-sm">
-                  Authorize compliance and initialize Phase 4 Stealth Microservice extraction to unlock custom-engineered architecture upgrades.
+                  Authorize compliance and initialize Stealth Microservice extraction to unlock custom-engineered architecture upgrades.
                 </p>
               </div>
               <button 
