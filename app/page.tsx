@@ -235,7 +235,7 @@ export default function Home() {
                 <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse shrink-0 shadow-[0_0_8px_rgba(6,182,212,0.8)]"></span>
                 <span>
                   {isFreeProvider 
-                    ? "⚠ Free email providers are not accepted." 
+                    ? "Free email providers are not accepted." 
                     : "Corporate domain required for enterprise telemetry."}
                 </span>
               </div>
