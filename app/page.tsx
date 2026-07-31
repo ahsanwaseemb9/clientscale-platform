@@ -37,7 +37,7 @@ export default function Home() {
     }
   }, [activeSection]);
 
-  // Step 1: Client-side submission logic
+  // Client-side submission logic
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     
@@ -49,24 +49,8 @@ export default function Home() {
     
     setIsLoading(true);
 
-    try {
-      // Hit the lightweight API
-      const res = await fetch('/api/audit-light', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ url, email: emailValue })
-      });
-      
-      const data = await res.json();
-      
-      // Store the fast telemetry data and push to dashboard
-      sessionStorage.setItem('initialAuditData', JSON.stringify(data.data));
-      router.push('/dashboard/scan');
-      
-    } catch (error) {
-      console.error("Audit initialization failed", error);
-      setIsLoading(false);
-    }
+    // Route to the standalone /scan page so the sidebar doesn't show!
+    router.push(`/scan?url=${encodeURIComponent(url)}`);
   };
 
   return (
@@ -205,7 +189,7 @@ export default function Home() {
               title="Please enter a valid website (e.g., google.com, www.google.com, https://google.com)"
               autoComplete="off"
               placeholder="Target URL (e.g., https://yourfacility.com)" 
-              className="w-full bg-transparent py-3 sm:py-3.5 px-2 text-zinc-100 placeholder-zinc-600 focus:outline-none text-sm font-normal tracking-wide" 
+              className="w-full bg-transparent py-3 sm:py-3.5 px-2 text-zinc-100 placeholder-zinc-600 focus:outline-none text-sm font-normal tracking-wide [&:-webkit-autofill]:[-webkit-text-fill-color:#fff] [&:-webkit-autofill]:[transition:background-color_5000s_ease-in-out_0s]" 
             />
           </div>
 
@@ -223,13 +207,13 @@ export default function Home() {
               value={emailValue}
               onChange={(e) => setEmailValue(e.target.value)}
               placeholder="Work Email (Required)" 
-              className="w-full bg-transparent py-3 sm:py-3.5 px-2 text-zinc-100 placeholder-zinc-600 focus:outline-none text-sm font-normal tracking-wide" 
+              className="w-full bg-transparent py-3 sm:py-3.5 px-2 text-zinc-100 placeholder-zinc-600 focus:outline-none text-sm font-normal tracking-wide [&:-webkit-autofill]:[-webkit-text-fill-color:#fff] [&:-webkit-autofill]:[transition:background-color_5000s_ease-in-out_0s]" 
             />
             {/* Dynamic Status Indicator */}
-            <div className={`hidden sm:flex items-center gap-2 bg-[#0d111c]/90 border border-zinc-800 rounded-lg px-3 py-1.5 mr-1 font-mono text-[10px] tracking-widest uppercase transition-all duration-300 ${isFreeProvider ? 'text-red-500 border-red-500/20' : isCorporateValid ? 'text-cyan-400 border-cyan-500/20' : 'text-zinc-600'}`}>
+            <div className={`hidden sm:flex items-center gap-2 bg-[#0d111c]/90 border border-zinc-800 rounded-lg px-3 py-1.5 mr-1 font-mono text-[10px] tracking-widest uppercase transition-all duration-300 ${isFreeProvider ? 'text-red-500 border-red-500/20' : isCorporateValid ? 'text-cyan-400 border-cyan-500/20' : 'text-zinc-500'}`}>
               <span className="relative flex h-1.5 w-1.5">
                 <span className={`animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 ${isCorporateValid ? 'bg-cyan-400/60' : 'hidden'}`}></span>
-                <span className={`relative inline-flex rounded-full h-1.5 w-1.5 ${isFreeProvider ? 'bg-red-500' : isCorporateValid ? 'bg-cyan-500' : 'bg-zinc-700'}`}></span>
+                <span className={`relative inline-flex rounded-full h-1.5 w-1.5 ${isFreeProvider ? 'bg-red-500' : isCorporateValid ? 'bg-cyan-500 shadow-[0_0_10px_rgba(6,182,212,0.8)]' : 'bg-cyan-500 shadow-[0_0_8px_rgba(6,182,212,0.6)] animate-pulse'}`}></span>
               </span>
               {isCorporateValid ? 'READY' : isFreeProvider ? 'BLOCKED' : 'WAITING'}
             </div>
@@ -248,7 +232,7 @@ export default function Home() {
               </button>
             ) : (
               <div className="flex items-center justify-center bg-zinc-900/40 border border-zinc-800/50 rounded-xl px-6 py-4 w-full sm:w-auto animate-fade-in">
-                <p className={`text-[10px] sm:text-xs font-mono tracking-widest uppercase text-center ${isFreeProvider ? 'text-red-400' : 'text-zinc-500'}`}>
+                <p className={`text-[10px] sm:text-xs font-mono tracking-widest uppercase text-center ${isFreeProvider ? 'text-red-400' : 'text-zinc-400'}`}>
                   {isFreeProvider 
                     ? "⚠ Free email providers are not accepted." 
                     : "In order to use this facility you must enter a valid corporate email."}
@@ -262,6 +246,3 @@ export default function Home() {
     </main>
   );
 }
-
-
-                                                                      
