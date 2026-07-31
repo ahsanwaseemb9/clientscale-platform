@@ -209,8 +209,8 @@ export default function Home() {
               placeholder="Work Email (Required)" 
               className="w-full bg-transparent py-3 sm:py-3.5 px-2 text-zinc-100 placeholder-zinc-600 focus:outline-none text-sm font-normal tracking-wide [&:-webkit-autofill]:[-webkit-text-fill-color:#fff] [&:-webkit-autofill]:[transition:background-color_5000s_ease-in-out_0s]" 
             />
-            {/* Dynamic Status Indicator (Always visible on mobile & desktop) */}
-            <div className={`flex items-center gap-2 bg-[#0d111c]/90 border border-zinc-800 rounded-lg px-2.5 sm:px-3 py-1.5 mr-1 font-mono text-[9px] sm:text-[10px] tracking-widest uppercase transition-all duration-300 shrink-0 ${isFreeProvider ? 'text-red-500 border-red-500/20' : isCorporateValid ? 'text-cyan-400 border-cyan-500/20' : 'text-zinc-500'}`}>
+            {/* Dynamic Status Indicator */}
+            <div className={`flex items-center gap-1.5 sm:gap-2 bg-[#0d111c]/90 border border-zinc-800 rounded-lg px-2 sm:px-3 py-1.5 mr-1 font-mono text-[8px] sm:text-[10px] tracking-wider sm:tracking-widest uppercase transition-all duration-300 shrink-0 ${isFreeProvider ? 'text-red-500 border-red-500/20' : isCorporateValid ? 'text-cyan-400 border-cyan-500/20' : 'text-zinc-500'}`}>
               <span className="relative flex h-1.5 w-1.5">
                 <span className={`animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 ${isCorporateValid ? 'bg-cyan-400/60' : 'hidden'}`}></span>
                 <span className={`relative inline-flex rounded-full h-1.5 w-1.5 ${isFreeProvider ? 'bg-red-500' : isCorporateValid ? 'bg-cyan-500 shadow-[0_0_10px_rgba(6,182,212,0.8)]' : 'bg-cyan-500 shadow-[0_0_8px_rgba(6,182,212,0.6)] animate-pulse'}`}></span>
@@ -231,12 +231,12 @@ export default function Home() {
                 {isLoading ? 'Establishing Connection...' : 'Initialize Diagnostic Scan'}
               </button>
             ) : (
-              <div className="flex items-center justify-center gap-2.5 px-4 py-3.5 bg-[#07070f]/90 border border-cyan-500/20 rounded-xl sm:rounded-2xl text-white text-xs tracking-wide w-full backdrop-blur-xl shadow-[0_0_15px_rgba(6,182,212,0.08)] animate-fade-in font-mono">
+              <div className="flex items-center justify-center gap-2.5 px-4 py-3.5 bg-[#07070f]/90 border border-cyan-500/20 rounded-xl sm:rounded-2xl text-white text-xs tracking-wide w-full backdrop-blur-xl shadow-[0_0_15px_rgba(6,182,212,0.08)] animate-fade-in font-mono text-center">
                 <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse shrink-0 shadow-[0_0_8px_rgba(6,182,212,0.8)]"></span>
                 <span>
                   {isFreeProvider 
                     ? "⚠ Free email providers are not accepted." 
-                    : "Enterprise telemetry requires a verified corporate domain."}
+                    : "Corporate domain required for enterprise telemetry."}
                 </span>
               </div>
             )}
