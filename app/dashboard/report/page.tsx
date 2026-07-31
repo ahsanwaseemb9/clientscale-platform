@@ -98,6 +98,9 @@ export default function AuditReportPage() {
   const meta = auditData?.metaAndSocial || {};
   const a11y = auditData?.accessibility || {};
 
+  // Dynamic Risk Tier override based on actual friction metrics so bloat/latency properly escalates risk
+  const dynamicSeverityTier = thirdPartyCount > 8 || perfScore < 50 ? 'HIGH' : thirdPartyCount > 4 ? 'MODERATE' : funnel.severityTier || 'OPTIMIZED';
+
   // Clean up HTML entities in the extracted title
   const displayTitle = meta.title 
     ? meta.title.replace(/&#039;/g, "'").replace(/&amp;/g, "&").replace(/&quot;/g, '"')
@@ -354,11 +357,11 @@ export default function AuditReportPage() {
             <div className="flex items-center gap-3">
               <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Risk Tier</span>
               <span className={`px-3 py-1 text-xs font-bold rounded-full uppercase tracking-wider ${
-                funnel.severityTier === 'HIGH' ? 'bg-red-500/10 text-red-400 border border-red-500/20' : 
-                funnel.severityTier === 'MODERATE' ? 'bg-orange-500/10 text-orange-400 border border-orange-500/20' : 
+                dynamicSeverityTier === 'HIGH' ? 'bg-red-500/10 text-red-400 border border-red-500/20' : 
+                dynamicSeverityTier === 'MODERATE' ? 'bg-orange-500/10 text-orange-400 border border-orange-500/20' : 
                 'bg-yellow-500/10 text-yellow-400 border border-yellow-500/20'
               }`}>
-                {funnel.severityTier || 'ANALYZING'}
+                {dynamicSeverityTier}
               </span>
             </div>
           </div>
