@@ -1,6 +1,7 @@
 export function auditHtmlMetadata(htmlText: string) {
-  // 1. Social Preview (Open Graph) via Regex
+  // 1. Social Preview & Meta Description via Regex
   const titleMatch = htmlText.match(/<title[^>]*>([^<]+)<\/title>/i);
+  
   const ogTitleMatch = htmlText.match(/<meta[^>]+property=["']og:title["'][^>]+content=["']([^"']+)["']/i) || 
                        htmlText.match(/<meta[^>]+content=["']([^"']+)["'][^>]+property=["']og:title["']/i);
                        
@@ -10,8 +11,13 @@ export function auditHtmlMetadata(htmlText: string) {
   const ogDescMatch = htmlText.match(/<meta[^>]+property=["']og:description["'][^>]+content=["']([^"']+)["']/i) ||
                       htmlText.match(/<meta[^>]+content=["']([^"']+)["'][^>]+property=["']og:description["']/i);
 
+  // Fallback to standard SEO description if og:description is missing
+  const standardDescMatch = htmlText.match(/<meta[^>]+name=["']description["'][^>]+content=["']([^"']+)["']/i) ||
+                            htmlText.match(/<meta[^>]+content=["']([^"']+)["'][^>]+name=["']description["']/i);
+
   const ogTitle = ogTitleMatch?.[1] || titleMatch?.[1] || null;
   const ogImage = ogImageMatch?.[1] || null;
+  const description = ogDescMatch?.[1] || standardDescMatch?.[1] || null;
 
   // 2. Accessibility Quick Vitals
   const totalImages = (htmlText.match(/<img[^>]+>/gi) || []).length;
@@ -29,7 +35,7 @@ export function auditHtmlMetadata(htmlText: string) {
     socialPreview: {
       title: ogTitle,
       image: ogImage,
-      description: ogDescMatch?.[1] || null,
+      description: description,
       isValid: Boolean(ogTitle && ogImage)
     },
     accessibility: {
