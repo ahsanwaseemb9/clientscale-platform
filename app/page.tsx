@@ -231,7 +231,7 @@ export default function Home() {
                 {isLoading ? 'Establishing Connection...' : 'Initialize Diagnostic Scan'}
               </button>
             ) : (
-              <div className="flex items-center justify-center gap-2.5 px-4 py-3.5 bg-[#07070f]/90 border border-cyan-500/20 rounded-xl sm:rounded-2xl text-cyan-400/90 text-xs tracking-wide w-full backdrop-blur-xl shadow-[0_0_15px_rgba(6,182,212,0.08)] animate-fade-in font-mono">
+              <div className="flex items-center justify-center gap-2.5 px-4 py-3.5 bg-[#07070f]/90 border border-cyan-500/20 rounded-xl sm:rounded-2xl text-white text-xs tracking-wide w-full backdrop-blur-xl shadow-[0_0_15px_rgba(6,182,212,0.08)] animate-fade-in font-mono">
                 <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse shrink-0 shadow-[0_0_8px_rgba(6,182,212,0.8)]"></span>
                 <span>
                   {isFreeProvider 
