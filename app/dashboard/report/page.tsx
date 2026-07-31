@@ -65,6 +65,7 @@ export default function AuditReportPage() {
   const perfScore = auditData?.diagnostics?.performanceScore || 50;
   const rawTbt = parseInt(auditData?.diagnostics?.latency?.tbt?.replace(/[^0-9]/g, '') || '800');
   const thirdPartyCount = auditData?.diagnostics?.thirdPartyScriptCount || 0;
+  const thirdPartyScripts = auditData?.diagnostics?.thirdPartyScripts || [];
   const rawInp = parseInt(auditData?.diagnostics?.latency?.inp?.replace(/[^0-9]/g, '') || '340');
   
   // Security & Thresholds
@@ -591,13 +592,8 @@ export default function AuditReportPage() {
             <p className="leading-relaxed mb-4">
               A forensic extraction of third-party network requests hijacking your local rendering pipeline.
             </p>
-            <ul className="space-y-4 list-disc pl-5 mb-8">
-              <li>Modern sites are bloated with external scripts: Facebook Pixels, live chat widgets, Google Analytics, and CRM trackers.</li>
-              <li>These "parasite" scripts force the mobile browser to pause rendering your core website while it reaches out to external servers to download code you do not control.</li>
-              <li><strong>Why we use an estimate:</strong> Instead of subjective audits, we isolate external network weights and apply standardized CPU execution cost multipliers to measure precisely how much third-party scripts drag down your infrastructure.</li>
-            </ul>
 
-            <div className="p-5 bg-cyan-950/20 border-l-2 border-cyan-500 rounded-r-lg">
+            <div className="p-5 bg-cyan-950/20 border-l-2 border-cyan-500 rounded-r-lg mb-8">
               <h4 className="text-[10px] font-bold text-cyan-400 uppercase tracking-widest mb-3 flex items-center gap-2">
                 <Activity size={14} /> The Business Translation
               </h4>
@@ -605,6 +601,41 @@ export default function AuditReportPage() {
                 "<strong>{parasiteImpact}%</strong> of your website's freezing isn't even your fault. It is caused by {thirdPartyCount} external marketing trackers feeding on your site's resources. Our AI Edge proxy can defer these instantly."
               </p>
             </div>
+
+            {/* --- DETECTED NETWORK HIJACKERS LIST --- */}
+            <div className="mb-8">
+               <h4 className="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-4 flex items-center gap-2">
+                <ShieldAlert size={14} className="text-yellow-500" /> Detected Network Hijackers
+              </h4>
+              
+              {thirdPartyScripts.length > 0 ? (
+                <div className="space-y-2 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
+                  {thirdPartyScripts.map((script: any, idx: number) => (
+                    <div key={idx} className="flex items-center justify-between p-3 bg-[#0a0a0c] border border-gray-800/50 rounded-lg">
+                      <div className="flex items-center gap-3 truncate pr-4">
+                         <span className="w-1.5 h-1.5 rounded-full bg-yellow-500/80 shrink-0"></span>
+                         <span className="text-sm text-gray-300 truncate">{script.name || script.url || 'Unknown Tracker'}</span>
+                      </div>
+                      {script.mainThreadTime > 0 && (
+                        <span className="text-[10px] text-yellow-500/80 font-mono shrink-0">
+                          {Math.round(script.mainThreadTime)}ms block
+                        </span>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="p-4 bg-[#0a0a0c] border border-gray-800/50 rounded-lg text-sm text-gray-500 italic text-center">
+                  Script identities protected by enterprise firewall or not detected.
+                </div>
+              )}
+            </div>
+
+            <ul className="space-y-4 list-disc pl-5">
+              <li>Modern sites are bloated with external scripts: Facebook Pixels, live chat widgets, Google Analytics, and CRM trackers.</li>
+              <li>These "parasite" scripts force the mobile browser to pause rendering your core website while it reaches out to external servers to download code you do not control.</li>
+              <li><strong>Why we use an estimate:</strong> Instead of subjective audits, we isolate external network weights and apply standardized CPU execution cost multipliers to measure precisely how much third-party scripts drag down your infrastructure.</li>
+            </ul>
           </div>
         )}
 
