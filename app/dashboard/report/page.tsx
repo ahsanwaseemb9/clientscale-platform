@@ -84,6 +84,11 @@ export default function AuditReportPage() {
   const meta = auditData?.metaAndSocial || {};
   const a11y = auditData?.accessibility || {};
 
+  // Clean up HTML entities in the extracted title
+  const displayTitle = meta.title 
+    ? meta.title.replace(/&#039;/g, "'").replace(/&amp;/g, "&").replace(/&quot;/g, '"')
+    : 'No Title Found';
+
   return (
     <div className="space-y-6 relative overflow-x-hidden min-h-screen pb-12">
       
@@ -371,7 +376,7 @@ export default function AuditReportPage() {
                 <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-2 block">Social Link Preview (OpenGraph)</span>
                 <div className="p-4 bg-[#0a0a0c] border border-gray-800/50 rounded-lg space-y-2">
                   <div className="flex justify-between items-start">
-                    <p className="text-sm text-gray-200 font-medium line-clamp-1">{meta.title || 'No Title Found'}</p>
+                    <p className="text-sm text-gray-200 font-medium line-clamp-1">{displayTitle}</p>
                     {meta.isValid ? (
                        <CheckCircle size={14} className="text-green-500 shrink-0" />
                     ) : (
@@ -403,7 +408,7 @@ export default function AuditReportPage() {
                       <span className={`text-sm font-bold ${a11y.missingAlt > 0 ? 'text-yellow-400' : 'text-green-400'}`}>
                         {a11y.missingAlt || 0} Missing
                       </span>
-                      <span className="text-[10px] font-bold text-gray-500">Score: {a11y.a11yComplianceScore || 100}</span>
+                      <span className="text-[10px] font-bold text-gray-500">Score: {a11y.altComplianceScore ?? 100}</span>
                     </div>
                  </div>
               </div>
