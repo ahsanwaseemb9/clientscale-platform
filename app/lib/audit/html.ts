@@ -25,10 +25,20 @@ export function auditHtmlMetadata(htmlText: string) {
   const ogImage = ogImageMatch?.[1] || null;
   const description = ogDescMatch?.[1] || standardDescMatch?.[1] || null;
 
-  // 2. Accessibility Quick Vitals
-  const totalImages = (htmlText.match(/<img[^>]+>/gi) || []).length;
-  // Matches <img> tags that do NOT contain an alt attribute
-  const missingAlt = (htmlText.match(/<img(?![^>]*\balt=)[^>]+>/gi) || []).length;
+  // 2. Accessibility & Missing Alt Extraction
+  const imgTags = htmlText.match(/<img[^>]+>/gi) || [];
+  const totalImages = imgTags.length;
+
+  const missingAltImages: string[] = [];
+  imgTags.forEach(img => {
+    // Check if the img tag does not contain an alt attribute
+    if (!/\balt\s*=/i.test(img)) {
+      const srcMatch = img.match(/src=["']([^"']+)["']/i);
+      missingAltImages.push(srcMatch?.[1] || 'Unnamed Asset / Inline SVG Element');
+    }
+  });
+
+  const missingAlt = missingAltImages.length;
 
   // 3. Schema Structured Data Check
   const hasSchema = /application\/ld\+json/i.test(htmlText);
@@ -47,6 +57,7 @@ export function auditHtmlMetadata(htmlText: string) {
     accessibility: {
       totalImages,
       missingAlt,
+      missingAltImages,
       altComplianceScore: totalImages > 0 ? Math.round(((totalImages - missingAlt) / totalImages) * 100) : 100
     },
     schemaPresent: hasSchema,

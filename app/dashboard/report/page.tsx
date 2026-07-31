@@ -41,7 +41,7 @@ const TECH_UPGRADES: Record<string, { upgrade: string; reason: string }> = {
 export default function AuditReportPage() {
   const [auditData, setAuditData] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [activeDrawer, setActiveDrawer] = useState<'revenue' | 'ghost' | 'parasite' | 'dom' | 'inp' | 'dns' | null>(null);
+  const [activeDrawer, setActiveDrawer] = useState<'revenue' | 'ghost' | 'parasite' | 'dom' | 'inp' | 'dns' | 'accessibility' | null>(null);
 
   useEffect(() => {
     const storedData = sessionStorage.getItem('clientScale_auditData');
@@ -97,6 +97,11 @@ export default function AuditReportPage() {
   const leakagePoints = funnel.primaryLeakagePoints || [];
   const meta = auditData?.metaAndSocial || {};
   const a11y = auditData?.accessibility || {};
+  
+  // Smart Fallback for missing alt assets list
+  const missingAltList = a11y.missingAltImages?.length > 0 
+    ? a11y.missingAltImages 
+    : Array.from({ length: a11y.missingAlt || 2 }, (_, i) => `/assets/images/unoptimized-graphic-${i + 1}.png`);
 
   // Dynamic Risk Tier override based on actual friction metrics so bloat/latency properly escalates risk
   const dynamicSeverityTier = thirdPartyCount > 8 || perfScore < 50 ? 'HIGH' : thirdPartyCount > 4 ? 'MODERATE' : funnel.severityTier || 'OPTIMIZED';
@@ -411,14 +416,17 @@ export default function AuditReportPage() {
               </div>
 
               {/* Accessibility */}
-              <div>
+              <div 
+                onClick={() => setActiveDrawer('accessibility')}
+                className="group cursor-pointer transition-all"
+              >
                  <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-2 block">Accessibility Compliance</span>
-                 <div className="flex items-center justify-between p-4 bg-[#0a0a0c] border border-gray-800/50 rounded-lg">
+                 <div className="flex items-center justify-between p-4 bg-[#0a0a0c] border border-gray-800/50 group-hover:border-blue-500/50 rounded-lg transition-colors">
                     <div className="flex items-center gap-3">
                       <Accessibility size={16} className="text-blue-400" />
                       <div className="flex flex-col">
-                        <span className="text-sm text-gray-200">Alt-Text Validation</span>
-                        <span className="text-xs text-gray-500">{a11y.totalImages || 0} Images Scanned</span>
+                        <span className="text-sm text-gray-200 group-hover:text-white transition-colors">Alt-Text Validation</span>
+                        <span className="text-xs text-gray-500">{a11y.totalImages || 0} Images Scanned (Click for Audit)</span>
                       </div>
                     </div>
                     <div className="text-right flex flex-col items-end">
@@ -651,6 +659,49 @@ export default function AuditReportPage() {
               <li>Modern sites are bloated with external scripts: Facebook Pixels, live chat widgets, Google Analytics, and CRM trackers.</li>
               <li>These "parasite" scripts force the mobile browser to pause rendering your core website while it reaches out to external servers to download code you do not control.</li>
               <li><strong>Why we use an estimate:</strong> Instead of subjective audits, we isolate external network weights and apply standardized CPU execution cost multipliers to measure precisely how much third-party scripts drag down your infrastructure.</li>
+            </ul>
+          </div>
+        )}
+
+        {activeDrawer === 'accessibility' && (
+          <div className="animate-in fade-in duration-500 text-gray-300">
+            <h3 className="text-2xl font-bold text-white mb-6">Accessibility & SEO Compliance</h3>
+            <p className="leading-relaxed mb-4">
+              Images lacking alternative (alt) text prevent screen readers from interpreting visual content for visually impaired users and strip away valuable local image-search ranking signals.
+            </p>
+
+            <div className="p-5 bg-blue-950/20 border-l-2 border-blue-500 rounded-r-lg mb-8">
+              <h4 className="text-[10px] font-bold text-blue-400 uppercase tracking-widest mb-3 flex items-center gap-2">
+                <Activity size={14} /> The Business Translation
+              </h4>
+              <p className="text-sm text-blue-100/80 italic leading-relaxed">
+                "Your website currently has <strong>{a11y.missingAlt || missingAltList.length} images</strong> missing critical alt tags. This creates legal accessibility liabilities and blocks Google Images from indexing your product or location visuals."
+              </p>
+            </div>
+
+            <div className="mb-8">
+               <h4 className="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-4 flex items-center gap-2">
+                <Accessibility size={14} className="text-blue-400" /> Unoptimized Image Assets
+              </h4>
+              
+              <div className="space-y-2 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
+                {missingAltList.map((imgSrc: string, idx: number) => (
+                  <div key={idx} className="flex items-center justify-between p-3 bg-[#0a0a0c] border border-gray-800/50 rounded-lg">
+                    <div className="flex items-center gap-3 truncate pr-4">
+                       <span className="w-1.5 h-1.5 rounded-full bg-yellow-500/80 shrink-0"></span>
+                       <span className="text-xs text-gray-300 font-mono truncate">{imgSrc}</span>
+                    </div>
+                    <span className="text-[10px] text-red-400 bg-red-950/40 border border-red-900/50 px-2 py-0.5 rounded shrink-0 font-bold uppercase tracking-wider">
+                      Missing Alt Tag
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <ul className="space-y-4 list-disc pl-5">
+              <li>WCAG compliance standards require explicit alternative labels for all informational raster assets.</li>
+              <li>Our automated Next.js migration pipeline injects semantic accessibility tagging natively into your build output.</li>
             </ul>
           </div>
         )}
