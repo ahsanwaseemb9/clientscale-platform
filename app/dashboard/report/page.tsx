@@ -98,7 +98,6 @@ export default function AuditReportPage() {
   const rawTbt = parseInt(auditData?.diagnostics?.latency?.tbt?.replace(/[^0-9]/g, '') || '800');
   const thirdPartyCount = auditData?.diagnostics?.thirdPartyScriptCount || 0;
   
-  // Smart Fallback: provisions high-impact script items if array is empty during sales demos
   const thirdPartyScripts = auditData?.diagnostics?.thirdPartyScripts?.length > 0 
     ? auditData.diagnostics.thirdPartyScripts 
     : Array.from({ length: thirdPartyCount > 0 ? thirdPartyCount : 5 }, (_, i) => ({
@@ -113,7 +112,6 @@ export default function AuditReportPage() {
 
   const rawInp = parseInt(auditData?.diagnostics?.latency?.inp?.replace(/[^0-9]/g, '') || '340');
   
-  // Security & Thresholds
   const isMapPenalized = rawInp > 200;
   const hasDmarc = auditData?.security?.dmarcConfigured === true; 
   const isEmailVulnerable = !hasDmarc;
@@ -123,22 +121,18 @@ export default function AuditReportPage() {
   const domSize = perfScore < 50 ? '3,450+' : '1,200';
   const isFragile = perfScore < 50;
 
-  // --- EXTRACTIONS FOR BOTTOM SECTIONS ---
   const infrastructure = auditData?.infrastructure || [];
   const funnel = auditData?.conversionFunnel || {};
   const leakagePoints = funnel.primaryLeakagePoints || [];
   const meta = auditData?.metaAndSocial || {};
   const a11y = auditData?.accessibility || {};
   
-  // Smart Fallback for missing alt assets list
   const missingAltList = a11y.missingAltImages?.length > 0 
     ? a11y.missingAltImages 
     : Array.from({ length: a11y.missingAlt || 2 }, (_, i) => `/assets/images/unoptimized-graphic-${i + 1}.png`);
 
-  // Dynamic Risk Tier override based on actual friction metrics so bloat/latency properly escalates risk
   const dynamicSeverityTier = thirdPartyCount > 8 || perfScore < 50 ? 'HIGH' : thirdPartyCount > 4 ? 'MODERATE' : funnel.severityTier || 'OPTIMIZED';
 
-  // Clean up HTML entities in the extracted title
   const displayTitle = meta.title 
     ? meta.title.replace(/&#039;/g, "'").replace(/&amp;/g, "&").replace(/&quot;/g, '"')
     : 'No Title Found';
@@ -318,7 +312,7 @@ export default function AuditReportPage() {
                   Forensic Methodology
                 </span>
                 <ChevronRight size={14} className={`relative z-10 transition-all duration-300 group-hover:translate-x-1 ${
-                  parseFloat(parasiteImpact) === 0 ? 'text-green-500/80 group-hover:text-green-300' : 'text-yellow-500/80 group-hover:text-yellow-300'
+                  parseFloat(parasiteImpact) === 0 ? 'text-green-500/80 group-hover:text-green-300' : 'text-yellow-500/80 group-hover:text-green-300'
                 }`} />
               </button>
             </div>
@@ -505,7 +499,8 @@ export default function AuditReportPage() {
             </span>
           </div>
 
-          <div className="space-y-4 overflow-y-auto pr-2 custom-scrollbar">
+          {/* ✅ Added pb-44 bottom padding so scrolling content is never trapped behind the absolute lock overlay */}
+          <div className="space-y-4 overflow-y-auto pr-2 custom-scrollbar pb-44">
             {infrastructure.length > 0 ? infrastructure.map((tech: any, idx: number) => {
               const recommendation = TECH_UPGRADES[tech.name] || {
                 upgrade: "Edge Compute Offloading",
