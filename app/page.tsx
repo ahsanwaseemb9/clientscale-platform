@@ -1,12 +1,73 @@
 'use client';
 
-import { useState } from 'react';
-import { handleAuditSubmit } from './actions';
+import { useState, useEffect, useRef } from 'react';
+import { useRouter } from 'next/navigation';
 import DecryptedLogo from './components/DecryptedLogo';
+
+const FREE_EMAIL_PROVIDERS = ['gmail.com', 'yahoo.com', 'hotmail.com', 'outlook.com', 'aol.com', 'icloud.com'];
 
 export default function Home() {
   // Navigation states: 'none' | 'features' | 'pricing'
   const [activeSection, setActiveSection] = useState<'none' | 'features' | 'pricing'>('none');
+
+  // Step 1: Form & Navigation States
+  const router = useRouter();
+  const [isLoading, setIsLoading] = useState(false);
+  
+  // Real-time email validation states
+  const [emailValue, setEmailValue] = useState('');
+  const domain = emailValue.split('@')[1]?.toLowerCase();
+  const hasValidFormat = emailValue.includes('@') && domain?.includes('.');
+  const isFreeProvider = FREE_EMAIL_PROVIDERS.includes(domain || '');
+  const isCorporateValid = hasValidFormat && !isFreeProvider;
+
+  // Create a reference to the content area for scrolling
+  const contentRef = useRef<HTMLDivElement>(null);
+
+  // Auto-scroll effect when a section is opened
+  useEffect(() => {
+    if (activeSection !== 'none' && contentRef.current) {
+      // Small timeout ensures the DOM has updated before scrolling
+      setTimeout(() => {
+        contentRef.current?.scrollIntoView({
+          behavior: 'smooth',
+          block: 'start'
+        });
+      }, 100);
+    }
+  }, [activeSection]);
+
+  // Step 1: Client-side submission logic
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    
+    // Failsafe: prevent submission if somehow triggered without valid email
+    if (!isCorporateValid) return;
+
+    const formData = new FormData(e.currentTarget);
+    const url = formData.get('url') as string;
+    
+    setIsLoading(true);
+
+    try {
+      // Hit the lightweight API
+      const res = await fetch('/api/audit-light', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ url, email: emailValue })
+      });
+      
+      const data = await res.json();
+      
+      // Store the fast telemetry data and push to dashboard
+      sessionStorage.setItem('initialAuditData', JSON.stringify(data.data));
+      router.push('/dashboard/scan');
+      
+    } catch (error) {
+      console.error("Audit initialization failed", error);
+      setIsLoading(false);
+    }
+  };
 
   return (
     <main className="flex min-h-screen flex-col items-center bg-[#020205] text-white antialiased selection:bg-cyan-500/30 selection:text-cyan-200 overflow-x-hidden pb-24 relative">
@@ -45,7 +106,7 @@ export default function Home() {
         </button>
       </div>
 
-      {/* --- SIDE PANEL DRAWER (REPLACES BOTTOM SCROLLING) --- */}
+      {/* --- SIDE PANEL DRAWER --- */}
       <div 
         className={`fixed top-0 right-0 h-full w-full sm:w-[450px] bg-[#050508] border-l border-zinc-800/50 shadow-2xl z-[200] transform transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] overflow-y-auto flex flex-col
           ${activeSection !== 'none' ? 'translate-x-0' : 'translate-x-full'}`}
@@ -125,10 +186,12 @@ export default function Home() {
           </div>
         </div>
 
-        {/* --- FIXED FORM SECTION --- */}
-        <form action={handleAuditSubmit} className="mt-8 sm:mt-12 flex flex-col items-center space-y-5 sm:space-y-6 max-w-2xl mx-auto w-full group px-2 relative">
-          <div className="relative flex items-center w-full bg-[#07070f]/90 border border-zinc-800/90 group-focus-within:border-cyan-400 rounded-xl sm:rounded-2xl p-2 sm:p-2.5 transition-all duration-300 backdrop-blur-2xl ring-1 ring-zinc-900/50 group-focus-within:ring-2 group-focus-within:ring-cyan-500/20 shadow-[0_0_15px_rgba(6,182,212,0.12)] hover:shadow-[0_0_25px_rgba(6,182,212,0.22)] group-focus-within:shadow-[0_0_30px_rgba(6,182,212,0.35),_inset_0_0_12px_rgba(6,182,212,0.15)] transform hover:-translate-y-1 hover:scale-[1.012] group-focus-within:-translate-y-1 group-focus-within:scale-[1.012] hover:bg-[#090916]">
-            <div className="pl-3 pr-1 sm:pl-4 sm:pr-2 text-zinc-500 group-focus-within:text-cyan-400 transition-colors">
+        {/* --- DYNAMIC FORM SECTION --- */}
+        <form onSubmit={handleSubmit} className="mt-8 sm:mt-12 flex flex-col items-center space-y-4 max-w-2xl mx-auto w-full px-2 relative">
+          
+          {/* Target URL Input */}
+          <div className="relative flex items-center w-full bg-[#07070f]/90 border border-zinc-800/90 focus-within:border-cyan-400 rounded-xl sm:rounded-2xl p-2 sm:p-2.5 transition-all duration-300 backdrop-blur-2xl ring-1 ring-zinc-900/50 focus-within:ring-2 focus-within:ring-cyan-500/20 shadow-[0_0_15px_rgba(6,182,212,0.12)] hover:shadow-[0_0_25px_rgba(6,182,212,0.22)] focus-within:shadow-[0_0_30px_rgba(6,182,212,0.35),_inset_0_0_12px_rgba(6,182,212,0.15)] transform hover:-translate-y-1 hover:scale-[1.012] focus-within:-translate-y-1 focus-within:scale-[1.012] hover:bg-[#090916]">
+            <div className="pl-3 pr-1 sm:pl-4 sm:pr-2 text-zinc-500 focus-within:text-cyan-400 transition-colors">
               <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
               </svg>
@@ -144,15 +207,55 @@ export default function Home() {
               placeholder="Target URL (e.g., https://yourfacility.com)" 
               className="w-full bg-transparent py-3 sm:py-3.5 px-2 text-zinc-100 placeholder-zinc-600 focus:outline-none text-sm font-normal tracking-wide" 
             />
-            
-            <div className="hidden sm:flex items-center gap-2 bg-[#0d111c]/90 border border-zinc-800 rounded-lg px-3 py-1.5 mr-1 font-mono text-[10px] tracking-widest text-zinc-500 uppercase transition-all duration-300 group-focus-within:border-cyan-500/20 group-focus-within:text-cyan-400">
-              <span className="relative flex h-1.5 w-1.5"><span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400/60 opacity-75"></span><span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-cyan-500"></span></span>
-              READY
+          </div>
+
+          {/* Work Email Input (Live Validated) */}
+          <div className={`relative flex items-center w-full bg-[#07070f]/90 border ${isFreeProvider ? 'border-red-500/50 focus-within:border-red-500/80' : 'border-zinc-800/90 focus-within:border-cyan-400'} rounded-xl sm:rounded-2xl p-2 sm:p-2.5 transition-all duration-300 backdrop-blur-2xl ring-1 ring-zinc-900/50 ${isFreeProvider ? 'focus-within:ring-red-500/20 shadow-[0_0_15px_rgba(239,68,68,0.12)]' : 'focus-within:ring-cyan-500/20 shadow-[0_0_15px_rgba(6,182,212,0.12)]'} hover:shadow-[0_0_25px_rgba(6,182,212,0.22)] transform hover:-translate-y-1 hover:scale-[1.012] focus-within:-translate-y-1 focus-within:scale-[1.012] hover:bg-[#090916]`}>
+            <div className={`pl-3 pr-1 sm:pl-4 sm:pr-2 transition-colors ${isFreeProvider ? 'text-red-400' : 'text-zinc-500 focus-within:text-cyan-400'}`}>
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+              </svg>
+            </div>
+            <input 
+              type="email" 
+              name="email" 
+              required 
+              value={emailValue}
+              onChange={(e) => setEmailValue(e.target.value)}
+              placeholder="Work Email (Required)" 
+              className="w-full bg-transparent py-3 sm:py-3.5 px-2 text-zinc-100 placeholder-zinc-600 focus:outline-none text-sm font-normal tracking-wide" 
+            />
+            {/* Dynamic Status Indicator */}
+            <div className={`hidden sm:flex items-center gap-2 bg-[#0d111c]/90 border border-zinc-800 rounded-lg px-3 py-1.5 mr-1 font-mono text-[10px] tracking-widest uppercase transition-all duration-300 ${isFreeProvider ? 'text-red-500 border-red-500/20' : isCorporateValid ? 'text-cyan-400 border-cyan-500/20' : 'text-zinc-600'}`}>
+              <span className="relative flex h-1.5 w-1.5">
+                <span className={`animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 ${isCorporateValid ? 'bg-cyan-400/60' : 'hidden'}`}></span>
+                <span className={`relative inline-flex rounded-full h-1.5 w-1.5 ${isFreeProvider ? 'bg-red-500' : isCorporateValid ? 'bg-cyan-500' : 'bg-zinc-700'}`}></span>
+              </span>
+              {isCorporateValid ? 'READY' : isFreeProvider ? 'BLOCKED' : 'WAITING'}
             </div>
           </div>
-          <button type="submit" className="w-auto bg-gradient-to-b from-zinc-900 to-zinc-950 border border-zinc-800 hover:border-cyan-500/50 active:border-cyan-500/50 text-zinc-300 hover:text-cyan-400 active:text-cyan-400 font-semibold px-6 sm:px-8 py-3.5 sm:py-4 rounded-xl transition-all duration-300 shadow-xl text-[11px] xs:text-xs sm:text-sm tracking-widest uppercase active:scale-[0.98] whitespace-nowrap">
-            Initialize Diagnostic Scan
-          </button>
+          
+          {/* Conditional Rendering: Submit Button OR Warning Message */}
+          <div className="w-full flex justify-center mt-2 min-h-[60px]">
+            {isCorporateValid ? (
+              <button 
+                type="submit" 
+                disabled={isLoading}
+                className={`w-auto bg-gradient-to-b from-zinc-900 to-zinc-950 border border-zinc-800 text-zinc-300 font-semibold px-6 sm:px-8 py-3.5 sm:py-4 rounded-xl transition-all duration-300 shadow-xl text-[11px] xs:text-xs sm:text-sm tracking-widest uppercase whitespace-nowrap animate-fade-in
+                  ${isLoading ? 'opacity-50 cursor-not-allowed' : 'hover:border-cyan-500/50 hover:text-cyan-400 hover:shadow-[0_0_20px_rgba(6,182,212,0.2)] active:text-cyan-400 active:scale-[0.98]'}`}
+              >
+                {isLoading ? 'Establishing Connection...' : 'Initialize Diagnostic Scan'}
+              </button>
+            ) : (
+              <div className="flex items-center justify-center bg-zinc-900/40 border border-zinc-800/50 rounded-xl px-6 py-4 w-full sm:w-auto animate-fade-in">
+                <p className={`text-[10px] sm:text-xs font-mono tracking-widest uppercase text-center ${isFreeProvider ? 'text-red-400' : 'text-zinc-500'}`}>
+                  {isFreeProvider 
+                    ? "⚠ Free email providers are not accepted." 
+                    : "In order to use this facility you must enter a valid corporate email."}
+                </p>
+              </div>
+            )}
+          </div>
         </form>
       </div>
 
