@@ -70,9 +70,10 @@ export default function AuditContent() {
   };
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center bg-[#020205] text-white antialiased selection:bg-cyan-500/30 selection:text-cyan-200 overflow-hidden relative p-4 sm:p-8">
+    // Changed to min-h-[100dvh] for perfect mobile vertical centering
+    <main className="flex min-h-[100dvh] w-full flex-col items-center justify-center bg-[#020205] text-white antialiased selection:bg-cyan-500/30 selection:text-cyan-200 overflow-hidden relative p-4">
 
-      {/* --- SPACE AGENCY TELEMETRY LAYERS (Matching Front Page) --- */}
+      {/* --- SPACE AGENCY TELEMETRY LAYERS --- */}
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_-20%,rgba(16,24,48,0.85),rgba(2,2,5,1)_65%)] pointer-events-none z-0" />
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(6,182,212,0.12),transparent_45%)] pointer-events-none z-0 mix-blend-screen" />
       <div className="absolute top-[30%] left-[10%] right-[10%] h-[500px] bg-[radial-gradient(circle_at_center,rgba(59,130,246,0.04),transparent_50%)] pointer-events-none z-0 mix-blend-screen" />
@@ -81,11 +82,13 @@ export default function AuditContent() {
       <div className="absolute inset-0 bg-[radial-gradient(1.5px_1.5px_at_45px_210px,#fff,transparent_100%),radial-gradient(1px_1px_at_180px_80px,rgba(255,255,255,0.8),transparent_100%),radial-gradient(1px_1px_at_290px_190px,#fff,transparent_100%)] bg-[size:400px_400px] opacity-25 pointer-events-none z-0 animate-pulse [animation-duration:12s]" />
 
       {/* --- TELEMETRY DASHBOARD CONTAINER --- */}
-      <div className="relative w-full max-w-4xl mx-auto bg-[#07070f]/80 border border-zinc-800/80 p-6 sm:p-10 shadow-[0_0_40px_rgba(6,182,212,0.1)] backdrop-blur-2xl rounded-2xl flex flex-col z-10 animate-fade-in">
+      {/* Added my-auto to explicitly force vertical centering */}
+      <div className="relative w-full max-w-4xl mx-auto my-auto bg-[#07070f]/80 border border-zinc-800/80 p-6 sm:p-10 shadow-[0_0_40px_rgba(6,182,212,0.1)] backdrop-blur-2xl rounded-2xl flex flex-col z-10 animate-fade-in">
         
         {/* Header Module */}
-        <div className="flex flex-col items-center mb-6 sm:mb-8 border-b border-zinc-800/50 pb-6">
-          <div className="transform scale-[0.85] sm:scale-100 origin-center mb-2">
+        <div className="flex flex-col items-center mb-6 sm:mb-8 border-b border-zinc-800/50 pb-6 w-full">
+          {/* Forced whitespace-nowrap and tightened mobile scaling (scale-[0.60]) */}
+          <div className="w-full flex justify-center whitespace-nowrap transform scale-[0.60] sm:scale-100 origin-center mb-2">
             <DecryptedLogo text="DIAGNOSTIC ENGINE ACTIVE" />
           </div>
 
