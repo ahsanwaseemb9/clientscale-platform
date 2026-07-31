@@ -231,9 +231,9 @@ export default function Home() {
                 {isLoading ? 'Establishing Connection...' : 'Initialize Diagnostic Scan'}
               </button>
             ) : (
-              <div className="flex items-center justify-center gap-2.5 px-4 py-3.5 bg-[#07070f]/90 border border-cyan-500/20 rounded-xl sm:rounded-2xl text-white text-xs tracking-wide w-full backdrop-blur-xl shadow-[0_0_15px_rgba(6,182,212,0.08)] animate-fade-in font-mono text-center">
+              <div className="flex items-center justify-center gap-2 px-3 py-3 bg-[#07070f]/90 border border-cyan-500/20 rounded-xl sm:rounded-2xl text-white text-[10px] sm:text-xs tracking-tight sm:tracking-wide w-full backdrop-blur-xl shadow-[0_0_15px_rgba(6,182,212,0.08)] animate-fade-in font-mono text-center whitespace-nowrap overflow-hidden text-ellipsis">
                 <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse shrink-0 shadow-[0_0_8px_rgba(6,182,212,0.8)]"></span>
-                <span>
+                <span className="truncate">
                   {isFreeProvider 
                     ? "Free email providers are not accepted." 
                     : "Corporate domain required for enterprise telemetry."}
