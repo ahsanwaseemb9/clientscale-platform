@@ -5,7 +5,7 @@ import {
   AlertTriangle, DollarSign, Ghost, ShieldAlert, Activity, 
   Database, ServerCrash, X, ChevronRight, MapPin, MailWarning,
   ListOrdered, Layers, Globe, Image as ImageIcon, Accessibility, 
-  CheckCircle, AlertCircle, Cpu
+  CheckCircle, AlertCircle, Cpu, Lock, Unlock, ShieldCheck
 } from 'lucide-react';
 
 // --- UPGRADE MAPPING DICTIONARY ---
@@ -42,6 +42,7 @@ export default function AuditReportPage() {
   const [auditData, setAuditData] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [activeDrawer, setActiveDrawer] = useState<'revenue' | 'ghost' | 'parasite' | 'dom' | 'inp' | 'dns' | 'accessibility' | null>(null);
+  const [isUpgradeUnlocked, setIsUpgradeUnlocked] = useState(false);
 
   useEffect(() => {
     const storedData = sessionStorage.getItem('clientScale_auditData');
@@ -441,22 +442,20 @@ export default function AuditReportPage() {
           </div>
         </div>
 
-        {/* --- UPGRADED: TECH STACK FINGERPRINT & UPGRADE PATH --- */}
-        <div className="bg-[#121216] border border-gray-800 rounded-xl p-4 sm:p-6 flex flex-col lg:max-h-[600px]">
-          <div className="flex justify-between items-center mb-6 border-b border-gray-800/50 pb-4 gap-2">
+        {/* --- UPGRADED & MONETIZED: TECH STACK FINGERPRINT & UPGRADE PATH --- */}
+        <div className="bg-[#121216] border border-gray-800 rounded-xl p-4 sm:p-6 flex flex-col lg:max-h-[600px] relative overflow-hidden">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 border-b border-gray-800/50 pb-4 gap-2">
             <div className="flex items-center gap-3 min-w-0">
               <Layers className="text-purple-400 shrink-0" size={20} />
-              <h2 className="text-sm font-bold text-gray-300 uppercase tracking-widest truncate">Tech Stack & Upgrade Path</h2>
+              <h2 className="text-xs sm:text-sm font-bold text-gray-300 uppercase tracking-widest break-words leading-snug">Tech Stack & Upgrade Path</h2>
             </div>
-            <span className="text-[10px] text-gray-500 uppercase tracking-widest shrink-0">
+            <span className="text-[10px] text-gray-500 uppercase tracking-widest shrink-0 self-start sm:self-auto">
               {infrastructure.length} Technologies Detected
             </span>
           </div>
 
           <div className="space-y-4 overflow-y-auto pr-2 custom-scrollbar">
             {infrastructure.length > 0 ? infrastructure.map((tech: any, idx: number) => {
-              
-              // Map to known upgrade or fallback to the new generic Edge Offloading message
               const recommendation = TECH_UPGRADES[tech.name] || {
                 upgrade: "Edge Compute Offloading",
                 reason: "Shifts the processing weight of this tool to our edge servers, preventing mobile browser freezing."
@@ -481,20 +480,32 @@ export default function AuditReportPage() {
                     </div>
                   </div>
 
-                  {/* RIGHT: What you recommend (The Upgrade) */}
-                  <div className="flex-1 pt-2 sm:pt-0 sm:pl-2 min-w-0">
+                  {/* RIGHT: Gated Recommendation / Upgrade Path */}
+                  <div className="flex-1 pt-2 sm:pt-0 sm:pl-2 min-w-0 relative">
                      <div className="text-[9px] font-bold text-cyan-500 uppercase tracking-wider mb-2 flex items-center gap-1.5">
                       <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse shrink-0"></span>
                       Recommended Upgrade
                     </div>
-                    <div className="flex flex-col min-w-0">
-                      <span className="text-sm font-bold text-white drop-shadow-[0_0_8px_rgba(34,211,238,0.4)] truncate">
-                        {recommendation.upgrade}
-                      </span>
-                      <span className="text-xs text-gray-400 mt-1.5 leading-relaxed font-light">
-                        {recommendation.reason}
-                      </span>
-                    </div>
+                    
+                    {isUpgradeUnlocked ? (
+                      <div className="flex flex-col min-w-0 animate-in fade-in duration-500">
+                        <span className="text-sm font-bold text-white drop-shadow-[0_0_8px_rgba(34,211,238,0.4)] truncate">
+                          {recommendation.upgrade}
+                        </span>
+                        <span className="text-xs text-gray-400 mt-1.5 leading-relaxed font-light">
+                          {recommendation.reason}
+                        </span>
+                      </div>
+                    ) : (
+                      <div className="flex flex-col min-w-0 filter blur-[5px] select-none pointer-events-none opacity-40">
+                        <span className="text-sm font-bold text-white truncate">
+                          {recommendation.upgrade}
+                        </span>
+                        <span className="text-xs text-gray-400 mt-1.5 leading-relaxed">
+                          {recommendation.reason}
+                        </span>
+                      </div>
+                    )}
                   </div>
 
                 </div>
@@ -505,6 +516,28 @@ export default function AuditReportPage() {
               </div>
             )}
           </div>
+
+          {/* --- MONETIZATION / AUTHORIZATION GATE OVERLAY --- */}
+          {!isUpgradeUnlocked && (
+            <div className="absolute inset-x-4 bottom-4 bg-[#0a0a0c]/95 backdrop-blur-md border border-cyan-500/40 rounded-xl p-5 text-center shadow-[0_0_25px_rgba(8,145,178,0.2)] flex flex-col items-center gap-3 z-20">
+              <div className="w-10 h-10 rounded-full bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-400">
+                <Lock size={18} />
+              </div>
+              <div>
+                <h4 className="text-sm font-bold text-white uppercase tracking-wider mb-1">Upgrade Paths & Migration Blueprints Locked</h4>
+                <p className="text-xs text-gray-400 max-w-sm">
+                  Authorize compliance and initialize Phase 4 Stealth Microservice extraction to unlock custom-engineered architecture upgrades.
+                </p>
+              </div>
+              <button 
+                onClick={() => setIsUpgradeUnlocked(true)}
+                className="w-full bg-cyan-600 hover:bg-cyan-500 text-white py-2.5 px-4 rounded-lg text-xs font-bold uppercase tracking-wider transition-colors shadow-[0_0_15px_rgba(8,145,178,0.4)] flex items-center justify-center gap-2"
+              >
+                <Unlock size={14} /> Authorize Remediation & Unlock Upgrades
+              </button>
+            </div>
+          )}
+
         </div>
 
       </div>
