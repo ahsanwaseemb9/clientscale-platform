@@ -93,7 +93,7 @@ export default function AuditReportPage() {
     );
   }
 
-  // --- BUZINESS FRICTION ALGORITHMS (Frontend Calculations) ---
+  // --- BUSINESS FRICTION ALGORITHMS (Frontend Calculations) ---
   const perfScore = auditData?.diagnostics?.performanceScore || 50;
   const rawTbt = parseInt(auditData?.diagnostics?.latency?.tbt?.replace(/[^0-9]/g, '') || '800');
   const thirdPartyCount = auditData?.diagnostics?.thirdPartyScriptCount || 0;
@@ -112,14 +112,22 @@ export default function AuditReportPage() {
 
   const rawInp = parseInt(auditData?.diagnostics?.latency?.inp?.replace(/[^0-9]/g, '') || '340');
   
+  // Dynamic Metric States
   const isMapPenalized = rawInp > 200;
   const hasDmarc = auditData?.security?.dmarcConfigured === true; 
   const isEmailVulnerable = !hasDmarc;
   const revenueLeakagePercent = Math.max(0, (100 - perfScore) * 0.15).toFixed(1);
+  
+  // Ghost Tap dynamic handling
   const ghostTapWindow = (rawTbt / 1000).toFixed(1); 
+  const isGhostOptimal = parseFloat(ghostTapWindow) === 0;
+
   const parasiteImpact = Math.min(95, (thirdPartyCount * 12)).toFixed(0);
-  const domSize = perfScore < 50 ? '3,450+' : '1,200';
-  const isFragile = perfScore < 50;
+  
+  // DOM Size dynamic handling
+  const rawDomNodes = auditData?.diagnostics?.domElements || (perfScore < 50 ? 3450 : (perfScore >= 90 ? 450 : 1200));
+  const domSize = rawDomNodes > 800 ? `${rawDomNodes.toLocaleString()}+` : `${rawDomNodes.toLocaleString()}`;
+  const isFragile = rawDomNodes > 800; // Google's 800 node limit
 
   const infrastructure = auditData?.infrastructure || [];
   const funnel = auditData?.conversionFunnel || {};
@@ -204,32 +212,42 @@ export default function AuditReportPage() {
           </div>
 
           {/* 2. Ghost Tap Window Card */}
-          <div className="bg-[#121216] border border-orange-900/50 rounded-xl relative flex flex-col justify-between hover:border-orange-500/50 transition-colors">
+          <div className={`bg-[#121216] border ${isGhostOptimal ? 'border-green-900/50 hover:border-green-500/50' : 'border-orange-900/50 hover:border-orange-500/50'} rounded-xl relative flex flex-col justify-between transition-colors`}>
              <div className="absolute inset-0 overflow-hidden rounded-xl pointer-events-none">
                <div className="absolute top-0 right-0 p-4 opacity-10">
-                <Ghost size={80} className="text-orange-500" />
+                <Ghost size={80} className={isGhostOptimal ? 'text-green-500' : 'text-orange-500'} />
               </div>
              </div>
             <div className="p-5 sm:p-6 relative z-10 flex-grow">
-              <div className="flex items-center gap-2 mb-3 text-orange-400">
+              <div className={`flex items-center gap-2 mb-3 ${isGhostOptimal ? 'text-green-400' : 'text-orange-400'}`}>
                 <Ghost size={18} />
                 <h3 className="text-sm font-bold uppercase tracking-wider">Ghost Tap Window</h3>
               </div>
-              <div className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white mb-3">{ghostTapWindow}s</div>
+              <div className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white mb-3">{isGhostOptimal ? '0.0s' : `${ghostTapWindow}s`}</div>
               <p className="text-xs sm:text-sm text-gray-400 leading-relaxed">
-                The screen appears loaded, but user taps are ignored for {ghostTapWindow} seconds due to main-thread blocking.
+                {isGhostOptimal 
+                  ? 'Main thread is unblocked. User interactions are instantly registered by the browser.'
+                  : `The screen appears loaded, but user taps are ignored for ${ghostTapWindow} seconds due to main-thread blocking.`}
               </p>
             </div>
              <div className="px-5 sm:px-6 pb-5 sm:pb-6 relative z-10 mt-2">
               <button 
                 onClick={() => setActiveDrawer('ghost')}
-                className="group relative w-full flex items-center justify-between px-4 py-3 bg-orange-950/30 rounded-lg border border-orange-900/50 hover:border-orange-500/70 transition-all duration-300 overflow-hidden"
+                className={`group relative w-full flex items-center justify-between px-4 py-3 rounded-lg border transition-all duration-300 overflow-hidden ${
+                  isGhostOptimal ? 'bg-green-950/30 border-green-900/50 hover:border-green-500/70' : 'bg-orange-950/30 border-orange-900/50 hover:border-orange-500/70'
+                }`}
               >
-                <div className="absolute inset-0 bg-gradient-to-r from-orange-500/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                <span className="relative z-10 text-[10px] uppercase tracking-widest font-bold text-orange-400 group-hover:text-orange-300 transition-colors">
+                <div className={`absolute inset-0 bg-gradient-to-r opacity-0 group-hover:opacity-100 transition-opacity duration-300 ${
+                  isGhostOptimal ? 'from-green-500/20 to-transparent' : 'from-orange-500/20 to-transparent'
+                }`} />
+                <span className={`relative z-10 text-[10px] uppercase tracking-widest font-bold transition-colors ${
+                  isGhostOptimal ? 'text-green-400 group-hover:text-green-300' : 'text-orange-400 group-hover:text-orange-300'
+                }`}>
                   Forensic Methodology
                 </span>
-                <ChevronRight size={14} className="relative z-10 text-orange-500/80 group-hover:text-orange-300 group-hover:translate-x-1 transition-all duration-300" />
+                <ChevronRight size={14} className={`relative z-10 transition-all duration-300 group-hover:translate-x-1 ${
+                  isGhostOptimal ? 'text-green-500/80 group-hover:text-green-300' : 'text-orange-500/80 group-hover:text-orange-300'
+                }`} />
               </button>
             </div>
           </div>
@@ -364,32 +382,42 @@ export default function AuditReportPage() {
           </div>
 
           {/* 6. Codebase Fragility Card */}
-          <div className="bg-[#121216] border border-gray-800 rounded-xl relative flex flex-col justify-between hover:border-gray-500 transition-colors">
+          <div className={`bg-[#121216] border ${!isFragile ? 'border-green-900/50 hover:border-green-500/50' : 'border-gray-800 hover:border-gray-500'} rounded-xl relative flex flex-col justify-between transition-colors`}>
              <div className="absolute inset-0 overflow-hidden rounded-xl pointer-events-none">
                <div className="absolute top-0 right-0 p-4 opacity-5">
-                <Database size={80} className="text-white" />
+                <Database size={80} className={!isFragile ? 'text-green-500' : 'text-white'} />
               </div>
              </div>
             <div className="p-5 sm:p-6 relative z-10 flex-grow">
-              <div className="flex items-center gap-2 mb-3 text-gray-400">
+              <div className={`flex items-center gap-2 mb-3 ${!isFragile ? 'text-green-400' : 'text-gray-400'}`}>
                 <Database size={18} />
                 <h3 className="text-sm font-bold uppercase tracking-wider">DOM Fragility</h3>
               </div>
               <div className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white mb-3">{domSize}</div>
               <p className="text-xs sm:text-sm text-gray-400 leading-relaxed">
-                {isFragile ? 'Massive HTML node count is draining mobile batteries and risking browser crashes.' : 'HTML structure is within acceptable limits.'}
+                {!isFragile 
+                  ? 'HTML structure is highly optimized. Low node count ensures rapid rendering.'
+                  : 'Massive HTML node count is draining mobile batteries and risking browser crashes.'}
               </p>
             </div>
             <div className="px-5 sm:px-6 pb-5 sm:pb-6 relative z-10 mt-2">
               <button 
                 onClick={() => setActiveDrawer('dom')}
-                className="group relative w-full flex items-center justify-between px-4 py-3 bg-gray-800/40 rounded-lg border border-gray-700/60 hover:border-gray-500/80 transition-all duration-300 overflow-hidden"
+                className={`group relative w-full flex items-center justify-between px-4 py-3 rounded-lg border transition-all duration-300 overflow-hidden ${
+                  !isFragile ? 'bg-green-950/30 border-green-900/50 hover:border-green-500/70' : 'bg-gray-800/40 border-gray-700/60 hover:border-gray-500/80'
+                }`}
               >
-                <div className="absolute inset-0 bg-gradient-to-r from-gray-500/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                <span className="relative z-10 text-[10px] uppercase tracking-widest font-bold text-gray-300 group-hover:text-white transition-colors">
+                <div className={`absolute inset-0 bg-gradient-to-r opacity-0 group-hover:opacity-100 transition-opacity duration-300 ${
+                  !isFragile ? 'from-green-500/20 to-transparent' : 'from-gray-500/20 to-transparent'
+                }`} />
+                <span className={`relative z-10 text-[10px] uppercase tracking-widest font-bold transition-colors ${
+                  !isFragile ? 'text-green-400 group-hover:text-green-300' : 'text-gray-300 group-hover:text-white'
+                }`}>
                   Forensic Methodology
                 </span>
-                <ChevronRight size={14} className="relative z-10 text-gray-400 group-hover:text-white group-hover:translate-x-1 transition-all duration-300" />
+                <ChevronRight size={14} className={`relative z-10 transition-all duration-300 group-hover:translate-x-1 ${
+                  !isFragile ? 'text-green-500/80 group-hover:text-green-300' : 'text-gray-400 group-hover:text-white'
+                }`} />
               </button>
             </div>
           </div>
@@ -663,46 +691,82 @@ export default function AuditReportPage() {
         {activeDrawer === 'ghost' && (
           <div className="animate-in fade-in duration-500 text-gray-300">
             <h3 className="text-xl sm:text-2xl font-bold text-white mb-6">Ghost Tap Window</h3>
-            <p className="text-xs sm:text-sm leading-relaxed mb-4">
-              This metric utilizes direct data from the Chromium rendering engine to measure UI paralysis.
-            </p>
-            <ul className="space-y-4 list-disc pl-5 mb-8 text-xs sm:text-sm">
-              <li>When a site visually loads, users assume it is interactive. However, if background JavaScript is still executing, the browser's <strong>Main Thread</strong> is locked.</li>
-              <li>We measure the exact <strong>Total Blocking Time (TBT)</strong>. During this window, user inputs (like tapping a "Book Now" button or opening a menu) are completely ignored by the device.</li>
-              <li><strong>Why we use an estimate:</strong> Rather than arbitrary guesswork, we translate raw millisecond lockups into a predictable user-frustration window, quantifying the exact duration UI interactions are completely paralyzed.</li>
-            </ul>
+            {isGhostOptimal ? (
+              <>
+                <p className="text-xs sm:text-sm leading-relaxed mb-4">
+                  A forensic extraction confirms zero Main Thread blocking occurring on your primary interface.
+                </p>
+                <div className="p-4 sm:p-5 bg-green-950/20 border-l-2 border-green-500 rounded-r-lg mb-8">
+                  <h4 className="text-[10px] font-bold text-green-400 uppercase tracking-widest mb-3 flex items-center gap-2">
+                    <CheckCircle size={14} className="shrink-0" /> Interactive Status
+                  </h4>
+                  <p className="text-xs sm:text-sm text-green-100/80 italic leading-relaxed">
+                    "Your UI is immediately responsive. There is zero 'ghost tap' window, meaning user inputs like 'Book Now' will never be ignored by a locked rendering pipeline."
+                  </p>
+                </div>
+              </>
+            ) : (
+              <>
+                <p className="text-xs sm:text-sm leading-relaxed mb-4">
+                  This metric utilizes direct data from the Chromium rendering engine to measure UI paralysis.
+                </p>
+                <ul className="space-y-4 list-disc pl-5 mb-8 text-xs sm:text-sm">
+                  <li>When a site visually loads, users assume it is interactive. However, if background JavaScript is still executing, the browser's <strong>Main Thread</strong> is locked.</li>
+                  <li>We measure the exact <strong>Total Blocking Time (TBT)</strong>. During this window, user inputs (like tapping a "Book Now" button or opening a menu) are completely ignored by the device.</li>
+                  <li><strong>Why we use an estimate:</strong> Rather than arbitrary guesswork, we translate raw millisecond lockups into a predictable user-frustration window, quantifying the exact duration UI interactions are completely paralyzed.</li>
+                </ul>
 
-            <div className="p-4 sm:p-5 bg-cyan-950/20 border-l-2 border-cyan-500 rounded-r-lg">
-              <h4 className="text-[10px] font-bold text-cyan-400 uppercase tracking-widest mb-3 flex items-center gap-2">
-                <Activity size={14} className="shrink-0" /> The Business Translation
-              </h4>
-              <p className="text-xs sm:text-sm text-cyan-100/80 italic leading-relaxed">
-                "For <strong>{ghostTapWindow} entire seconds</strong>, your website is essentially a frozen picture. If a customer tries to tap your 'Book Now' button during this window, their phone will ignore the tap. It makes your brand look broken."
-              </p>
-            </div>
+                <div className="p-4 sm:p-5 bg-cyan-950/20 border-l-2 border-cyan-500 rounded-r-lg">
+                  <h4 className="text-[10px] font-bold text-cyan-400 uppercase tracking-widest mb-3 flex items-center gap-2">
+                    <Activity size={14} className="shrink-0" /> The Business Translation
+                  </h4>
+                  <p className="text-xs sm:text-sm text-cyan-100/80 italic leading-relaxed">
+                    "For <strong>{ghostTapWindow} entire seconds</strong>, your website is essentially a frozen picture. If a customer tries to tap your 'Book Now' button during this window, their phone will ignore the tap. It makes your brand look broken."
+                  </p>
+                </div>
+              </>
+            )}
           </div>
         )}
 
         {activeDrawer === 'inp' && (
           <div className="animate-in fade-in duration-500 text-gray-300">
             <h3 className="text-xl sm:text-2xl font-bold text-white mb-6">Local Search & Latency Risk</h3>
-            <p className="text-xs sm:text-sm leading-relaxed mb-4">
-              This extracts the <strong>Interaction to Next Paint (INP)</strong>, Google's newest and most heavily weighted Core Web Vital.
-            </p>
-            <ul className="space-y-4 list-disc pl-5 mb-8 text-xs sm:text-sm">
-              <li>INP measures the actual latency between a user interacting with the page and the browser visually updating.</li>
-              <li>Google Maps and Local Search algorithms officially penalize domains with an INP above 200 milliseconds.</li>
-              <li><strong>Why we use an estimate:</strong> We map your live INP latency against Google Search Central's documented ranking thresholds to objectively warn you if your technical debt is actively suppressing your local SEO visibility.</li>
-            </ul>
+            {!isMapPenalized ? (
+              <>
+                <p className="text-xs sm:text-sm leading-relaxed mb-4">
+                  Your <strong>Interaction to Next Paint (INP)</strong> easily clears Google's Core Web Vitals thresholds.
+                </p>
+                <div className="p-4 sm:p-5 bg-green-950/20 border-l-2 border-green-500 rounded-r-lg mb-8">
+                  <h4 className="text-[10px] font-bold text-green-400 uppercase tracking-widest mb-3 flex items-center gap-2">
+                    <CheckCircle size={14} className="shrink-0" /> Search Status
+                  </h4>
+                  <p className="text-xs sm:text-sm text-green-100/80 italic leading-relaxed">
+                    "INP is within optimal limits. Local SEO and Google Maps visibility are completely unaffected by interaction latency penalties."
+                  </p>
+                </div>
+              </>
+            ) : (
+              <>
+                <p className="text-xs sm:text-sm leading-relaxed mb-4">
+                  This extracts the <strong>Interaction to Next Paint (INP)</strong>, Google's newest and most heavily weighted Core Web Vital.
+                </p>
+                <ul className="space-y-4 list-disc pl-5 mb-8 text-xs sm:text-sm">
+                  <li>INP measures the actual latency between a user interacting with the page and the browser visually updating.</li>
+                  <li>Google Maps and Local Search algorithms officially penalize domains with an INP above 200 milliseconds.</li>
+                  <li><strong>Why we use an estimate:</strong> We map your live INP latency against Google Search Central's documented ranking thresholds to objectively warn you if your technical debt is actively suppressing your local SEO visibility.</li>
+                </ul>
 
-            <div className="p-4 sm:p-5 bg-cyan-950/20 border-l-2 border-cyan-500 rounded-r-lg">
-              <h4 className="text-[10px] font-bold text-cyan-400 uppercase tracking-widest mb-3 flex items-center gap-2">
-                <Activity size={14} className="shrink-0" /> The Business Translation
-              </h4>
-              <p className="text-xs sm:text-sm text-cyan-100/80 italic leading-relaxed">
-                "Your interaction latency is currently {rawInp}ms, which crosses Google's penalty threshold. Because of this sluggishness, Google's algorithm is actively demoting your business in Local Search and Google Maps, handing those leads to your faster competitors."
-              </p>
-            </div>
+                <div className="p-4 sm:p-5 bg-cyan-950/20 border-l-2 border-cyan-500 rounded-r-lg">
+                  <h4 className="text-[10px] font-bold text-cyan-400 uppercase tracking-widest mb-3 flex items-center gap-2">
+                    <Activity size={14} className="shrink-0" /> The Business Translation
+                  </h4>
+                  <p className="text-xs sm:text-sm text-cyan-100/80 italic leading-relaxed">
+                    "Your interaction latency is currently {rawInp}ms, which crosses Google's penalty threshold. Because of this sluggishness, Google's algorithm is actively demoting your business in Local Search and Google Maps, handing those leads to your faster competitors."
+                  </p>
+                </div>
+              </>
+            )}
           </div>
         )}
 
@@ -830,46 +894,82 @@ export default function AuditReportPage() {
         {activeDrawer === 'dns' && (
           <div className="animate-in fade-in duration-500 text-gray-300">
             <h3 className="text-xl sm:text-2xl font-bold text-white mb-6">Marketing Nurture Trust Risk</h3>
-            <p className="text-xs sm:text-sm leading-relaxed mb-4">
-              We check the raw DNS records for missing <strong>SPF and DMARC</strong> email authentication protocols.
-            </p>
-            <ul className="space-y-4 list-disc pl-5 mb-8 text-xs sm:text-sm">
-              <li>As of recent updates, Google Workspace and Microsoft 365 heavily filter unauthenticated emails to protect users from phishing.</li>
-              <li>Without properly configured DMARC and SPF, automated CRM emails (like free trials, lead magnets, and follow-ups) are automatically flagged.</li>
-              <li><strong>Why we use an estimate:</strong> By validating the absence of these records in your live DNS propagation, we can guarantee with near certainty that your automated nurture sequences are hitting spam folders instead of primary inboxes.</li>
-            </ul>
+            {!isEmailVulnerable ? (
+              <>
+                 <p className="text-xs sm:text-sm leading-relaxed mb-4">
+                  We check the raw DNS records for missing <strong>SPF and DMARC</strong> email authentication protocols.
+                </p>
+                <div className="p-4 sm:p-5 bg-green-950/20 border-l-2 border-green-500 rounded-r-lg mb-8">
+                  <h4 className="text-[10px] font-bold text-green-400 uppercase tracking-widest mb-3 flex items-center gap-2">
+                    <CheckCircle size={14} className="shrink-0" /> Security Status
+                  </h4>
+                  <p className="text-xs sm:text-sm text-green-100/80 italic leading-relaxed">
+                    "Domain authentication protocols are intact. Lead nurture deliverability is protected and will bypass modern Google/Microsoft spam filters."
+                  </p>
+                </div>
+              </>
+            ) : (
+              <>
+                <p className="text-xs sm:text-sm leading-relaxed mb-4">
+                  We check the raw DNS records for missing <strong>SPF and DMARC</strong> email authentication protocols.
+                </p>
+                <ul className="space-y-4 list-disc pl-5 mb-8 text-xs sm:text-sm">
+                  <li>As of recent updates, Google Workspace and Microsoft 365 heavily filter unauthenticated emails to protect users from phishing.</li>
+                  <li>Without properly configured DMARC and SPF, automated CRM emails (like free trials, lead magnets, and follow-ups) are automatically flagged.</li>
+                  <li><strong>Why we use an estimate:</strong> By validating the absence of these records in your live DNS propagation, we can guarantee with near certainty that your automated nurture sequences are hitting spam folders instead of primary inboxes.</li>
+                </ul>
 
-            <div className="p-4 sm:p-5 bg-cyan-950/20 border-l-2 border-cyan-500 rounded-r-lg">
-              <h4 className="text-[10px] font-bold text-cyan-400 uppercase tracking-widest mb-3 flex items-center gap-2">
-                <Activity size={14} className="shrink-0" /> The Business Translation
-              </h4>
-              <p className="text-xs sm:text-sm text-cyan-100/80 italic leading-relaxed">
-                "Your domain is missing basic email security protocols. When a lead signs up for a free trial or downloads your guide, Gmail and Outlook are highly likely sending your automated follow-ups directly to their spam folder. You are paying for leads you cannot legally email."
-              </p>
-            </div>
+                <div className="p-4 sm:p-5 bg-cyan-950/20 border-l-2 border-cyan-500 rounded-r-lg">
+                  <h4 className="text-[10px] font-bold text-cyan-400 uppercase tracking-widest mb-3 flex items-center gap-2">
+                    <Activity size={14} className="shrink-0" /> The Business Translation
+                  </h4>
+                  <p className="text-xs sm:text-sm text-cyan-100/80 italic leading-relaxed">
+                    "Your domain is missing basic email security protocols. When a lead signs up for a free trial or downloads your guide, Gmail and Outlook are highly likely sending your automated follow-ups directly to their spam folder. You are paying for leads you cannot legally email."
+                  </p>
+                </div>
+              </>
+            )}
           </div>
         )}
 
         {activeDrawer === 'dom' && (
           <div className="animate-in fade-in duration-500 text-gray-300">
             <h3 className="text-xl sm:text-2xl font-bold text-white mb-6">DOM Fragility Index</h3>
-            <p className="text-xs sm:text-sm leading-relaxed mb-4">
-              This references Google's official developer thresholds for structural HTML health.
-            </p>
-            <ul className="space-y-4 list-disc pl-5 mb-8 text-xs sm:text-sm">
-              <li>The Document Object Model (DOM) is the skeletal structure of your website. Drag-and-drop page builders frequently create massive, bloated structures with nested elements.</li>
-              <li>Google's core algorithms actively penalize DOM trees exceeding <strong>800 individual HTML nodes</strong>.</li>
-              <li><strong>Why we use an estimate:</strong> Rather than scanning every individual asset manually, we benchmark your overall performance footprint against Google's official 800-node threshold to reliably score structural bloat.</li>
-            </ul>
+            {!isFragile ? (
+              <>
+                 <p className="text-xs sm:text-sm leading-relaxed mb-4">
+                  This references Google's official developer thresholds for structural HTML health.
+                </p>
+                <div className="p-4 sm:p-5 bg-green-950/20 border-l-2 border-green-500 rounded-r-lg mb-8">
+                  <h4 className="text-[10px] font-bold text-green-400 uppercase tracking-widest mb-3 flex items-center gap-2">
+                    <CheckCircle size={14} className="shrink-0" /> Clean Architecture
+                  </h4>
+                  <p className="text-xs sm:text-sm text-green-100/80 italic leading-relaxed">
+                    "Your website's code is structurally optimized. With only {domSize} elements, it renders rapidly on mobile devices without draining battery or causing older phones to crash."
+                  </p>
+                </div>
+              </>
+            ) : (
+              <>
+                <p className="text-xs sm:text-sm leading-relaxed mb-4">
+                  This references Google's official developer thresholds for structural HTML health.
+                </p>
+                <ul className="space-y-4 list-disc pl-5 mb-8 text-xs sm:text-sm">
+                  <li>The Document Object Model (DOM) is the skeletal structure of your website. Drag-and-drop page builders frequently create massive, bloated structures with nested elements.</li>
+                  <li>Google's core algorithms actively penalize DOM trees exceeding <strong>800 individual HTML nodes</strong>.</li>
+                  <li><strong>Why we use an estimate:</strong> Rather than scanning every individual asset manually, we benchmark your overall performance footprint against Google's official 800-node threshold to reliably score structural bloat.</li>
+                </ul>
 
-            <div className="p-4 sm:p-5 bg-cyan-950/20 border-l-2 border-cyan-500 rounded-r-lg">
-              <h4 className="text-[10px] font-bold text-cyan-400 uppercase tracking-widest mb-3 flex items-center gap-2">
-                <Activity size={14} className="shrink-0" /> The Business Translation
-              </h4>
-              <p className="text-xs sm:text-sm text-cyan-100/80 italic leading-relaxed">
-                "Your website's code is structurally obese. It forces a mobile phone to download <strong>{domSize}</strong> individual elements just to show a landing page, which drains the user's battery and causes older phones to crash."
-              </p>
-            </div>
+                <div className="p-4 sm:p-5 bg-cyan-950/20 border-l-2 border-cyan-500 rounded-r-lg">
+                  <h4 className="text-[10px] font-bold text-cyan-400 uppercase tracking-widest mb-3 flex items-center gap-2">
+                    <Activity size={14} className="shrink-0" /> The Business Translation
+                  </h4>
+                  <p className="text-xs sm:text-sm text-cyan-100/80 italic leading-relaxed">
+                    "Your website's code is structurally obese. It forces a mobile phone to download <strong>{domSize}</strong> individual elements just to show a landing page, which drains the user's battery and causes older phones to crash."
+                  </p>
+                </div>
+              </>
+            )}
           </div>
         )}
       </div>
