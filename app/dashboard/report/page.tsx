@@ -165,16 +165,15 @@ export default function AuditReportPage() {
     dynamicSeverityTier = 'MODERATE';
   }
 
-  // State-of-the-art smooth live breathing telemetry wave component. 
-  // If isFlat is true, it renders a completely stable horizontal line.
+  // High-End Smooth Live Telemetry Component (Flat if optimized, smoothly undulating sine wave if active/alert)
   const LiveTelemetryWave = ({ isFlat, isAlert }: { isFlat: boolean; isAlert: boolean }) => {
     const [phase, setPhase] = useState(0);
 
     useEffect(() => {
-      if (isFlat) return; // Keep flat if optimized/0%
+      if (isFlat) return; 
       let animationFrameId: number;
       const render = () => {
-        setPhase((prev) => (prev + (isAlert ? 0.07 : 0.03)) % (Math.PI * 2));
+        setPhase((prev) => (prev + (isAlert ? 0.05 : 0.025)) % (Math.PI * 2));
         animationFrameId = requestAnimationFrame(render);
       };
       animationFrameId = requestAnimationFrame(render);
@@ -189,18 +188,10 @@ export default function AuditReportPage() {
     for (let x = 0; x <= width; x += 2) {
       let y = centerY;
       if (!isFlat) {
-        const freq = isAlert ? 0.045 : 0.02;
-        const amplitude = isAlert ? 7.5 : 3.5;
-        
-        y = centerY + Math.sin(x * freq + phase) * amplitude;
-        
-        // Organic ECG heartbeat spike
-        const cycle = (x + phase * 22) % 120;
-        if (cycle > 50 && cycle < 70) {
-          if (cycle < 58) y -= (cycle - 50) * (isAlert ? 2.8 : 1.4);
-          else if (cycle < 64) y += (cycle - 58) * (isAlert ? 4.5 : 2.2);
-          else y -= (70 - cycle) * (isAlert ? 1.2 : 0.6);
-        }
+        // Smooth mathematical sine composition for high-end agency look
+        const primaryWave = Math.sin(x * 0.03 + phase) * (isAlert ? 6 : 3);
+        const secondaryWave = Math.cos(x * 0.06 - phase * 1.5) * (isAlert ? 3 : 1.5);
+        y = centerY + primaryWave + secondaryWave;
       }
       points.push(`${x === 0 ? 'M' : 'L'} ${x},${y}`);
     }
@@ -213,9 +204,9 @@ export default function AuditReportPage() {
         <svg className="w-full h-full" viewBox={`0 0 ${width} ${height}`} preserveAspectRatio="none">
           <defs>
             <linearGradient id={`grad-${strokeColor.replace('#','')}`} x1="0%" y1="0%" x2="100%" y2="0%">
-              <stop offset="0%" stopColor={strokeColor} stopOpacity={isFlat ? "0.6" : "0.2"} />
+              <stop offset="0%" stopColor={strokeColor} stopOpacity={isFlat ? "0.4" : "0.1"} />
               <stop offset="50%" stopColor={strokeColor} stopOpacity="1" />
-              <stop offset="100%" stopColor={strokeColor} stopOpacity={isFlat ? "0.6" : "0.2"} />
+              <stop offset="100%" stopColor={strokeColor} stopOpacity={isFlat ? "0.4" : "0.1"} />
             </linearGradient>
           </defs>
           <path 
@@ -225,7 +216,7 @@ export default function AuditReportPage() {
             strokeWidth="2" 
             strokeLinecap="round"
             strokeLinejoin="round"
-            className={isFlat ? "opacity-75" : isAlert ? "drop-shadow-[0_0_8px_rgba(239,68,68,0.8)]" : "drop-shadow-[0_0_6px_rgba(6,182,212,0.6)]"}
+            className={isFlat ? "opacity-80" : isAlert ? "drop-shadow-[0_0_8px_rgba(239,68,68,0.7)]" : "drop-shadow-[0_0_6px_rgba(6,182,212,0.6)]"}
           />
         </svg>
       </div>
