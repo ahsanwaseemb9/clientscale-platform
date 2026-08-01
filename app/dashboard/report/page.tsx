@@ -5,7 +5,7 @@ import {
   AlertTriangle, DollarSign, Ghost, ShieldAlert, Activity, 
   Database, ServerCrash, X, ChevronRight, MapPin, MailWarning,
   ListOrdered, Layers, Globe, Image as ImageIcon, Accessibility, 
-  CheckCircle, AlertCircle, Cpu, Lock, Unlock, ShieldCheck, Search
+  CheckCircle, AlertCircle, Cpu, Lock, Unlock, ShieldCheck, Search, Info
 } from 'lucide-react';
 
 // --- UPGRADE MAPPING DICTIONARY ---
@@ -187,6 +187,22 @@ export default function AuditReportPage() {
           <Activity size={16} />
           Initialize AI Remediation
         </button>
+      </div>
+
+      {/* --- TELEMETRY VOLATILITY NOTICE --- */}
+      <div className="mb-6 sm:mb-8 bg-[#0a0a0c] border border-blue-900/50 rounded-xl p-4 sm:p-5 flex flex-col sm:flex-row items-start sm:items-center gap-4 relative overflow-hidden group shadow-sm">
+        <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-transparent pointer-events-none" />
+        <div className="w-10 h-10 rounded-full bg-blue-500/10 border border-blue-500/30 flex items-center justify-center text-blue-400 shrink-0 relative z-10">
+          <Info size={18} className="animate-pulse" />
+        </div>
+        <div className="relative z-10 flex-grow">
+          <h4 className="text-[10px] font-bold text-blue-400 uppercase tracking-widest mb-1">
+            Live Telemetry Volatility Warning
+          </h4>
+          <p className="text-xs sm:text-sm text-gray-400 leading-relaxed">
+            Because this target domain relies on a traditional origin server, the data below will fluctuate based on live traffic and CPU strain. Migrating to the ClientScale Edge Network removes this instability, permanently locking these metrics into an optimized state.
+          </p>
+        </div>
       </div>
 
       {/* --- BUSINESS FRICTION GRID (Top 6 Cards) --- */}
