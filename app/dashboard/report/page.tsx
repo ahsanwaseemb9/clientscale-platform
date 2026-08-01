@@ -171,18 +171,17 @@ export default function AuditReportPage() {
 
     useEffect(() => {
       if (isFlat) {
-        setPoints(Array(20).fill(15));
+        setPoints(Array(30).fill(18));
         return;
       }
 
-      // Initialize initial wave points
-      const initial = Array.from({ length: 25 }, () => 15 + (Math.random() * 10 - 5));
+      const initial = Array.from({ length: 30 }, () => 18 + (Math.random() * 12 - 6));
       setPoints(initial);
 
       const interval = setInterval(() => {
         setPoints((prev) => {
-          const nextVal = 15 + (Math.random() * (isAlert ? 20 : 8) - (isAlert ? 10 : 4));
-          const clamped = Math.max(5, Math.min(25, nextVal));
+          const nextVal = 18 + (Math.random() * (isAlert ? 22 : 10) - (isAlert ? 11 : 5));
+          const clamped = Math.max(6, Math.min(30, nextVal));
           return [...prev.slice(1), clamped];
         });
       }, 350);
@@ -190,8 +189,8 @@ export default function AuditReportPage() {
       return () => clearInterval(interval);
     }, [isFlat, isAlert]);
 
-    const width = 300;
-    const height = 30;
+    const width = 450;
+    const height = 36;
     const dx = width / (points.length - 1 || 1);
 
     let pathString = '';
@@ -210,23 +209,23 @@ export default function AuditReportPage() {
     const strokeColor = isFlat ? '#10b981' : isAlert ? '#ef4444' : '#06b6d4';
 
     return (
-      <div className="w-full h-8 overflow-hidden relative mt-3 flex items-center">
+      <div className="w-full h-10 overflow-hidden relative mt-4 flex items-center">
         <svg className="w-full h-full" viewBox={`0 0 ${width} ${height}`} preserveAspectRatio="none">
           <defs>
             <linearGradient id={`grad-${strokeColor.replace('#','')}`} x1="0%" y1="0%" x2="100%" y2="0%">
-              <stop offset="0%" stopColor={strokeColor} stopOpacity={isFlat ? "0.6" : "0.2"} />
+              <stop offset="0%" stopColor={strokeColor} stopOpacity={isFlat ? "0.6" : "0.15"} />
               <stop offset="50%" stopColor={strokeColor} stopOpacity="1" />
-              <stop offset="100%" stopColor={strokeColor} stopOpacity={isFlat ? "0.6" : "0.2"} />
+              <stop offset="100%" stopColor={strokeColor} stopOpacity={isFlat ? "0.6" : "0.15"} />
             </linearGradient>
           </defs>
           <path 
             d={pathString} 
             fill="none" 
             stroke={`url(#grad-${strokeColor.replace('#','')})`}
-            strokeWidth="2" 
+            strokeWidth="2.5" 
             strokeLinecap="round"
             strokeLinejoin="round"
-            className={isFlat ? "opacity-90" : isAlert ? "drop-shadow-[0_0_8px_rgba(239,68,68,0.8)]" : "drop-shadow-[0_0_6px_rgba(6,182,212,0.6)]"}
+            className={isFlat ? "opacity-90" : isAlert ? "drop-shadow-[0_0_10px_rgba(239,68,68,0.9)]" : "drop-shadow-[0_0_8px_rgba(6,182,212,0.8)]"}
           />
         </svg>
       </div>
@@ -277,25 +276,25 @@ export default function AuditReportPage() {
           </div>
         </div>
 
-        {/* --- BUSINESS FRICTION GRID (Top 6 Cards) --- */}
+        {/* --- BUSINESS FRICTION GRID (Top 6 Stretched Enterprise Cards) --- */}
         <div className="mb-6 sm:mb-8">
           <h2 className="text-[11px] font-mono font-bold text-zinc-500 uppercase tracking-[0.2em] mb-4">Revenue & Friction Analysis</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             
             {/* 1. Revenue Leakage Card */}
-            <div className={`bg-[#07070f]/90 border ${parseFloat(revenueLeakagePercent) === 0 ? 'border-green-900/50 hover:border-green-500/50' : 'border-red-900/50 hover:border-red-500/50'} rounded-2xl relative flex flex-col justify-between transition-all backdrop-blur-xl shadow-xl p-5 sm:p-6`}>
+            <div className={`bg-[#0a0a0e] border ${parseFloat(revenueLeakagePercent) === 0 ? 'border-green-900/50 hover:border-green-500/50' : 'border-red-900/50 hover:border-red-500/50'} rounded-2xl relative flex flex-col justify-between transition-all backdrop-blur-xl shadow-2xl p-6 sm:p-8`}>
               <div className="absolute inset-0 overflow-hidden rounded-2xl pointer-events-none">
-                <div className="absolute top-0 right-0 p-4 opacity-10">
-                  <DollarSign size={80} className={parseFloat(revenueLeakagePercent) === 0 ? 'text-green-500' : 'text-red-500'} />
+                <div className="absolute top-0 right-0 p-6 opacity-10">
+                  <DollarSign size={90} className={parseFloat(revenueLeakagePercent) === 0 ? 'text-green-500' : 'text-red-500'} />
                 </div>
               </div>
               <div className="relative z-10 flex-grow">
-                <div className={`flex items-center gap-2 mb-3 ${parseFloat(revenueLeakagePercent) === 0 ? 'text-green-400' : 'text-red-400'}`}>
-                  <AlertTriangle size={18} />
+                <div className={`flex items-center gap-2.5 mb-3 ${parseFloat(revenueLeakagePercent) === 0 ? 'text-green-400' : 'text-red-400'}`}>
+                  <AlertTriangle size={20} />
                   <h3 className="text-xs font-mono font-bold uppercase tracking-wider">Revenue Leakage</h3>
                 </div>
-                <div className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white mb-2">{revenueLeakagePercent}%</div>
-                <p className="text-xs text-zinc-400 leading-relaxed font-light">
+                <div className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-white mb-3 tracking-tight">{revenueLeakagePercent}%</div>
+                <p className="text-xs sm:text-sm text-zinc-400 leading-relaxed font-light max-w-xl">
                   {parseFloat(revenueLeakagePercent) === 0 
                     ? 'Performance is fully optimized. Zero estimated revenue leakage due to latency.'
                     : (isGhostOptimal && parseFloat(parasiteImpact) === 0 
@@ -304,10 +303,10 @@ export default function AuditReportPage() {
                 </p>
                 <LiveTelemetryWave isFlat={parseFloat(revenueLeakagePercent) === 0} isAlert={parseFloat(revenueLeakagePercent) > 0} />
               </div>
-              <div className="relative z-10 mt-4">
+              <div className="relative z-10 mt-6">
                 <button 
                   onClick={() => setActiveDrawer('revenue')}
-                  className={`group relative w-full flex items-center justify-between px-4 py-3 rounded-xl border transition-all duration-300 overflow-hidden ${
+                  className={`group relative w-full flex items-center justify-between px-5 py-3.5 rounded-xl border transition-all duration-300 overflow-hidden ${
                     parseFloat(revenueLeakagePercent) === 0 ? 'bg-green-950/30 border-green-900/50 hover:border-green-500/70' : 'bg-red-950/30 border-red-900/50 hover:border-red-500/70'
                   }`}
                 >
@@ -316,7 +315,7 @@ export default function AuditReportPage() {
                   }`}>
                     Forensic Methodology
                   </span>
-                  <ChevronRight size={14} className={`relative z-10 transition-transform group-hover:translate-x-1 ${
+                  <ChevronRight size={16} className={`relative z-10 transition-transform group-hover:translate-x-1 ${
                     parseFloat(revenueLeakagePercent) === 0 ? 'text-green-400' : 'text-red-400'
                   }`} />
                 </button>
@@ -324,29 +323,29 @@ export default function AuditReportPage() {
             </div>
 
             {/* 2. Ghost Tap Window Card */}
-            <div className={`bg-[#07070f]/90 border ${isGhostOptimal ? 'border-green-900/50 hover:border-green-500/50' : 'border-orange-900/50 hover:border-orange-500/50'} rounded-2xl relative flex flex-col justify-between transition-all backdrop-blur-xl shadow-xl p-5 sm:p-6`}>
+            <div className={`bg-[#0a0a0e] border ${isGhostOptimal ? 'border-green-900/50 hover:border-green-500/50' : 'border-orange-900/50 hover:border-orange-500/50'} rounded-2xl relative flex flex-col justify-between transition-all backdrop-blur-xl shadow-2xl p-6 sm:p-8`}>
               <div className="absolute inset-0 overflow-hidden rounded-2xl pointer-events-none">
-                <div className="absolute top-0 right-0 p-4 opacity-10">
-                  <Ghost size={80} className={isGhostOptimal ? 'text-green-500' : 'text-orange-500'} />
+                <div className="absolute top-0 right-0 p-6 opacity-10">
+                  <Ghost size={90} className={isGhostOptimal ? 'text-green-500' : 'text-orange-500'} />
                 </div>
               </div>
               <div className="relative z-10 flex-grow">
-                <div className={`flex items-center gap-2 mb-3 ${isGhostOptimal ? 'text-green-400' : 'text-orange-400'}`}>
-                  <Ghost size={18} />
+                <div className={`flex items-center gap-2.5 mb-3 ${isGhostOptimal ? 'text-green-400' : 'text-orange-400'}`}>
+                  <Ghost size={20} />
                   <h3 className="text-xs font-mono font-bold uppercase tracking-wider">Ghost Tap Window</h3>
                 </div>
-                <div className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white mb-2">{isGhostOptimal ? '0.0s' : `${ghostTapWindow}s`}</div>
-                <p className="text-xs text-zinc-400 leading-relaxed font-light">
+                <div className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-white mb-3 tracking-tight">{isGhostOptimal ? '0.0s' : `${ghostTapWindow}s`}</div>
+                <p className="text-xs sm:text-sm text-zinc-400 leading-relaxed font-light max-w-xl">
                   {isGhostOptimal 
                     ? 'Main thread is unblocked. User interactions are instantly registered by the browser.'
                     : `The screen appears loaded, but user taps are ignored for ${ghostTapWindow} seconds due to main-thread blocking.`}
                 </p>
                 <LiveTelemetryWave isFlat={isGhostOptimal} isAlert={!isGhostOptimal} />
               </div>
-              <div className="relative z-10 mt-4">
+              <div className="relative z-10 mt-6">
                 <button 
                   onClick={() => setActiveDrawer('ghost')}
-                  className={`group relative w-full flex items-center justify-between px-4 py-3 rounded-xl border transition-all duration-300 overflow-hidden ${
+                  className={`group relative w-full flex items-center justify-between px-5 py-3.5 rounded-xl border transition-all duration-300 overflow-hidden ${
                     isGhostOptimal ? 'bg-green-950/30 border-green-900/50 hover:border-green-500/70' : 'bg-orange-950/30 border-orange-900/50 hover:border-orange-500/70'
                   }`}
                 >
@@ -355,7 +354,7 @@ export default function AuditReportPage() {
                   }`}>
                     Forensic Methodology
                   </span>
-                  <ChevronRight size={14} className={`relative z-10 transition-transform group-hover:translate-x-1 ${
+                  <ChevronRight size={16} className={`relative z-10 transition-transform group-hover:translate-x-1 ${
                     isGhostOptimal ? 'text-green-400' : 'text-orange-400'
                   }`} />
                 </button>
@@ -363,29 +362,29 @@ export default function AuditReportPage() {
             </div>
             
             {/* 3. Local Search Penalty (INP) Card */}
-            <div className={`bg-[#07070f]/90 border ${isMapPenalized ? 'border-red-900/50 hover:border-red-500/50' : 'border-green-900/50 hover:border-green-500/50'} rounded-2xl relative flex flex-col justify-between transition-all backdrop-blur-xl shadow-xl p-5 sm:p-6`}>
+            <div className={`bg-[#0a0a0e] border ${isMapPenalized ? 'border-red-900/50 hover:border-red-500/50' : 'border-green-900/50 hover:border-green-500/50'} rounded-2xl relative flex flex-col justify-between transition-all backdrop-blur-xl shadow-2xl p-6 sm:p-8`}>
               <div className="absolute inset-0 overflow-hidden rounded-2xl pointer-events-none">
-                <div className="absolute top-0 right-0 p-4 opacity-10">
-                  <MapPin size={80} className={isMapPenalized ? 'text-red-500' : 'text-green-500'} />
+                <div className="absolute top-0 right-0 p-6 opacity-10">
+                  <MapPin size={90} className={isMapPenalized ? 'text-red-500' : 'text-green-500'} />
                 </div>
               </div>
               <div className="relative z-10 flex-grow">
-                <div className={`flex items-center gap-2 mb-3 ${isMapPenalized ? 'text-red-400' : 'text-green-400'}`}>
-                  <MapPin size={18} />
+                <div className={`flex items-center gap-2.5 mb-3 ${isMapPenalized ? 'text-red-400' : 'text-green-400'}`}>
+                  <MapPin size={20} />
                   <h3 className="text-xs font-mono font-bold uppercase tracking-wider">Local SEO Penalty</h3>
                 </div>
-                <div className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white mb-2">{rawInp}ms</div>
-                <p className="text-xs text-zinc-400 leading-relaxed font-light">
+                <div className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-white mb-3 tracking-tight">{rawInp}ms</div>
+                <p className="text-xs sm:text-sm text-zinc-400 leading-relaxed font-light max-w-xl">
                   {isMapPenalized 
                     ? `INP exceeds 200ms threshold. Google algorithms are actively suppressing your Google Maps visibility due to poor UX.` 
                     : `INP is within passing limits. Local SEO and Maps visibility are unaffected by interaction latency.`}
                 </p>
                 <LiveTelemetryWave isFlat={!isMapPenalized} isAlert={isMapPenalized} />
               </div>
-              <div className="relative z-10 mt-4">
+              <div className="relative z-10 mt-6">
                 <button 
                   onClick={() => setActiveDrawer('inp')}
-                  className={`group relative w-full flex items-center justify-between px-4 py-3 rounded-xl border transition-all duration-300 overflow-hidden ${
+                  className={`group relative w-full flex items-center justify-between px-5 py-3.5 rounded-xl border transition-all duration-300 overflow-hidden ${
                     isMapPenalized ? 'bg-red-950/30 border-red-900/50 hover:border-red-500/70' : 'bg-green-950/30 border-green-900/50 hover:border-green-500/70'
                   }`}
                 >
@@ -394,7 +393,7 @@ export default function AuditReportPage() {
                   }`}>
                     Forensic Methodology
                   </span>
-                  <ChevronRight size={14} className={`relative z-10 transition-transform group-hover:translate-x-1 ${
+                  <ChevronRight size={16} className={`relative z-10 transition-transform group-hover:translate-x-1 ${
                     isMapPenalized ? 'text-red-400' : 'text-green-400'
                   }`} />
                 </button>
@@ -402,29 +401,29 @@ export default function AuditReportPage() {
             </div>
 
             {/* 4. Parasite Load Card */}
-            <div className={`bg-[#07070f]/90 border ${parseFloat(parasiteImpact) === 0 ? 'border-green-900/50 hover:border-green-500/50' : 'border-yellow-900/50 hover:border-yellow-500/50'} rounded-2xl relative flex flex-col justify-between transition-all backdrop-blur-xl shadow-xl p-5 sm:p-6`}>
+            <div className={`bg-[#0a0a0e] border ${parseFloat(parasiteImpact) === 0 ? 'border-green-900/50 hover:border-green-500/50' : 'border-yellow-900/50 hover:border-yellow-500/50'} rounded-2xl relative flex flex-col justify-between transition-all backdrop-blur-xl shadow-2xl p-6 sm:p-8`}>
               <div className="absolute inset-0 overflow-hidden rounded-2xl pointer-events-none">
-                <div className="absolute top-0 right-0 p-4 opacity-10">
-                  <ShieldAlert size={80} className={parseFloat(parasiteImpact) === 0 ? 'text-green-500' : 'text-yellow-500'} />
+                <div className="absolute top-0 right-0 p-6 opacity-10">
+                  <ShieldAlert size={90} className={parseFloat(parasiteImpact) === 0 ? 'text-green-500' : 'text-yellow-500'} />
                 </div>
               </div>
               <div className="relative z-10 flex-grow">
-                <div className={`flex items-center gap-2 mb-3 ${parseFloat(parasiteImpact) === 0 ? 'text-green-400' : 'text-yellow-400'}`}>
-                  <ServerCrash size={18} />
+                <div className={`flex items-center gap-2.5 mb-3 ${parseFloat(parasiteImpact) === 0 ? 'text-green-400' : 'text-yellow-400'}`}>
+                  <ServerCrash size={20} />
                   <h3 className="text-xs font-mono font-bold uppercase tracking-wider">Parasite Load</h3>
                 </div>
-                <div className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white mb-2">{parasiteImpact}%</div>
-                <p className="text-xs text-zinc-400 leading-relaxed font-light">
+                <div className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-white mb-3 tracking-tight">{parasiteImpact}%</div>
+                <p className="text-xs sm:text-sm text-zinc-400 leading-relaxed font-light max-w-xl">
                   {parseFloat(parasiteImpact) === 0
                     ? 'Zero external tracking scripts detected. Pipeline resource consumption is clean.'
                     : `${thirdPartyCount} external marketing scripts are responsible for ${parasiteImpact}% of your mobile lag.`}
                 </p>
                 <LiveTelemetryWave isFlat={parseFloat(parasiteImpact) === 0} isAlert={parseFloat(parasiteImpact) > 0} />
               </div>
-              <div className="relative z-10 mt-4">
+              <div className="relative z-10 mt-6">
                 <button 
                   onClick={() => setActiveDrawer('parasite')}
-                  className={`group relative w-full flex items-center justify-between px-4 py-3 rounded-xl border transition-all duration-300 overflow-hidden ${
+                  className={`group relative w-full flex items-center justify-between px-5 py-3.5 rounded-xl border transition-all duration-300 overflow-hidden ${
                     parseFloat(parasiteImpact) === 0 ? 'bg-green-950/30 border-green-900/50 hover:border-green-500/70' : 'bg-yellow-950/30 border-yellow-900/50 hover:border-yellow-500/70'
                   }`}
                 >
@@ -433,7 +432,7 @@ export default function AuditReportPage() {
                   }`}>
                     Forensic Methodology
                   </span>
-                  <ChevronRight size={14} className={`relative z-10 transition-transform group-hover:translate-x-1 ${
+                  <ChevronRight size={16} className={`relative z-10 transition-transform group-hover:translate-x-1 ${
                     parseFloat(parasiteImpact) === 0 ? 'text-green-400' : 'text-yellow-400'
                   }`} />
                 </button>
@@ -441,31 +440,31 @@ export default function AuditReportPage() {
             </div>
 
             {/* 5. Marketing Nurture Security (DNS/DMARC) Card */}
-            <div className={`bg-[#07070f]/90 border ${isEmailVulnerable ? 'border-red-900/50 hover:border-red-500/50' : 'border-green-900/50 hover:border-green-500/50'} rounded-2xl relative flex flex-col justify-between transition-all backdrop-blur-xl shadow-xl p-5 sm:p-6`}>
+            <div className={`bg-[#0a0a0e] border ${isEmailVulnerable ? 'border-red-900/50 hover:border-red-500/50' : 'border-green-900/50 hover:border-green-500/50'} rounded-2xl relative flex flex-col justify-between transition-all backdrop-blur-xl shadow-2xl p-6 sm:p-8`}>
               <div className="absolute inset-0 overflow-hidden rounded-2xl pointer-events-none">
-                <div className="absolute top-0 right-0 p-4 opacity-10">
-                  <MailWarning size={80} className={isEmailVulnerable ? 'text-red-500' : 'text-green-500'} />
+                <div className="absolute top-0 right-0 p-6 opacity-10">
+                  <MailWarning size={90} className={isEmailVulnerable ? 'text-red-500' : 'text-green-500'} />
                 </div>
               </div>
               <div className="relative z-10 flex-grow">
-                <div className={`flex items-center gap-2 mb-3 ${isEmailVulnerable ? 'text-red-400' : 'text-green-400'}`}>
-                  <MailWarning size={18} />
+                <div className={`flex items-center gap-2.5 mb-3 ${isEmailVulnerable ? 'text-red-400' : 'text-green-400'}`}>
+                  <MailWarning size={20} />
                   <h3 className="text-xs font-mono font-bold uppercase tracking-wider">Nurture Trust Risk</h3>
                 </div>
-                <div className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-white mb-2 break-words">
+                <div className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white mb-3 tracking-tight break-words">
                   {isEmailVulnerable ? 'VULNERABLE' : 'SECURE'}
                 </div>
-                <p className="text-xs text-zinc-400 leading-relaxed font-light">
+                <p className="text-xs sm:text-sm text-zinc-400 leading-relaxed font-light max-w-xl">
                   {isEmailVulnerable 
                     ? `Missing DMARC/SPF protocols. Automated free-trial follow-ups are highly likely routing to client spam folders.`
                     : `Domain authentication protocols are intact. Lead nurture deliverability is protected.`}
                 </p>
                 <LiveTelemetryWave isFlat={!isEmailVulnerable} isAlert={isEmailVulnerable} />
               </div>
-              <div className="relative z-10 mt-4">
+              <div className="relative z-10 mt-6">
                 <button 
                   onClick={() => setActiveDrawer('dns')}
-                  className={`group relative w-full flex items-center justify-between px-4 py-3 rounded-xl border transition-all duration-300 overflow-hidden ${
+                  className={`group relative w-full flex items-center justify-between px-5 py-3.5 rounded-xl border transition-all duration-300 overflow-hidden ${
                     isEmailVulnerable ? 'bg-red-950/30 border-red-900/50 hover:border-red-500/70' : 'bg-green-950/30 border-green-900/50 hover:border-green-500/70'
                   }`}
                 >
@@ -474,7 +473,7 @@ export default function AuditReportPage() {
                   }`}>
                     Forensic Methodology
                   </span>
-                  <ChevronRight size={14} className={`relative z-10 transition-transform group-hover:translate-x-1 ${
+                  <ChevronRight size={16} className={`relative z-10 transition-transform group-hover:translate-x-1 ${
                     isEmailVulnerable ? 'text-red-400' : 'text-green-400'
                   }`} />
                 </button>
@@ -482,29 +481,29 @@ export default function AuditReportPage() {
             </div>
 
             {/* 6. Codebase Fragility Card */}
-            <div className={`bg-[#07070f]/90 border ${!isFragile ? 'border-green-900/50 hover:border-green-500/50' : 'border-zinc-800 hover:border-zinc-700'} rounded-2xl relative flex flex-col justify-between transition-all backdrop-blur-xl shadow-xl p-5 sm:p-6`}>
+            <div className={`bg-[#0a0a0e] border ${!isFragile ? 'border-green-900/50 hover:border-green-500/50' : 'border-zinc-800 hover:border-zinc-700'} rounded-2xl relative flex flex-col justify-between transition-all backdrop-blur-xl shadow-2xl p-6 sm:p-8`}>
               <div className="absolute inset-0 overflow-hidden rounded-2xl pointer-events-none">
-                <div className="absolute top-0 right-0 p-4 opacity-5">
-                  <Database size={80} className={!isFragile ? 'text-green-500' : 'text-white'} />
+                <div className="absolute top-0 right-0 p-6 opacity-5">
+                  <Database size={90} className={!isFragile ? 'text-green-500' : 'text-white'} />
                 </div>
               </div>
               <div className="relative z-10 flex-grow">
-                <div className={`flex items-center gap-2 mb-3 ${!isFragile ? 'text-green-400' : 'text-zinc-400'}`}>
-                  <Database size={18} />
+                <div className={`flex items-center gap-2.5 mb-3 ${!isFragile ? 'text-green-400' : 'text-zinc-400'}`}>
+                  <Database size={20} />
                   <h3 className="text-xs font-mono font-bold uppercase tracking-wider">DOM Fragility</h3>
                 </div>
-                <div className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white mb-2">{domSize}</div>
-                <p className="text-xs text-zinc-400 leading-relaxed font-light">
+                <div className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-white mb-3 tracking-tight">{domSize}</div>
+                <p className="text-xs sm:text-sm text-zinc-400 leading-relaxed font-light max-w-xl">
                   {!isFragile 
                     ? 'HTML structure is highly optimized. Low node count ensures rapid rendering.'
                     : 'Massive HTML node count is draining mobile batteries and risking browser crashes.'}
                 </p>
                 <LiveTelemetryWave isFlat={!isFragile} isAlert={isFragile} />
               </div>
-              <div className="relative z-10 mt-4">
+              <div className="relative z-10 mt-6">
                 <button 
                   onClick={() => setActiveDrawer('dom')}
-                  className={`group relative w-full flex items-center justify-between px-4 py-3 rounded-xl border transition-all duration-300 overflow-hidden ${
+                  className={`group relative w-full flex items-center justify-between px-5 py-3.5 rounded-xl border transition-all duration-300 overflow-hidden ${
                     !isFragile ? 'bg-green-950/30 border-green-900/50 hover:border-green-500/70' : 'bg-zinc-900/50 border-zinc-800 hover:border-zinc-700'
                   }`}
                 >
@@ -513,7 +512,7 @@ export default function AuditReportPage() {
                   }`}>
                     Forensic Methodology
                   </span>
-                  <ChevronRight size={14} className={`relative z-10 transition-transform group-hover:translate-x-1 ${
+                  <ChevronRight size={16} className={`relative z-10 transition-transform group-hover:translate-x-1 ${
                     !isFragile ? 'text-green-400' : 'text-zinc-300'
                   }`} />
                 </button>
@@ -524,7 +523,7 @@ export default function AuditReportPage() {
         </div>
 
         {/* --- PRIMARY LEAKAGE CHECKLIST --- */}
-        <div className="mb-6 sm:mb-8 bg-[#07070f]/90 border border-zinc-800/80 rounded-2xl p-5 sm:p-6 backdrop-blur-xl shadow-xl">
+        <div className="mb-6 sm:mb-8 bg-[#0a0a0e] border border-zinc-800/80 rounded-2xl p-6 sm:p-8 backdrop-blur-xl shadow-2xl">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 border-b border-zinc-800/80 pb-4 gap-3">
             <div className="flex items-center gap-3">
               <ListOrdered className="text-cyan-500 shrink-0" size={20} />
@@ -545,13 +544,13 @@ export default function AuditReportPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {activeLeakagePoints.length > 0 ? (
               activeLeakagePoints.map((point: string, idx: number) => (
-                <div key={idx} className="flex items-start gap-3 p-4 bg-[#0a0a0f] border border-zinc-800/60 rounded-xl">
+                <div key={idx} className="flex items-start gap-3 p-4 bg-[#050508] border border-zinc-800/60 rounded-xl">
                   <AlertCircle className="text-red-500 shrink-0 mt-0.5" size={16} />
                   <p className="text-xs sm:text-sm text-zinc-300 font-medium leading-relaxed">{point}</p>
                 </div>
               ))
             ) : (
-              <div className="col-span-1 md:col-span-2 flex items-center justify-center p-8 bg-[#0a0a0f] border border-green-900/30 rounded-xl gap-3">
+              <div className="col-span-1 md:col-span-2 flex items-center justify-center p-8 bg-[#050508] border border-green-900/30 rounded-xl gap-3">
                 <CheckCircle className="text-green-500" size={20} />
                 <p className="text-sm text-zinc-300 font-medium">Pipeline structure optimized. No critical funnel leakage points detected.</p>
               </div>
@@ -563,7 +562,7 @@ export default function AuditReportPage() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6 sm:mb-8 items-start">
           
           {/* Brand Impression & Accessibility */}
-          <div className="bg-[#07070f]/90 border border-zinc-800/80 rounded-2xl p-5 sm:p-6 backdrop-blur-xl shadow-xl flex flex-col h-full">
+          <div className="bg-[#0a0a0e] border border-zinc-800/80 rounded-2xl p-6 sm:p-8 backdrop-blur-xl shadow-2xl flex flex-col h-full">
             <div>
               <div className="flex items-center gap-3 mb-6">
                 <Globe className="text-indigo-400 shrink-0" size={20} />
@@ -573,7 +572,7 @@ export default function AuditReportPage() {
                 {/* Meta Data */}
                 <div>
                   <span className="text-[10px] font-mono font-bold text-zinc-500 uppercase tracking-widest mb-2 block">Social Link Preview (OpenGraph)</span>
-                  <div className="p-4 bg-[#0a0a0f] border border-zinc-800/60 rounded-xl space-y-2">
+                  <div className="p-4 bg-[#050508] border border-zinc-800/60 rounded-xl space-y-2">
                     <div className="flex justify-between items-start gap-2">
                       <p className="text-xs sm:text-sm text-zinc-200 font-medium line-clamp-1 break-all">{displayTitle}</p>
                       {meta.isValid ? (
@@ -598,7 +597,7 @@ export default function AuditReportPage() {
                   className="group cursor-pointer transition-all"
                 >
                   <span className="text-[10px] font-mono font-bold text-zinc-500 uppercase tracking-widest mb-2 block">Accessibility Compliance</span>
-                  <div className="flex items-center justify-between p-4 bg-[#0a0a0f] border border-zinc-800/60 group-hover:border-blue-500/50 rounded-xl transition-colors gap-2">
+                  <div className="flex items-center justify-between p-4 bg-[#050508] border border-zinc-800/60 group-hover:border-blue-500/50 rounded-xl transition-colors gap-2">
                     <div className="flex items-center gap-3 min-w-0">
                       <Accessibility size={16} className="text-blue-400 shrink-0" />
                       <div className="flex flex-col min-w-0">
@@ -619,7 +618,7 @@ export default function AuditReportPage() {
           </div>
 
           {/* --- TECH STACK FINGERPRINT & UPGRADE PATH --- */}
-          <div className="bg-[#07070f]/90 border border-zinc-800/80 rounded-2xl p-5 sm:p-6 backdrop-blur-xl shadow-xl flex flex-col lg:max-h-[600px] relative overflow-hidden">
+          <div className="bg-[#0a0a0e] border border-zinc-800/80 rounded-2xl p-6 sm:p-8 backdrop-blur-xl shadow-2xl flex flex-col lg:max-h-[600px] relative overflow-hidden">
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 border-b border-zinc-800/80 pb-4 gap-2">
               <div className="flex items-center gap-3 min-w-0">
                 <Layers className="text-purple-400 shrink-0" size={20} />
@@ -638,7 +637,7 @@ export default function AuditReportPage() {
                 };
 
                 return (
-                  <div key={idx} className="flex flex-col sm:flex-row gap-4 p-4 bg-[#0a0a0f] border border-zinc-800/60 rounded-xl relative overflow-hidden group hover:border-cyan-500/30 transition-colors">
+                  <div key={idx} className="flex flex-col sm:flex-row gap-4 p-4 bg-[#050508] border border-zinc-800/60 rounded-xl relative overflow-hidden group hover:border-cyan-500/30 transition-colors">
                     {/* LEFT: Detected Infrastructure */}
                     <div className="flex-1 border-b sm:border-b-0 sm:border-r border-zinc-800/60 pb-4 sm:pb-0 sm:pr-4 min-w-0">
                       <div className="text-[9px] font-mono font-bold text-zinc-500 uppercase tracking-wider mb-2 flex items-center gap-1.5">
@@ -717,7 +716,7 @@ export default function AuditReportPage() {
         {/* --- STANDARD TECHNICAL DATA --- */}
         <div className="pt-4 border-t border-zinc-800/80">
            <h2 className="text-[11px] font-mono font-bold text-zinc-500 uppercase tracking-[0.2em] mb-4">Raw Diagnostic Output</h2>
-           <div className="bg-[#07070f]/90 border border-zinc-800/80 rounded-2xl p-4 overflow-hidden shadow-xl backdrop-blur-xl">
+           <div className="bg-[#0a0a0e] border border-zinc-800/80 rounded-2xl p-6 overflow-hidden shadow-2xl backdrop-blur-xl">
               <p className="text-[10px] font-mono text-zinc-500 mb-4 font-bold tracking-widest uppercase">
                 Pipeline Payload Injected
               </p>
