@@ -244,17 +244,17 @@ export default function AuditReportPage() {
 
       <div className="space-y-6 relative overflow-x-hidden min-h-screen pb-12 px-3 sm:px-6 lg:px-8 max-w-7xl mx-auto z-10 w-full pt-12">
         
-        {/* Page Header */}
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 border-b border-zinc-700/80 pb-6 overflow-hidden">
-          <div className="w-full min-w-0">
-            <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-white tracking-tight break-words">
+        {/* --- CENTERE & MOBILE-OPTIMIZED PAGE HEADER WITH CLEAN GAP --- */}
+        <div className="flex flex-col items-center text-center gap-6 border-b border-zinc-700/80 pb-8 mb-10 w-full overflow-hidden">
+          <div className="w-full max-w-3xl px-2">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-white tracking-tight">
               Diagnostic Forensics
             </h1>
-            <p className="text-zinc-200 mt-2 text-sm sm:text-base break-all sm:truncate font-mono font-medium">
+            <p className="text-zinc-200 mt-3 text-sm sm:text-base font-mono font-medium break-all sm:break-normal">
               Live pipeline intelligence for <span className="text-cyan-300 font-bold">{auditData?.target?.replace('https://', '').replace('http://', '') || 'Target Domain'}</span>
             </p>
           </div>
-          <button className="w-full md:w-auto bg-gradient-to-b from-cyan-600 to-cyan-700 hover:from-cyan-500 hover:to-cyan-600 text-white px-6 py-3 rounded-xl font-bold text-xs sm:text-sm transition-all shadow-[0_0_20px_rgba(6,182,212,0.4)] shrink-0 flex items-center justify-center gap-2 border border-cyan-400/50">
+          <button className="w-full sm:w-auto bg-gradient-to-b from-cyan-600 to-cyan-700 hover:from-cyan-500 hover:to-cyan-600 text-white px-8 py-3.5 rounded-xl font-bold text-xs sm:text-sm transition-all shadow-[0_0_20px_rgba(6,182,212,0.4)] flex items-center justify-center gap-2 border border-cyan-400/50">
             <Activity size={16} />
             Initialize AI Remediation
           </button>
