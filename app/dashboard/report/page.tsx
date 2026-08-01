@@ -165,7 +165,7 @@ export default function AuditReportPage() {
     dynamicSeverityTier = 'MODERATE';
   }
 
-  // High-End APM Streaming Telemetry Component
+  // High-End APM Streaming Telemetry Component (Lifeline color changed to pure white #ffffff)
   const LiveTelemetryWave = ({ isFlat, isAlert }: { isFlat: boolean; isAlert: boolean }) => {
     const [points, setPoints] = useState<number[]>([]);
 
@@ -206,13 +206,13 @@ export default function AuditReportPage() {
       }
     }
 
-    const strokeColor = isFlat ? '#10b981' : isAlert ? '#3b82f6' : '#06b6d4';
+    const strokeColor = '#ffffff';
 
     return (
       <div className="w-full h-10 overflow-hidden relative mt-4 flex items-center bg-[#12121c]/90 border border-zinc-600/50 rounded-xl px-2 shadow-inner">
         <svg className="w-full h-full" viewBox={`0 0 ${width} ${height}`} preserveAspectRatio="none">
           <defs>
-            <linearGradient id={`grad-${strokeColor.replace('#','')}`} x1="0%" y1="0%" x2="100%" y2="0%">
+            <linearGradient id={`grad-white`} x1="0%" y1="0%" x2="100%" y2="0%">
               <stop offset="0%" stopColor={strokeColor} stopOpacity={isFlat ? "0.7" : "0.3"} />
               <stop offset="50%" stopColor={strokeColor} stopOpacity="1" />
               <stop offset="100%" stopColor={strokeColor} stopOpacity={isFlat ? "0.7" : "0.3"} />
@@ -221,11 +221,11 @@ export default function AuditReportPage() {
           <path 
             d={pathString} 
             fill="none" 
-            stroke={`url(#grad-${strokeColor.replace('#','')})`}
+            stroke="url(#grad-white)"
             strokeWidth="2.5" 
             strokeLinecap="round"
             strokeLinejoin="round"
-            className={isFlat ? "opacity-100" : isAlert ? "drop-shadow-[0_0_10px_rgba(59,130,246,0.9)]" : "drop-shadow-[0_0_8px_rgba(6,182,212,0.8)]"}
+            className="drop-shadow-[0_0_8px_rgba(255,255,255,0.7)]"
           />
         </svg>
       </div>
@@ -263,14 +263,14 @@ export default function AuditReportPage() {
           </button>
         </div>
 
-        {/* --- LIVE TELEMETRY VOLATILITY WARNING (Centered, Reverted Color, Increased Font Size & Generous Spacing) --- */}
-        <div className="bg-[#12121c]/95 border border-blue-400/40 rounded-2xl p-6 sm:p-8 flex flex-col items-center text-center gap-5 relative overflow-hidden group backdrop-blur-xl shadow-xl mb-12 sm:mb-16">
+        {/* --- LIVE TELEMETRY VOLATILITY WARNING (Mobile Optimized Heading + Increased Spacing) --- */}
+        <div className="bg-[#12121c]/95 border border-blue-400/40 rounded-2xl p-6 sm:p-8 flex flex-col items-center text-center gap-4 relative overflow-hidden group backdrop-blur-xl shadow-xl mb-16 sm:mb-20">
           <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-transparent pointer-events-none" />
-          <div className="w-12 h-12 rounded-xl bg-blue-500/20 border border-blue-400/40 flex items-center justify-center text-blue-300 shrink-0 relative z-10 shadow-[0_0_12px_rgba(59,130,246,0.3)]">
-            <Info size={24} className="opacity-95" />
+          <div className="w-11 h-11 rounded-xl bg-blue-500/20 border border-blue-400/40 flex items-center justify-center text-blue-300 shrink-0 relative z-10 shadow-[0_0_10px_rgba(59,130,246,0.3)]">
+            <Info size={22} className="opacity-95" />
           </div>
-          <div className="relative z-10 max-w-3xl space-y-3">
-            <h4 className="text-base sm:text-lg md:text-xl font-mono font-extrabold text-cyan-400 uppercase tracking-widest leading-snug break-words">
+          <div className="relative z-10 max-w-3xl">
+            <h4 className="text-[11px] xs:text-xs sm:text-sm md:text-base font-mono font-extrabold text-cyan-400 uppercase tracking-tight sm:tracking-widest mb-3 whitespace-nowrap sm:whitespace-normal overflow-hidden text-ellipsis">
               Live Telemetry Volatility Warning
             </h4>
             <p className="text-sm sm:text-base md:text-lg text-white leading-relaxed font-normal">
