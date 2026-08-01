@@ -278,10 +278,10 @@ export default function AuditReportPage() {
 
         {/* --- BUSINESS FRICTION GRID (Top 6 Stretched High-Contrast Cards) --- */}
         <div className="mb-6 sm:mb-8">
-          {/* Centered Heading with Blue-Cyan Line Underneath */}
+          {/* Centered Heading with White Text and Toned-Down Underline Glow */}
           <div className="flex flex-col items-center justify-center mb-6 text-center">
-            <h2 className="text-sm font-mono font-bold text-cyan-300 uppercase tracking-[0.25em]">Revenue & Friction Analysis</h2>
-            <div className="w-48 h-[2px] bg-gradient-to-r from-blue-600 via-cyan-400 to-blue-600 mt-2 shadow-[0_0_10px_rgba(6,182,212,0.8)]"></div>
+            <h2 className="text-sm font-mono font-bold text-white uppercase tracking-[0.25em]">Revenue & Friction Analysis</h2>
+            <div className="w-48 h-[2px] bg-gradient-to-r from-blue-600/50 via-cyan-400/50 to-blue-600/50 mt-2 shadow-[0_0_4px_rgba(6,182,212,0.3)]"></div>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
