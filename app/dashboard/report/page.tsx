@@ -280,9 +280,9 @@ export default function AuditReportPage() {
         </div>
 
         {/* --- BUSINESS FRICTION GRID (Top 6 Brightened High-Contrast Cards) --- */}
-        <div className="mb-6 sm:mb-8">
-          {/* Centered Heading with Increased Font Size and Line Removed */}
-          <div className="flex flex-col items-center justify-center mb-6 text-center">
+        <div className="mb-8 sm:mb-12">
+          {/* Centered Heading with Top & Bottom Gaps */}
+          <div className="flex flex-col items-center justify-center my-8 sm:my-10 text-center">
             <h2 className="text-base sm:text-lg font-mono font-bold text-white uppercase tracking-[0.25em]">Revenue & Friction Analysis</h2>
           </div>
 
