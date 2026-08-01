@@ -261,9 +261,9 @@ export default function AuditReportPage() {
         </div>
 
         {/* --- TELEMETRY VOLATILITY NOTICE --- */}
-        <div className="bg-[#0b0b14]/95 border border-blue-500/40 rounded-2xl p-5 sm:p-6 flex flex-col sm:flex-row items-start sm:items-center gap-4 relative overflow-hidden group shadow-[0_0_25px_rgba(6,182,212,0.1)] backdrop-blur-xl">
-          <div className="absolute inset-0 bg-gradient-to-r from-blue-500/15 to-transparent pointer-events-none" />
-          <div className="w-12 h-12 rounded-xl bg-blue-500/20 border border-blue-400/50 flex items-center justify-center text-blue-300 shrink-0 relative z-10 shadow-[0_0_15px_rgba(59,130,246,0.3)]">
+        <div className="bg-[#0b0b14]/95 border border-blue-500/30 rounded-2xl p-5 sm:p-6 flex flex-col sm:flex-row items-start sm:items-center gap-4 relative overflow-hidden group shadow-[0_0_15px_rgba(6,182,212,0.05)] backdrop-blur-xl">
+          <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-transparent pointer-events-none" />
+          <div className="w-12 h-12 rounded-xl bg-blue-500/15 border border-blue-400/40 flex items-center justify-center text-blue-300 shrink-0 relative z-10 shadow-[0_0_10px_rgba(59,130,246,0.2)]">
             <Info size={22} className="animate-pulse" />
           </div>
           <div className="relative z-10 flex-grow">
@@ -278,7 +278,10 @@ export default function AuditReportPage() {
 
         {/* --- BUSINESS FRICTION GRID (Top 6 Stretched High-Contrast Cards) --- */}
         <div className="mb-6 sm:mb-8">
-          <h2 className="text-xs font-mono font-bold text-zinc-300 uppercase tracking-[0.2em] mb-4">Revenue & Friction Analysis</h2>
+          <div className="flex flex-col items-center mb-6">
+            <h2 className="text-xs font-mono font-bold text-zinc-200 uppercase tracking-[0.2em] text-center">Revenue & Friction Analysis</h2>
+            <div className="w-36 h-[2px] bg-gradient-to-r from-transparent via-cyan-400 to-transparent mt-2 shadow-[0_0_8px_rgba(6,182,212,0.6)]"></div>
+          </div>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             
             {/* 1. Revenue Leakage Card */}
