@@ -521,12 +521,12 @@ export default function AuditReportPage() {
 
           {/* --- TECH STACK FINGERPRINT & UPGRADE PATH --- */}
           <div className="bg-gradient-to-b from-[#151522] to-[#0e0e14] border border-zinc-500/60 rounded-2xl p-6 sm:p-8 backdrop-blur-xl shadow-2xl flex flex-col lg:max-h-[600px] relative overflow-hidden">
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 border-b border-zinc-700/80 pb-4 gap-2">
-              <div className="flex items-center gap-3 min-w-0">
+            <div className="flex flex-row justify-between items-center mb-6 border-b border-zinc-700/80 pb-4 gap-2 flex-nowrap overflow-hidden">
+              <div className="flex items-center gap-3 min-w-0 shrink-0">
                 <Layers className="text-purple-300 shrink-0" size={20} />
-                <h2 className="text-xs sm:text-sm font-mono font-bold text-zinc-100 uppercase tracking-widest shrink-0 whitespace-nowrap">Tech Stack & Upgrade Path</h2>
+                <h2 className="text-xs sm:text-sm font-mono font-bold text-zinc-100 uppercase tracking-widest whitespace-nowrap overflow-hidden text-ellipsis">Tech Stack & Upgrade Path</h2>
               </div>
-              <span className="text-[10px] font-mono text-zinc-300 uppercase tracking-widest shrink-0 self-start sm:self-auto">
+              <span className="text-[10px] font-mono text-zinc-300 uppercase tracking-widest shrink-0 whitespace-nowrap ml-2">
                 {infrastructure.length} Technologies Detected
               </span>
             </div>
