@@ -130,18 +130,36 @@ export default function AuditReportPage() {
 
   const infrastructure = auditData?.infrastructure || [];
   const funnel = auditData?.conversionFunnel || {};
-  const leakagePoints = funnel.primaryLeakagePoints || [];
   const meta = auditData?.metaAndSocial || {};
   const a11y = auditData?.accessibility || {};
   const missingAltList = a11y.missingAltImages?.length > 0 
     ? a11y.missingAltImages 
     : Array.from({ length: a11y.missingAlt || 2 }, (_, i) => `/assets/images/unoptimized-graphic-${i + 1}.png`);
 
-  const dynamicSeverityTier = thirdPartyCount > 8 || perfScore < 50 ? 'HIGH' : thirdPartyCount > 4 ? 'MODERATE' : funnel.severityTier || 'OPTIMIZED';
-
   const displayTitle = meta.title 
     ? meta.title.replace(/&#039;/g, "'").replace(/&amp;/g, "&").replace(/&quot;/g, '"')
     : 'No Title Found';
+
+  // --- AUTO-GENERATE LEAKAGE POINTS IF BACKEND IS EMPTY ---
+  const baseLeakagePoints = funnel.primaryLeakagePoints || [];
+  const generatedLeakagePoints = [];
+  
+  if (parseFloat(revenueLeakagePercent) > 0) generatedLeakagePoints.push(`Latency is actively deflating conversions by an estimated ${revenueLeakagePercent}%.`);
+  if (isMapPenalized) generatedLeakagePoints.push(`Interaction to Next Paint (${rawInp}ms) is triggering Google Maps and Local SEO penalties.`);
+  if (!isGhostOptimal) generatedLeakagePoints.push(`Main thread is blocked for ${ghostTapWindow}s, causing 'ghost taps' on mobile devices.`);
+  if (isFragile) generatedLeakagePoints.push(`Massive DOM structure (${domSize} nodes) is draining mobile batteries and risking crashes.`);
+  if (parseFloat(parasiteImpact) > 0) generatedLeakagePoints.push(`${thirdPartyCount} external marketing trackers are responsible for ${parasiteImpact}% of mobile pipeline lag.`);
+  if (isEmailVulnerable) generatedLeakagePoints.push(`Missing DMARC/SPF protocols. Automated free-trial follow-ups risk spam routing.`);
+
+  const activeLeakagePoints = baseLeakagePoints.length > 0 ? baseLeakagePoints : generatedLeakagePoints;
+
+  // --- DYNAMIC SEVERITY TIER ---
+  const dynamicSeverityTier = 
+    activeLeakagePoints.length > 2 || perfScore < 50 || rawInp > 200 || isEmailVulnerable 
+      ? 'HIGH' 
+      : activeLeakagePoints.length > 0 
+      ? 'MODERATE' 
+      : funnel.severityTier || 'OPTIMIZED';
 
   return (
     <div className="space-y-4 sm:space-y-6 relative overflow-x-hidden min-h-screen pb-12 px-3 sm:px-6 lg:px-8 max-w-7xl mx-auto">
@@ -442,8 +460,8 @@ export default function AuditReportPage() {
         </div>
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {leakagePoints.length > 0 ? (
-            leakagePoints.map((point: string, idx: number) => (
+          {activeLeakagePoints.length > 0 ? (
+            activeLeakagePoints.map((point: string, idx: number) => (
               <div key={idx} className="flex items-start gap-3 p-4 bg-[#0a0a0c] border border-gray-800/50 rounded-lg">
                 <AlertCircle className="text-red-500 shrink-0 mt-0.5" size={16} />
                 <p className="text-xs sm:text-sm text-gray-300 font-medium leading-relaxed">{point}</p>
