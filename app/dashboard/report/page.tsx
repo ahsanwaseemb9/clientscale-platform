@@ -270,7 +270,7 @@ export default function AuditReportPage() {
             <Info size={22} className="opacity-95" />
           </div>
           <div className="relative z-10 flex-grow">
-            <h4 className="text-xs font-mono font-extrabold text-blue-300 uppercase tracking-widest mb-1.5">
+            <h4 className="text-xs font-mono font-extrabold text-white uppercase tracking-widest mb-1.5">
               Live Telemetry Volatility Warning
             </h4>
             <p className="text-sm sm:text-base text-white leading-relaxed font-normal">
