@@ -670,9 +670,15 @@ export default function AuditReportPage() {
                   <h4 className="text-[10px] font-bold text-cyan-400 uppercase tracking-widest mb-3 flex items-center gap-2">
                     <Activity size={14} className="shrink-0" /> The Business Translation
                   </h4>
-                  <p className="text-xs sm:text-sm text-cyan-100/80 italic leading-relaxed">
-                    "Because your website is technically unoptimized, we estimate that <strong>{revenueLeakagePercent}%</strong> of your traffic is getting frustrated and abandoning the pipeline before they ever submit a lead or make a purchase."
-                  </p>
+                  {isGhostOptimal && !isMapPenalized && parseFloat(parasiteImpact) === 0 && !isFragile ? (
+                    <p className="text-xs sm:text-sm text-cyan-100/80 italic leading-relaxed">
+                      "Your foundational code is actually incredibly clean. You don't have dangerous third-party scripts, your buttons are instantly interactive, and your HTML structure is solid. However, you are still bleeding <strong>{revenueLeakagePercent}%</strong> of your revenue because your visual assets or your hosting server are dragging you down. Your customers are staring at a white screen waiting for a massive image to load or for your server to respond. Even though the code is good, modern consumers won't wait 4 seconds for a picture to render—they just leave."
+                    </p>
+                  ) : (
+                    <p className="text-xs sm:text-sm text-cyan-100/80 italic leading-relaxed">
+                      "Because your website is technically unoptimized, we estimate that <strong>{revenueLeakagePercent}%</strong> of your traffic is getting frustrated and abandoning the pipeline before they ever submit a lead or make a purchase."
+                    </p>
+                  )}
                 </div>
               </>
             )}
