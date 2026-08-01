@@ -350,14 +350,14 @@ export default function AuditReportPage() {
           </button>
         </div>
 
-        {/* --- LIVE TELEMETRY VOLATILITY WARNING --- */}
+        {/* --- LIVE TELEMETRY VOLATILITY WARNING (Cyan Blue Heading & Increased Spacing to Paragraph) --- */}
         <div className="bg-[#12121c]/95 border border-blue-400/40 rounded-2xl p-6 sm:p-8 flex flex-col items-center text-center gap-4 relative overflow-hidden group backdrop-blur-xl shadow-xl mb-16 sm:mb-20">
           <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-transparent pointer-events-none" />
           <div className="w-11 h-11 rounded-xl bg-blue-500/20 border border-blue-400/40 flex items-center justify-center text-blue-300 shrink-0 relative z-10 shadow-[0_0_10px_rgba(59,130,246,0.3)]">
             <Info size={22} className="opacity-95" />
           </div>
           <div className="relative z-10 max-w-3xl">
-            <h4 className="text-xs sm:text-sm font-mono font-extrabold text-blue-300 uppercase tracking-widest mb-2 whitespace-nowrap sm:whitespace-normal overflow-hidden text-ellipsis">
+            <h4 className="text-xs sm:text-sm font-mono font-extrabold text-cyan-400 uppercase tracking-widest mb-4 sm:mb-5 whitespace-nowrap sm:whitespace-normal overflow-hidden text-ellipsis">
               Live Telemetry Volatility Warning
             </h4>
             <p className="text-sm sm:text-base md:text-lg text-white leading-relaxed font-normal">
@@ -522,11 +522,11 @@ export default function AuditReportPage() {
           {/* --- TECH STACK FINGERPRINT & UPGRADE PATH --- */}
           <div className="bg-gradient-to-b from-[#151522] to-[#0e0e14] border border-zinc-500/60 rounded-2xl p-6 sm:p-8 backdrop-blur-xl shadow-2xl flex flex-col lg:max-h-[600px] relative overflow-hidden">
             <div className="flex flex-row justify-between items-center mb-6 border-b border-zinc-700/80 pb-4 gap-2 flex-nowrap overflow-hidden">
-              <div className="flex items-center gap-2 min-w-0 shrink">
-                <Layers className="text-purple-300 shrink-0" size={18} />
-                <h2 className="text-[11px] sm:text-xs md:text-sm font-mono font-bold text-zinc-100 uppercase tracking-wider truncate">Tech Stack & Upgrade Path</h2>
+              <div className="flex items-center gap-3 min-w-0 shrink-0">
+                <Layers className="text-purple-300 shrink-0" size={20} />
+                <h2 className="text-[11px] sm:text-xs md:text-sm font-mono font-bold text-zinc-100 uppercase tracking-widest shrink-0 whitespace-nowrap">Tech Stack & Upgrade Path</h2>
               </div>
-              <span className="text-[9px] sm:text-[10px] font-mono text-zinc-300 uppercase tracking-wider shrink-0 whitespace-nowrap ml-1">
+              <span className="text-[9px] sm:text-[10px] font-mono text-zinc-300 uppercase tracking-widest shrink-0 whitespace-nowrap ml-1">
                 {infrastructure.length} Technologies Detected
               </span>
             </div>
