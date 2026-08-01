@@ -115,6 +115,7 @@ export default function AuditReportPage() {
   const hasDmarc = auditData?.security?.dmarcConfigured === true; 
   const isEmailVulnerable = !hasDmarc;
   const revenueLeakagePercent = Math.max(0, (100 - perfScore) * 0.15).toFixed(1);
+  
   // Ghost Tap dynamic handling
   const ghostTapWindow = (rawTbt / 1000).toFixed(1); 
   const isGhostOptimal = parseFloat(ghostTapWindow) === 0;
@@ -179,7 +180,9 @@ export default function AuditReportPage() {
               <p className="text-xs sm:text-sm text-gray-400 leading-relaxed">
                 {parseFloat(revenueLeakagePercent) === 0 
                   ? 'Performance is fully optimized. Zero estimated revenue leakage due to latency.'
-                  : 'Latency is actively deflating your conversion rate. Traffic is abandoning the pipeline before checkout.'}
+                  : (isGhostOptimal && parseFloat(parasiteImpact) === 0 
+                     ? 'Foundational code is solid, but slow visual assets or server response times are actively deflating conversions.' 
+                     : 'Latency is actively deflating your conversion rate. Traffic is abandoning the pipeline before checkout.')}
               </p>
             </div>
             <div className="px-5 sm:px-6 pb-5 sm:pb-6 relative z-10 mt-2">
@@ -244,6 +247,7 @@ export default function AuditReportPage() {
               </button>
             </div>
           </div>
+          
           {/* 3. Local Search Penalty (INP) Card */}
           <div className={`bg-[#121216] border ${isMapPenalized ? 'border-red-900/50 hover:border-red-500/50' : 'border-green-900/50 hover:border-green-500/50'} rounded-xl relative flex flex-col justify-between transition-colors`}>
             <div className="absolute inset-0 overflow-hidden rounded-xl pointer-events-none">
@@ -670,7 +674,7 @@ export default function AuditReportPage() {
                   <h4 className="text-[10px] font-bold text-cyan-400 uppercase tracking-widest mb-3 flex items-center gap-2">
                     <Activity size={14} className="shrink-0" /> The Business Translation
                   </h4>
-                  {isGhostOptimal && !isMapPenalized && parseFloat(parasiteImpact) === 0 && !isFragile ? (
+                  {isGhostOptimal && parseFloat(parasiteImpact) === 0 ? (
                     <p className="text-xs sm:text-sm text-cyan-100/80 italic leading-relaxed">
                       "Your foundational code is actually incredibly clean. You don't have dangerous third-party scripts, your buttons are instantly interactive, and your HTML structure is solid. However, you are still bleeding <strong>{revenueLeakagePercent}%</strong> of your revenue because your visual assets or your hosting server are dragging you down. Your customers are staring at a white screen waiting for a massive image to load or for your server to respond. Even though the code is good, modern consumers won't wait 4 seconds for a picture to render—they just leave."
                     </p>
