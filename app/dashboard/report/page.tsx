@@ -524,9 +524,9 @@ export default function AuditReportPage() {
             <div className="flex flex-row justify-between items-center mb-6 border-b border-zinc-700/80 pb-4 gap-2 flex-nowrap overflow-hidden">
               <div className="flex items-center gap-3 min-w-0 shrink-0">
                 <Layers className="text-purple-300 shrink-0" size={20} />
-                <h2 className="text-xs sm:text-sm font-mono font-bold text-zinc-100 uppercase tracking-widest whitespace-nowrap overflow-hidden text-ellipsis">Tech Stack & Upgrade Path</h2>
+                <h2 className="text-[11px] sm:text-xs md:text-sm font-mono font-bold text-zinc-100 uppercase tracking-widest shrink-0 whitespace-nowrap">Tech Stack & Upgrade Path</h2>
               </div>
-              <span className="text-[10px] font-mono text-zinc-300 uppercase tracking-widest shrink-0 whitespace-nowrap ml-2">
+              <span className="text-[9px] sm:text-[10px] font-mono text-zinc-300 uppercase tracking-widest shrink-0 whitespace-nowrap ml-1">
                 {infrastructure.length} Technologies Detected
               </span>
             </div>
