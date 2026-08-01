@@ -260,7 +260,7 @@ export default function AuditReportPage() {
           </button>
         </div>
 
-        {/* --- TELEMETRY VOLATILITY NOTICE (Toned Down Glow) --- */}
+        {/* --- TELEMETRY VOLATILITY NOTICE --- */}
         <div className="bg-[#07070f]/80 border border-blue-500/20 rounded-2xl p-4 sm:p-5 flex flex-col sm:flex-row items-start sm:items-center gap-4 relative overflow-hidden group backdrop-blur-xl">
           <div className="absolute inset-0 bg-gradient-to-r from-blue-500/5 to-transparent pointer-events-none" />
           <div className="w-10 h-10 rounded-xl bg-blue-500/10 border border-blue-400/20 flex items-center justify-center text-blue-300 shrink-0 relative z-10">
@@ -278,10 +278,9 @@ export default function AuditReportPage() {
 
         {/* --- BUSINESS FRICTION GRID (Top 6 Stretched High-Contrast Cards) --- */}
         <div className="mb-6 sm:mb-8">
-          {/* Centered Heading with White Text and Toned-Down Underline Glow */}
+          {/* Centered Heading with Increased Font Size and Line Removed */}
           <div className="flex flex-col items-center justify-center mb-6 text-center">
-            <h2 className="text-sm font-mono font-bold text-white uppercase tracking-[0.25em]">Revenue & Friction Analysis</h2>
-            <div className="w-48 h-[2px] bg-gradient-to-r from-blue-600/50 via-cyan-400/50 to-blue-600/50 mt-2 shadow-[0_0_4px_rgba(6,182,212,0.3)]"></div>
+            <h2 className="text-base sm:text-lg font-mono font-bold text-white uppercase tracking-[0.25em]">Revenue & Friction Analysis</h2>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
