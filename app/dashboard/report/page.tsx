@@ -165,38 +165,48 @@ export default function AuditReportPage() {
     dynamicSeverityTier = 'MODERATE';
   }
 
-  // High-End Smooth Live Telemetry Component (Flat if optimized, smoothly undulating sine wave if active/alert)
+  // High-End APM Streaming Telemetry Component
   const LiveTelemetryWave = ({ isFlat, isAlert }: { isFlat: boolean; isAlert: boolean }) => {
-    const [phase, setPhase] = useState(0);
+    const [points, setPoints] = useState<number[]>([]);
 
     useEffect(() => {
-      if (isFlat) return; 
-      let animationFrameId: number;
-      const render = () => {
-        setPhase((prev) => (prev + (isAlert ? 0.05 : 0.025)) % (Math.PI * 2));
-        animationFrameId = requestAnimationFrame(render);
-      };
-      animationFrameId = requestAnimationFrame(render);
-      return () => cancelAnimationFrame(animationFrameId);
+      if (isFlat) {
+        setPoints(Array(20).fill(15));
+        return;
+      }
+
+      // Initialize initial wave points
+      const initial = Array.from({ length: 25 }, () => 15 + (Math.random() * 10 - 5));
+      setPoints(initial);
+
+      const interval = setInterval(() => {
+        setPoints((prev) => {
+          const nextVal = 15 + (Math.random() * (isAlert ? 20 : 8) - (isAlert ? 10 : 4));
+          const clamped = Math.max(5, Math.min(25, nextVal));
+          return [...prev.slice(1), clamped];
+        });
+      }, 350);
+
+      return () => clearInterval(interval);
     }, [isFlat, isAlert]);
 
-    const points = [];
     const width = 300;
     const height = 30;
-    const centerY = height / 2;
+    const dx = width / (points.length - 1 || 1);
 
-    for (let x = 0; x <= width; x += 2) {
-      let y = centerY;
-      if (!isFlat) {
-        // Smooth mathematical sine composition for high-end agency look
-        const primaryWave = Math.sin(x * 0.03 + phase) * (isAlert ? 6 : 3);
-        const secondaryWave = Math.cos(x * 0.06 - phase * 1.5) * (isAlert ? 3 : 1.5);
-        y = centerY + primaryWave + secondaryWave;
+    let pathString = '';
+    if (points.length > 0) {
+      pathString = `M 0,${points[0]}`;
+      for (let i = 0; i < points.length - 1; i++) {
+        const xCurrent = i * dx;
+        const yCurrent = points[i];
+        const xNext = (i + 1) * dx;
+        const yNext = points[i + 1];
+        const xMid = (xCurrent + xNext) / 2;
+        pathString += ` Q ${xMid},${yCurrent} ${xNext},${yNext}`;
       }
-      points.push(`${x === 0 ? 'M' : 'L'} ${x},${y}`);
     }
 
-    const pathData = points.join(' ');
     const strokeColor = isFlat ? '#10b981' : isAlert ? '#ef4444' : '#06b6d4';
 
     return (
@@ -204,19 +214,19 @@ export default function AuditReportPage() {
         <svg className="w-full h-full" viewBox={`0 0 ${width} ${height}`} preserveAspectRatio="none">
           <defs>
             <linearGradient id={`grad-${strokeColor.replace('#','')}`} x1="0%" y1="0%" x2="100%" y2="0%">
-              <stop offset="0%" stopColor={strokeColor} stopOpacity={isFlat ? "0.4" : "0.1"} />
+              <stop offset="0%" stopColor={strokeColor} stopOpacity={isFlat ? "0.6" : "0.2"} />
               <stop offset="50%" stopColor={strokeColor} stopOpacity="1" />
-              <stop offset="100%" stopColor={strokeColor} stopOpacity={isFlat ? "0.4" : "0.1"} />
+              <stop offset="100%" stopColor={strokeColor} stopOpacity={isFlat ? "0.6" : "0.2"} />
             </linearGradient>
           </defs>
           <path 
-            d={pathData} 
+            d={pathString} 
             fill="none" 
             stroke={`url(#grad-${strokeColor.replace('#','')})`}
             strokeWidth="2" 
             strokeLinecap="round"
             strokeLinejoin="round"
-            className={isFlat ? "opacity-80" : isAlert ? "drop-shadow-[0_0_8px_rgba(239,68,68,0.7)]" : "drop-shadow-[0_0_6px_rgba(6,182,212,0.6)]"}
+            className={isFlat ? "opacity-90" : isAlert ? "drop-shadow-[0_0_8px_rgba(239,68,68,0.8)]" : "drop-shadow-[0_0_6px_rgba(6,182,212,0.6)]"}
           />
         </svg>
       </div>
