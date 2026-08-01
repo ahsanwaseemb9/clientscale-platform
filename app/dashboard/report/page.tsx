@@ -263,14 +263,14 @@ export default function AuditReportPage() {
           </button>
         </div>
 
-        {/* --- LIVE TELEMETRY VOLATILITY WARNING (Centered, Bright White & Larger Font) --- */}
+        {/* --- LIVE TELEMETRY VOLATILITY WARNING (Centered, Cyan Blue & Larger Font) --- */}
         <div className="bg-[#12121c]/95 border border-blue-400/40 rounded-2xl p-5 sm:p-6 flex flex-col items-center text-center gap-4 relative overflow-hidden group backdrop-blur-xl shadow-xl">
           <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-transparent pointer-events-none" />
           <div className="w-11 h-11 rounded-xl bg-blue-500/20 border border-blue-400/40 flex items-center justify-center text-blue-300 shrink-0 relative z-10 shadow-[0_0_10px_rgba(59,130,246,0.3)]">
             <Info size={22} className="opacity-95" />
           </div>
           <div className="relative z-10 max-w-3xl">
-            <h4 className="text-xs sm:text-sm font-mono font-extrabold text-white uppercase tracking-widest mb-2">
+            <h4 className="text-sm sm:text-base md:text-lg font-mono font-extrabold text-cyan-400 uppercase tracking-widest mb-2">
               Live Telemetry Volatility Warning
             </h4>
             <p className="text-sm sm:text-base md:text-lg text-white leading-relaxed font-normal">
@@ -1001,7 +1001,7 @@ export default function AuditReportPage() {
                       <CheckCircle size={14} className="shrink-0" /> Clean Architecture
                     </h4>
                     <p className="text-xs sm:text-sm text-green-100 italic leading-relaxed">
-                      "Your website's code is structurally optimized. With only {domSize} elements, it renders rapidly on mobile devices without draining battery or causing older phones to crash."
+                      "Your website's code is structurally optimized. Only {domSize} elements ensure rapid rendering."
                     </p>
                   </div>
                 </>
