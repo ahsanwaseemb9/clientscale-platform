@@ -165,36 +165,67 @@ export default function AuditReportPage() {
     dynamicSeverityTier = 'MODERATE';
   }
 
-  // Fluctuating Heart Monitor Lifeline SVG Component
-  const LifelineSvg = ({ isAlert }: { isAlert: boolean }) => (
-    <div className="w-full h-8 overflow-hidden relative mt-3 opacity-90">
-      <svg className="w-full h-full" viewBox="0 0 600 30" preserveAspectRatio="none">
-        <path 
-          d="M0,15 L40,15 L45,5 L50,25 L55,10 L60,20 L65,15 L120,15 L150,15 L155,2 L160,28 L165,12 L170,18 L175,15 L230,15 L260,15 L265,5 L270,25 L275,10 L280,20 L285,15 L340,15 L370,15 L375,2 L380,28 L385,12 L390,18 L395,15 L450,15 L480,15 L485,5 L490,25 L495,10 L500,20 L505,15 L600,15" 
-          fill="none" 
-          stroke={isAlert ? '#ef4444' : '#06b6d4'} 
-          strokeWidth="2.5" 
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          style={{
-            strokeDasharray: '600',
-            animation: isAlert ? 'pulse-wave 1.2s ease-in-out infinite' : 'flow-wave 4s linear infinite'
-          }}
-          className={isAlert ? "drop-shadow-[0_0_10px_rgba(239,68,68,0.8)]" : "drop-shadow-[0_0_8px_rgba(6,182,212,0.6)]"}
-        />
-      </svg>
-      <style jsx>{`
-        @keyframes flow-wave {
-          0% { transform: translateX(0); }
-          100% { transform: translateX(-300px); }
-        }
-        @keyframes pulse-wave {
-          0%, 100% { opacity: 0.3; transform: scaleY(0.8); }
-          50% { opacity: 1; transform: scaleY(1.2); }
-        }
-      `}</style>
-    </div>
-  );
+  // State-of-the-art smooth live breathing telemetry wave component driven by requestAnimationFrame
+  const LiveTelemetryWave = ({ isAlert }: { isAlert: boolean }) => {
+    const [phase, setPhase] = useState(0);
+
+    useEffect(() => {
+      let animationFrameId: number;
+      const render = () => {
+        setPhase((prev) => (prev + (isAlert ? 0.08 : 0.03)) % (Math.PI * 2));
+        animationFrameId = requestAnimationFrame(render);
+      };
+      animationFrameId = requestAnimationFrame(render);
+      return () => cancelAnimationFrame(animationFrameId);
+    }, [isAlert]);
+
+    const points = [];
+    const width = 300;
+    const height = 30;
+    const centerY = height / 2;
+
+    for (let x = 0; x <= width; x += 3) {
+      const freq = isAlert ? 0.05 : 0.02;
+      const amplitude = isAlert ? 9 : 4.5;
+      
+      let y = centerY + Math.sin(x * freq + phase) * amplitude;
+      
+      const modX = (x + phase * 20) % 150;
+      if (modX > 65 && modX < 85) {
+        if (modX < 72) y -= (modX - 65) * (isAlert ? 3.2 : 1.8);
+        else if (modX < 78) y += (modX - 72) * (isAlert ? 5.5 : 3);
+        else y -= (85 - modX) * (isAlert ? 1.2 : 0.8);
+      }
+
+      points.push(`${x === 0 ? 'M' : 'L'} ${x},${y}`);
+    }
+
+    const pathData = points.join(' ');
+    const strokeColor = isAlert ? '#ef4444' : '#06b6d4';
+
+    return (
+      <div className="w-full h-8 overflow-hidden relative mt-3 flex items-center">
+        <svg className="w-full h-full" viewBox={`0 0 ${width} ${height}`} preserveAspectRatio="none">
+          <defs>
+            <linearGradient id={isAlert ? "alertGrad" : "cyanGrad"} x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stopColor={strokeColor} stopOpacity="0.15" />
+              <stop offset="50%" stopColor={strokeColor} stopOpacity="1" />
+              <stop offset="100%" stopColor={strokeColor} stopOpacity="0.15" />
+            </linearGradient>
+          </defs>
+          <path 
+            d={pathData} 
+            fill="none" 
+            stroke={`url(#${isAlert ? "alertGrad" : "cyanGrad"})`}
+            strokeWidth="2.2" 
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            className={isAlert ? "drop-shadow-[0_0_10px_rgba(239,68,68,0.9)]" : "drop-shadow-[0_0_8px_rgba(6,182,212,0.7)]"}
+          />
+        </svg>
+      </div>
+    );
+  };
 
   return (
     <main className="flex min-h-[100dvh] w-full flex-col items-center bg-[#020205] text-white antialiased selection:bg-cyan-500/30 selection:text-cyan-200 overflow-x-hidden pb-24 relative">
@@ -265,7 +296,7 @@ export default function AuditReportPage() {
                        ? 'Foundational code is solid, but slow visual assets or server response times are actively deflating conversions.' 
                        : 'Latency is actively deflating your conversion rate. Traffic is abandoning the pipeline before checkout.')}
                 </p>
-                <LifelineSvg isAlert={parseFloat(revenueLeakagePercent) > 0} />
+                <LiveTelemetryWave isAlert={parseFloat(revenueLeakagePercent) > 0} />
               </div>
               <div className="relative z-10 mt-4">
                 <button 
@@ -304,7 +335,7 @@ export default function AuditReportPage() {
                     ? 'Main thread is unblocked. User interactions are instantly registered by the browser.'
                     : `The screen appears loaded, but user taps are ignored for ${ghostTapWindow} seconds due to main-thread blocking.`}
                 </p>
-                <LifelineSvg isAlert={!isGhostOptimal} />
+                <LiveTelemetryWave isAlert={!isGhostOptimal} />
               </div>
               <div className="relative z-10 mt-4">
                 <button 
@@ -343,7 +374,7 @@ export default function AuditReportPage() {
                     ? `INP exceeds 200ms threshold. Google algorithms are actively suppressing your Google Maps visibility due to poor UX.` 
                     : `INP is within passing limits. Local SEO and Maps visibility are unaffected by interaction latency.`}
                 </p>
-                <LifelineSvg isAlert={isMapPenalized} />
+                <LiveTelemetryWave isAlert={isMapPenalized} />
               </div>
               <div className="relative z-10 mt-4">
                 <button 
@@ -382,7 +413,7 @@ export default function AuditReportPage() {
                     ? 'Zero external tracking scripts detected. Pipeline resource consumption is clean.'
                     : `${thirdPartyCount} external marketing scripts are responsible for ${parasiteImpact}% of your mobile lag.`}
                 </p>
-                <LifelineSvg isAlert={parseFloat(parasiteImpact) > 0} />
+                <LiveTelemetryWave isAlert={parseFloat(parasiteImpact) > 0} />
               </div>
               <div className="relative z-10 mt-4">
                 <button 
@@ -423,7 +454,7 @@ export default function AuditReportPage() {
                     ? `Missing DMARC/SPF protocols. Automated free-trial follow-ups are highly likely routing to client spam folders.`
                     : `Domain authentication protocols are intact. Lead nurture deliverability is protected.`}
                 </p>
-                <LifelineSvg isAlert={isEmailVulnerable} />
+                <LiveTelemetryWave isAlert={isEmailVulnerable} />
               </div>
               <div className="relative z-10 mt-4">
                 <button 
@@ -462,7 +493,7 @@ export default function AuditReportPage() {
                     ? 'HTML structure is highly optimized. Low node count ensures rapid rendering.'
                     : 'Massive HTML node count is draining mobile batteries and risking browser crashes.'}
                 </p>
-                <LifelineSvg isAlert={isFragile} />
+                <LiveTelemetryWave isAlert={isFragile} />
               </div>
               <div className="relative z-10 mt-4">
                 <button 
