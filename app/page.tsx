@@ -54,7 +54,7 @@ export default function Home() {
   };
 
   return (
-    <main className="flex min-h-screen flex-col items-center bg-[#020205] text-white antialiased selection:bg-cyan-500/30 selection:text-cyan-200 overflow-x-hidden pb-24 relative">
+    <main className="flex min-h-[100dvh] w-full flex-col items-center bg-[#020205] text-white antialiased selection:bg-cyan-500/30 selection:text-cyan-200 overflow-x-hidden pb-24 relative">
 
       {/* --- SPACE AGENCY TELEMETRY LAYERS --- */}
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_-20%,rgba(16,24,48,0.85),rgba(2,2,5,1)_65%)] pointer-events-none z-0" />
