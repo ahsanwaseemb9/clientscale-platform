@@ -165,7 +165,7 @@ export default function AuditReportPage() {
     dynamicSeverityTier = 'MODERATE';
   }
 
-  // High-End APM Streaming Telemetry Component (Lifeline color changed to pure white #ffffff)
+  // High-End APM Streaming Telemetry Component with Pure White Lifeline
   const LiveTelemetryWave = ({ isFlat, isAlert }: { isFlat: boolean; isAlert: boolean }) => {
     const [points, setPoints] = useState<number[]>([]);
 
@@ -232,6 +232,93 @@ export default function AuditReportPage() {
     );
   };
 
+  // --- DYNAMIC CARDS CONFIGURATION & SORTING ---
+  const frictionCards = [
+    {
+      id: 'revenue',
+      isGreen: parseFloat(revenueLeakagePercent) === 0,
+      title: 'Revenue Leakage',
+      icon: AlertTriangle,
+      value: `${revenueLeakagePercent}%`,
+      description: parseFloat(revenueLeakagePercent) === 0 
+        ? 'Performance is fully optimized. Zero estimated revenue leakage due to latency.'
+        : (isGhostOptimal && parseFloat(parasiteImpact) === 0 
+           ? 'Foundational code is solid, but slow visual assets or server response times are actively deflating conversions.' 
+           : 'Latency is actively deflating your conversion rate. Traffic is abandoning the pipeline before checkout.'),
+      drawerKey: 'revenue' as const,
+      isZero: parseFloat(revenueLeakagePercent) === 0,
+      iconComp: DollarSign
+    },
+    {
+      id: 'ghost',
+      isGreen: isGhostOptimal,
+      title: 'Ghost Tap Window',
+      icon: Ghost,
+      value: isGhostOptimal ? '0.0s' : `${ghostTapWindow}s`,
+      description: isGhostOptimal 
+        ? 'Main thread is unblocked. User interactions are instantly registered by the browser.'
+        : `The screen appears loaded, but user taps are ignored for ${ghostTapWindow} seconds due to main-thread blocking.`,
+      drawerKey: 'ghost' as const,
+      isZero: isGhostOptimal,
+      iconComp: Ghost
+    },
+    {
+      id: 'inp',
+      isGreen: !isMapPenalized,
+      title: 'Local SEO Penalty',
+      icon: MapPin,
+      value: `${rawInp}ms`,
+      description: isMapPenalized 
+        ? `INP exceeds 200ms threshold. Google algorithms are actively suppressing your Google Maps visibility due to poor UX.` 
+        : `INP is within passing limits. Local SEO and Maps visibility are unaffected by interaction latency.`,
+      drawerKey: 'inp' as const,
+      isZero: !isMapPenalized,
+      iconComp: MapPin
+    },
+    {
+      id: 'parasite',
+      isGreen: parseFloat(parasiteImpact) === 0,
+      title: 'Parasite Load',
+      icon: ServerCrash,
+      value: `${parasiteImpact}%`,
+      description: parseFloat(parasiteImpact) === 0
+        ? 'Zero external tracking scripts detected. Pipeline resource consumption is clean.'
+        : `${thirdPartyCount} external marketing scripts are responsible for ${parasiteImpact}% of your mobile lag.`,
+      drawerKey: 'parasite' as const,
+      isZero: parseFloat(parasiteImpact) === 0,
+      iconComp: ShieldAlert
+    },
+    {
+      id: 'dns',
+      isGreen: !isEmailVulnerable,
+      title: 'Nurture Trust Risk',
+      icon: MailWarning,
+      value: isEmailVulnerable ? 'VULNERABLE' : 'SECURE',
+      description: isEmailVulnerable 
+        ? `Missing DMARC/SPF protocols. Automated free-trial follow-ups are highly likely routing to client spam folders.`
+        : `Domain authentication protocols are intact. Lead nurture deliverability is protected.`,
+      drawerKey: 'dns' as const,
+      isZero: !isEmailVulnerable,
+      iconComp: MailWarning
+    },
+    {
+      id: 'dom',
+      isGreen: !isFragile,
+      title: 'DOM Fragility',
+      icon: Database,
+      value: domSize,
+      description: !isFragile 
+        ? 'HTML structure is highly optimized. Low node count ensures rapid rendering.'
+        : 'Massive HTML node count is draining mobile batteries and risking browser crashes.',
+      drawerKey: 'dom' as const,
+      isZero: !isFragile,
+      iconComp: Database
+    }
+  ];
+
+  // Dynamically sort cards so non-green (blue/alerts) come first, and green (optimized) cards appear below
+  frictionCards.sort((a, b) => (a.isGreen === b.isGreen ? 0 : a.isGreen ? 1 : -1));
+
   return (
     <main className="flex min-h-[100dvh] w-full flex-col items-center bg-[#020205] text-white antialiased selection:bg-cyan-500/30 selection:text-cyan-200 overflow-x-hidden pb-24 relative">
 
@@ -263,14 +350,14 @@ export default function AuditReportPage() {
           </button>
         </div>
 
-        {/* --- LIVE TELEMETRY VOLATILITY WARNING (Mobile Optimized Heading + Increased Spacing) --- */}
+        {/* --- LIVE TELEMETRY VOLATILITY WARNING --- */}
         <div className="bg-[#12121c]/95 border border-blue-400/40 rounded-2xl p-6 sm:p-8 flex flex-col items-center text-center gap-4 relative overflow-hidden group backdrop-blur-xl shadow-xl mb-16 sm:mb-20">
           <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-transparent pointer-events-none" />
           <div className="w-11 h-11 rounded-xl bg-blue-500/20 border border-blue-400/40 flex items-center justify-center text-blue-300 shrink-0 relative z-10 shadow-[0_0_10px_rgba(59,130,246,0.3)]">
             <Info size={22} className="opacity-95" />
           </div>
           <div className="relative z-10 max-w-3xl">
-            <h4 className="text-[11px] xs:text-xs sm:text-sm md:text-base font-mono font-extrabold text-cyan-400 uppercase tracking-tight sm:tracking-widest mb-3 whitespace-nowrap sm:whitespace-normal overflow-hidden text-ellipsis">
+            <h4 className="text-xs sm:text-sm font-mono font-extrabold text-blue-300 uppercase tracking-widest mb-2 whitespace-nowrap sm:whitespace-normal overflow-hidden text-ellipsis">
               Live Telemetry Volatility Warning
             </h4>
             <p className="text-sm sm:text-base md:text-lg text-white leading-relaxed font-normal">
@@ -279,253 +366,61 @@ export default function AuditReportPage() {
           </div>
         </div>
 
-        {/* --- BUSINESS FRICTION GRID (Top 6 Brightened High-Contrast Cards) --- */}
+        {/* --- BUSINESS FRICTION GRID (Dynamically Sorted: Blue/Alerts on top, Green/Optimized below) --- */}
         <div className="mb-8 sm:mb-12">
-          {/* Centered Heading with Spaced Gaps Top and Bottom */}
           <div className="flex flex-col items-center justify-center my-10 sm:my-14 text-center">
             <h2 className="text-base sm:text-lg font-mono font-bold text-white uppercase tracking-[0.25em]">Revenue & Friction Analysis</h2>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            
-            {/* 1. Revenue Leakage Card */}
-            <div className={`bg-gradient-to-b from-[#151522] to-[#0e0e14] border ${parseFloat(revenueLeakagePercent) === 0 ? 'border-green-500/60 hover:border-green-400' : 'border-zinc-500/60 hover:border-cyan-400/60'} rounded-2xl relative flex flex-col justify-between transition-all backdrop-blur-xl shadow-2xl p-6 sm:p-8`}>
-              <div className="absolute inset-0 overflow-hidden rounded-2xl pointer-events-none">
-                <div className="absolute top-0 right-0 p-6 opacity-20">
-                  <DollarSign size={90} className={parseFloat(revenueLeakagePercent) === 0 ? 'text-green-400' : 'text-blue-400'} />
-                </div>
-              </div>
-              <div className="relative z-10 flex-grow">
-                <div className={`flex items-center gap-2.5 mb-3 font-mono font-bold ${parseFloat(revenueLeakagePercent) === 0 ? 'text-green-400' : 'text-blue-400'}`}>
-                  <AlertTriangle size={20} />
-                  <h3 className="text-xs uppercase tracking-wider">Revenue Leakage</h3>
-                </div>
-                <div className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-white mb-3 tracking-tight">{revenueLeakagePercent}%</div>
-                <p className="text-xs sm:text-sm text-zinc-100 leading-relaxed font-normal max-w-xl">
-                  {parseFloat(revenueLeakagePercent) === 0 
-                    ? 'Performance is fully optimized. Zero estimated revenue leakage due to latency.'
-                    : (isGhostOptimal && parseFloat(parasiteImpact) === 0 
-                       ? 'Foundational code is solid, but slow visual assets or server response times are actively deflating conversions.' 
-                       : 'Latency is actively deflating your conversion rate. Traffic is abandoning the pipeline before checkout.')}
-                </p>
-                <LiveTelemetryWave isFlat={parseFloat(revenueLeakagePercent) === 0} isAlert={parseFloat(revenueLeakagePercent) > 0} />
-              </div>
-              <div className="relative z-10 mt-6">
-                <button 
-                  onClick={() => setActiveDrawer('revenue')}
-                  className={`group relative w-full flex items-center justify-between px-5 py-3.5 rounded-xl border transition-all duration-300 overflow-hidden ${
-                    parseFloat(revenueLeakagePercent) === 0 ? 'bg-green-950/60 border-green-700/80 hover:border-green-400' : 'bg-[#1b1b28] border-zinc-600/70 hover:border-cyan-400/80'
-                  }`}
+            {frictionCards.map((card) => {
+              const IconComponent = card.icon;
+              const BGIconComp = card.iconComp;
+              return (
+                <div 
+                  key={card.id}
+                  className={`bg-gradient-to-b from-[#151522] to-[#0e0e14] border ${
+                    card.isGreen 
+                      ? 'border-green-500/60 hover:border-green-400 shadow-[0_0_15px_rgba(16,185,129,0.1)]' 
+                      : 'border-zinc-500/60 hover:border-cyan-400/60 shadow-2xl'
+                  } rounded-2xl relative flex flex-col justify-between transition-all backdrop-blur-xl p-6 sm:p-8`}
                 >
-                  <span className={`relative z-10 text-xs uppercase tracking-widest font-mono font-bold ${
-                    parseFloat(revenueLeakagePercent) === 0 ? 'text-green-300' : 'text-cyan-300'
-                  }`}>
-                    Forensic Methodology
-                  </span>
-                  <ChevronRight size={16} className={`relative z-10 transition-transform group-hover:translate-x-1 ${
-                    parseFloat(revenueLeakagePercent) === 0 ? 'text-green-300' : 'text-cyan-300'
-                  }`} />
-                </button>
-              </div>
-            </div>
-
-            {/* 2. Ghost Tap Window Card */}
-            <div className={`bg-gradient-to-b from-[#151522] to-[#0e0e14] border ${isGhostOptimal ? 'border-green-500/60 hover:border-green-400' : 'border-zinc-500/60 hover:border-cyan-400/60'} rounded-2xl relative flex flex-col justify-between transition-all backdrop-blur-xl shadow-2xl p-6 sm:p-8`}>
-              <div className="absolute inset-0 overflow-hidden rounded-2xl pointer-events-none">
-                <div className="absolute top-0 right-0 p-6 opacity-20">
-                  <Ghost size={90} className={isGhostOptimal ? 'text-green-400' : 'text-blue-400'} />
+                  <div className="absolute inset-0 overflow-hidden rounded-2xl pointer-events-none">
+                    <div className="absolute top-0 right-0 p-6 opacity-20">
+                      <BGIconComp size={90} className={card.isGreen ? 'text-green-400' : 'text-blue-400'} />
+                    </div>
+                  </div>
+                  <div className="relative z-10 flex-grow">
+                    <div className={`flex items-center gap-2.5 mb-3 font-mono font-bold ${card.isGreen ? 'text-green-400' : 'text-blue-400'}`}>
+                      <IconComponent size={20} />
+                      <h3 className="text-xs uppercase tracking-wider">{card.title}</h3>
+                    </div>
+                    <div className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-white mb-3 tracking-tight">
+                      {card.value}
+                    </div>
+                    <p className="text-xs sm:text-sm text-zinc-100 leading-relaxed font-normal max-w-xl">
+                      {card.description}
+                    </p>
+                    <LiveTelemetryWave isFlat={card.isZero} isAlert={!card.isZero} />
+                  </div>
+                  <div className="relative z-10 mt-6">
+                    <button 
+                      onClick={() => setActiveDrawer(card.drawerKey)}
+                      className={`group relative w-full flex items-center justify-between px-5 py-3.5 rounded-xl border transition-all duration-300 overflow-hidden ${
+                        card.isGreen 
+                          ? 'bg-green-950/60 border-green-700/80 hover:border-green-400 text-green-300' 
+                          : 'bg-[#1b1b28] border-zinc-600/70 hover:border-cyan-400/80 text-cyan-300'
+                      }`}
+                    >
+                      <span className="relative z-10 text-xs uppercase tracking-widest font-mono font-bold">
+                        Forensic Methodology
+                      </span>
+                      <ChevronRight size={16} className="relative z-10 transition-transform group-hover:translate-x-1" />
+                    </button>
+                  </div>
                 </div>
-              </div>
-              <div className="relative z-10 flex-grow">
-                <div className={`flex items-center gap-2.5 mb-3 font-mono font-bold ${isGhostOptimal ? 'text-green-400' : 'text-blue-400'}`}>
-                  <Ghost size={20} />
-                  <h3 className="text-xs uppercase tracking-wider">Ghost Tap Window</h3>
-                </div>
-                <div className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-white mb-3 tracking-tight">{isGhostOptimal ? '0.0s' : `${ghostTapWindow}s`}</div>
-                <p className="text-xs sm:text-sm text-zinc-100 leading-relaxed font-normal max-w-xl">
-                  {isGhostOptimal 
-                    ? 'Main thread is unblocked. User interactions are instantly registered by the browser.'
-                    : `The screen appears loaded, but user taps are ignored for ${ghostTapWindow} seconds due to main-thread blocking.`}
-                </p>
-                <LiveTelemetryWave isFlat={isGhostOptimal} isAlert={!isGhostOptimal} />
-              </div>
-              <div className="relative z-10 mt-6">
-                <button 
-                  onClick={() => setActiveDrawer('ghost')}
-                  className={`group relative w-full flex items-center justify-between px-5 py-3.5 rounded-xl border transition-all duration-300 overflow-hidden ${
-                    isGhostOptimal ? 'bg-green-950/60 border-green-700/80 hover:border-green-400' : 'bg-[#1b1b28] border-zinc-600/70 hover:border-cyan-400/80'
-                  }`}
-                >
-                  <span className={`relative z-10 text-xs uppercase tracking-widest font-mono font-bold ${
-                    isGhostOptimal ? 'text-green-300' : 'text-cyan-300'
-                  }`}>
-                    Forensic Methodology
-                  </span>
-                  <ChevronRight size={16} className={`relative z-10 transition-transform group-hover:translate-x-1 ${
-                    isGhostOptimal ? 'text-green-300' : 'text-cyan-300'
-                  }`} />
-                </button>
-              </div>
-            </div>
-            
-            {/* 3. Local Search Penalty (INP) Card */}
-            <div className={`bg-gradient-to-b from-[#151522] to-[#0e0e14] border ${!isMapPenalized ? 'border-green-500/60 hover:border-green-400' : 'border-zinc-500/60 hover:border-cyan-400/60'} rounded-2xl relative flex flex-col justify-between transition-all backdrop-blur-xl shadow-2xl p-6 sm:p-8`}>
-              <div className="absolute inset-0 overflow-hidden rounded-2xl pointer-events-none">
-                <div className="absolute top-0 right-0 p-6 opacity-20">
-                  <MapPin size={90} className={!isMapPenalized ? 'text-green-400' : 'text-blue-400'} />
-                </div>
-              </div>
-              <div className="relative z-10 flex-grow">
-                <div className={`flex items-center gap-2.5 mb-3 font-mono font-bold ${!isMapPenalized ? 'text-green-400' : 'text-blue-400'}`}>
-                  <MapPin size={20} />
-                  <h3 className="text-xs uppercase tracking-wider">Local SEO Penalty</h3>
-                </div>
-                <div className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-white mb-3 tracking-tight">{rawInp}ms</div>
-                <p className="text-xs sm:text-sm text-zinc-100 leading-relaxed font-normal max-w-xl">
-                  {isMapPenalized 
-                    ? `INP exceeds 200ms threshold. Google algorithms are actively suppressing your Google Maps visibility due to poor UX.` 
-                    : `INP is within passing limits. Local SEO and Maps visibility are unaffected by interaction latency.`}
-                </p>
-                <LiveTelemetryWave isFlat={!isMapPenalized} isAlert={isMapPenalized} />
-              </div>
-              <div className="relative z-10 mt-6">
-                <button 
-                  onClick={() => setActiveDrawer('inp')}
-                  className={`group relative w-full flex items-center justify-between px-5 py-3.5 rounded-xl border transition-all duration-300 overflow-hidden ${
-                    !isMapPenalized ? 'bg-green-950/60 border-green-700/80 hover:border-green-400' : 'bg-[#1b1b28] border-zinc-600/70 hover:border-cyan-400/80'
-                  }`}
-                >
-                  <span className={`relative z-10 text-xs uppercase tracking-widest font-mono font-bold ${
-                    !isMapPenalized ? 'text-green-300' : 'text-cyan-300'
-                  }`}>
-                    Forensic Methodology
-                  </span>
-                  <ChevronRight size={16} className={`relative z-10 transition-transform group-hover:translate-x-1 ${
-                    !isMapPenalized ? 'text-green-300' : 'text-cyan-300'
-                  }`} />
-                </button>
-              </div>
-            </div>
-
-            {/* 4. Parasite Load Card */}
-            <div className={`bg-gradient-to-b from-[#151522] to-[#0e0e14] border ${parseFloat(parasiteImpact) === 0 ? 'border-green-500/60 hover:border-green-400' : 'border-zinc-500/60 hover:border-cyan-400/60'} rounded-2xl relative flex flex-col justify-between transition-all backdrop-blur-xl shadow-2xl p-6 sm:p-8`}>
-              <div className="absolute inset-0 overflow-hidden rounded-2xl pointer-events-none">
-                <div className="absolute top-0 right-0 p-6 opacity-20">
-                  <ShieldAlert size={90} className={parseFloat(parasiteImpact) === 0 ? 'text-green-400' : 'text-blue-400'} />
-                </div>
-              </div>
-              <div className="relative z-10 flex-grow">
-                <div className={`flex items-center gap-2.5 mb-3 font-mono font-bold ${parseFloat(parasiteImpact) === 0 ? 'text-green-400' : 'text-blue-400'}`}>
-                  <ServerCrash size={20} />
-                  <h3 className="text-xs uppercase tracking-wider">Parasite Load</h3>
-                </div>
-                <div className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-white mb-3 tracking-tight">{parasiteImpact}%</div>
-                <p className="text-xs sm:text-sm text-zinc-100 leading-relaxed font-normal max-w-xl">
-                  {parseFloat(parasiteImpact) === 0
-                    ? 'Zero external tracking scripts detected. Pipeline resource consumption is clean.'
-                    : `${thirdPartyCount} external marketing scripts are responsible for ${parasiteImpact}% of your mobile lag.`}
-                </p>
-                <LiveTelemetryWave isFlat={parseFloat(parasiteImpact) === 0} isAlert={parseFloat(parasiteImpact) > 0} />
-              </div>
-              <div className="relative z-10 mt-6">
-                <button 
-                  onClick={() => setActiveDrawer('parasite')}
-                  className={`group relative w-full flex items-center justify-between px-5 py-3.5 rounded-xl border transition-all duration-300 overflow-hidden ${
-                    parseFloat(parasiteImpact) === 0 ? 'bg-green-950/60 border-green-700/80 hover:border-green-400' : 'bg-[#1b1b28] border-zinc-600/70 hover:border-cyan-400/80'
-                  }`}
-                >
-                  <span className={`relative z-10 text-xs uppercase tracking-widest font-mono font-bold ${
-                    parseFloat(parasiteImpact) === 0 ? 'text-green-300' : 'text-cyan-300'
-                  }`}>
-                    Forensic Methodology
-                  </span>
-                  <ChevronRight size={16} className={`relative z-10 transition-transform group-hover:translate-x-1 ${
-                    parseFloat(parasiteImpact) === 0 ? 'text-green-300' : 'text-cyan-300'
-                  }`} />
-                </button>
-              </div>
-            </div>
-
-            {/* 5. Marketing Nurture Security (DNS/DMARC) Card */}
-            <div className={`bg-gradient-to-b from-[#151522] to-[#0e0e14] border ${!isEmailVulnerable ? 'border-green-500/60 hover:border-green-400' : 'border-zinc-500/60 hover:border-cyan-400/60'} rounded-2xl relative flex flex-col justify-between transition-all backdrop-blur-xl shadow-2xl p-6 sm:p-8`}>
-              <div className="absolute inset-0 overflow-hidden rounded-2xl pointer-events-none">
-                <div className="absolute top-0 right-0 p-6 opacity-20">
-                  <MailWarning size={90} className={!isEmailVulnerable ? 'text-green-400' : 'text-blue-400'} />
-                </div>
-              </div>
-              <div className="relative z-10 flex-grow">
-                <div className={`flex items-center gap-2.5 mb-3 font-mono font-bold ${!isEmailVulnerable ? 'text-green-400' : 'text-blue-400'}`}>
-                  <MailWarning size={20} />
-                  <h3 className="text-xs uppercase tracking-wider">Nurture Trust Risk</h3>
-                </div>
-                <div className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white mb-3 tracking-tight break-words">
-                  {isEmailVulnerable ? 'VULNERABLE' : 'SECURE'}
-                </div>
-                <p className="text-xs sm:text-sm text-zinc-100 leading-relaxed font-normal max-w-xl">
-                  {isEmailVulnerable 
-                    ? `Missing DMARC/SPF protocols. Automated free-trial follow-ups are highly likely routing to client spam folders.`
-                    : `Domain authentication protocols are intact. Lead nurture deliverability is protected.`}
-                </p>
-                <LiveTelemetryWave isFlat={!isEmailVulnerable} isAlert={isEmailVulnerable} />
-              </div>
-              <div className="relative z-10 mt-6">
-                <button 
-                  onClick={() => setActiveDrawer('dns')}
-                  className={`group relative w-full flex items-center justify-between px-5 py-3.5 rounded-xl border transition-all duration-300 overflow-hidden ${
-                    !isEmailVulnerable ? 'bg-green-950/60 border-green-700/80 hover:border-green-400' : 'bg-[#1b1b28] border-zinc-600/70 hover:border-cyan-400/80'
-                  }`}
-                >
-                  <span className={`relative z-10 text-xs uppercase tracking-widest font-mono font-bold ${
-                    !isEmailVulnerable ? 'text-green-300' : 'text-cyan-300'
-                  }`}>
-                    Forensic Methodology
-                  </span>
-                  <ChevronRight size={16} className={`relative z-10 transition-transform group-hover:translate-x-1 ${
-                    !isEmailVulnerable ? 'text-green-300' : 'text-cyan-300'
-                  }`} />
-                </button>
-              </div>
-            </div>
-
-            {/* 6. Codebase Fragility Card */}
-            <div className={`bg-gradient-to-b from-[#151522] to-[#0e0e14] border ${!isFragile ? 'border-green-500/60 hover:border-green-400' : 'border-zinc-500/60 hover:border-cyan-400/60'} rounded-2xl relative flex flex-col justify-between transition-all backdrop-blur-xl shadow-2xl p-6 sm:p-8`}>
-              <div className="absolute inset-0 overflow-hidden rounded-2xl pointer-events-none">
-                <div className="absolute top-0 right-0 p-6 opacity-20">
-                  <Database size={90} className={!isFragile ? 'text-green-400' : 'text-blue-400'} />
-                </div>
-              </div>
-              <div className="relative z-10 flex-grow">
-                <div className={`flex items-center gap-2.5 mb-3 font-mono font-bold ${!isFragile ? 'text-green-400' : 'text-blue-400'}`}>
-                  <Database size={20} />
-                  <h3 className="text-xs uppercase tracking-wider">DOM Fragility</h3>
-                </div>
-                <div className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-white mb-3 tracking-tight">{domSize}</div>
-                <p className="text-xs sm:text-sm text-zinc-100 leading-relaxed font-normal max-w-xl">
-                  {!isFragile 
-                    ? 'HTML structure is highly optimized. Low node count ensures rapid rendering.'
-                    : 'Massive HTML node count is draining mobile batteries and risking browser crashes.'}
-                </p>
-                <LiveTelemetryWave isFlat={!isFragile} isAlert={isFragile} />
-              </div>
-              <div className="relative z-10 mt-6">
-                <button 
-                  onClick={() => setActiveDrawer('dom')}
-                  className={`group relative w-full flex items-center justify-between px-5 py-3.5 rounded-xl border transition-all duration-300 overflow-hidden ${
-                    !isFragile ? 'bg-green-950/60 border-green-700/80 hover:border-green-400' : 'bg-[#1b1b28] border-zinc-600/70 hover:border-cyan-400/80'
-                  }`}
-                >
-                  <span className={`relative z-10 text-xs uppercase tracking-widest font-mono font-bold ${
-                    !isFragile ? 'text-green-300' : 'text-cyan-300'
-                  }`}>
-                    Forensic Methodology
-                  </span>
-                  <ChevronRight size={16} className={`relative z-10 transition-transform group-hover:translate-x-1 ${
-                    !isFragile ? 'text-green-300' : 'text-cyan-300'
-                  }`} />
-                </button>
-              </div>
-            </div>
-
+              );
+            })}
           </div>
         </div>
 
@@ -629,7 +524,7 @@ export default function AuditReportPage() {
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 border-b border-zinc-700/80 pb-4 gap-2">
               <div className="flex items-center gap-3 min-w-0">
                 <Layers className="text-purple-300 shrink-0" size={20} />
-                <h2 className="text-xs sm:text-sm font-mono font-bold text-zinc-100 uppercase tracking-widest break-words leading-snug">Tech Stack & Upgrade Path</h2>
+                <h2 className="text-xs sm:text-sm font-mono font-bold text-zinc-100 uppercase tracking-widest shrink-0 whitespace-nowrap">Tech Stack & Upgrade Path</h2>
               </div>
               <span className="text-[10px] font-mono text-zinc-300 uppercase tracking-widest shrink-0 self-start sm:self-auto">
                 {infrastructure.length} Technologies Detected
