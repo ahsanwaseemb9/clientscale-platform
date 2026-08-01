@@ -263,14 +263,14 @@ export default function AuditReportPage() {
           </button>
         </div>
 
-        {/* --- LIVE TELEMETRY VOLATILITY WARNING (Centered, Cyan Blue & Larger Font) --- */}
-        <div className="bg-[#12121c]/95 border border-blue-400/40 rounded-2xl p-5 sm:p-6 flex flex-col items-center text-center gap-4 relative overflow-hidden group backdrop-blur-xl shadow-xl">
+        {/* --- LIVE TELEMETRY VOLATILITY WARNING (Centered, Reverted Color, Increased Font Size & Generous Spacing) --- */}
+        <div className="bg-[#12121c]/95 border border-blue-400/40 rounded-2xl p-6 sm:p-8 flex flex-col items-center text-center gap-5 relative overflow-hidden group backdrop-blur-xl shadow-xl mb-12 sm:mb-16">
           <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-transparent pointer-events-none" />
-          <div className="w-11 h-11 rounded-xl bg-blue-500/20 border border-blue-400/40 flex items-center justify-center text-blue-300 shrink-0 relative z-10 shadow-[0_0_10px_rgba(59,130,246,0.3)]">
-            <Info size={22} className="opacity-95" />
+          <div className="w-12 h-12 rounded-xl bg-blue-500/20 border border-blue-400/40 flex items-center justify-center text-blue-300 shrink-0 relative z-10 shadow-[0_0_12px_rgba(59,130,246,0.3)]">
+            <Info size={24} className="opacity-95" />
           </div>
-          <div className="relative z-10 max-w-3xl">
-            <h4 className="text-sm sm:text-base md:text-lg font-mono font-extrabold text-cyan-400 uppercase tracking-widest mb-2">
+          <div className="relative z-10 max-w-3xl space-y-3">
+            <h4 className="text-base sm:text-lg md:text-xl font-mono font-extrabold text-cyan-400 uppercase tracking-widest leading-snug break-words">
               Live Telemetry Volatility Warning
             </h4>
             <p className="text-sm sm:text-base md:text-lg text-white leading-relaxed font-normal">
