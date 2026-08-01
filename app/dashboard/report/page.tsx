@@ -244,7 +244,7 @@ export default function AuditReportPage() {
 
       <div className="space-y-6 relative overflow-x-hidden min-h-screen pb-12 px-3 sm:px-6 lg:px-8 max-w-7xl mx-auto z-10 w-full pt-12">
         
-        {/* --- CENTERED & MOBILE-OPTIMIZED PAGE HEADER WITH CLEAN GAP --- */}
+        {/* --- PAGE HEADER --- */}
         <div className="flex flex-col items-center text-center gap-6 border-b border-zinc-700/80 pb-10 mb-12 w-full overflow-hidden">
           <div className="w-full max-w-3xl px-2">
             <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-white tracking-tight">
@@ -263,17 +263,17 @@ export default function AuditReportPage() {
           </button>
         </div>
 
-        {/* --- TELEMETRY VOLATILITY NOTICE --- */}
-        <div className="bg-[#12121c]/90 border border-blue-400/30 rounded-2xl p-4 sm:p-5 flex flex-col sm:flex-row items-start sm:items-center gap-4 relative overflow-hidden group backdrop-blur-xl shadow-lg">
+        {/* --- LIVE TELEMETRY VOLATILITY WARNING (Brightened & White Font) --- */}
+        <div className="bg-[#12121c]/95 border border-blue-400/40 rounded-2xl p-5 sm:p-6 flex flex-col sm:flex-row items-start sm:items-center gap-4 relative overflow-hidden group backdrop-blur-xl shadow-xl">
           <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-transparent pointer-events-none" />
-          <div className="w-10 h-10 rounded-xl bg-blue-500/20 border border-blue-400/30 flex items-center justify-center text-blue-300 shrink-0 relative z-10">
-            <Info size={20} className="opacity-90" />
+          <div className="w-11 h-11 rounded-xl bg-blue-500/20 border border-blue-400/40 flex items-center justify-center text-blue-300 shrink-0 relative z-10 shadow-[0_0_10px_rgba(59,130,246,0.3)]">
+            <Info size={22} className="opacity-95" />
           </div>
           <div className="relative z-10 flex-grow">
-            <h4 className="text-[10px] font-mono font-bold text-blue-300 uppercase tracking-widest mb-1">
+            <h4 className="text-xs font-mono font-extrabold text-blue-300 uppercase tracking-widest mb-1.5">
               Live Telemetry Volatility Warning
             </h4>
-            <p className="text-xs sm:text-sm text-zinc-200 leading-relaxed font-light">
+            <p className="text-sm sm:text-base text-white leading-relaxed font-normal">
               Because this target domain relies on a traditional origin server, the telemetry below fluctuates based on live traffic and CPU strain. Migrating to the ClientScale Edge Network removes this instability, permanently locking these metrics into an optimized state.
             </p>
           </div>
@@ -281,8 +281,8 @@ export default function AuditReportPage() {
 
         {/* --- BUSINESS FRICTION GRID (Top 6 Brightened High-Contrast Cards) --- */}
         <div className="mb-8 sm:mb-12">
-          {/* Centered Heading with Top & Bottom Gaps */}
-          <div className="flex flex-col items-center justify-center my-8 sm:my-10 text-center">
+          {/* Centered Heading with Spaced Gaps Top and Bottom */}
+          <div className="flex flex-col items-center justify-center my-10 sm:my-14 text-center">
             <h2 className="text-base sm:text-lg font-mono font-bold text-white uppercase tracking-[0.25em]">Revenue & Friction Analysis</h2>
           </div>
 
