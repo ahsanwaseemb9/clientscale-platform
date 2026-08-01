@@ -250,8 +250,11 @@ export default function AuditReportPage() {
             <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-white tracking-tight">
               Diagnostic Forensics
             </h1>
-            <p className="text-zinc-200 mt-4 text-sm sm:text-base font-mono font-medium break-all sm:break-normal">
-              Live pipeline intelligence for <span className="text-cyan-300 font-bold">{auditData?.target?.replace('https://', '').replace('http://', '') || 'Target Domain'}</span>
+            <p className="text-zinc-200 mt-5 sm:mt-6 text-sm sm:text-base font-mono font-medium">
+              Live pipeline intelligence for{' '}
+              <span className="text-cyan-300 font-bold inline-block whitespace-nowrap">
+                {auditData?.target?.replace('https://', '').replace('http://', '') || 'Target Domain'}
+              </span>
             </p>
           </div>
           <button className="w-full sm:w-auto bg-gradient-to-b from-cyan-600 to-cyan-700 hover:from-cyan-500 hover:to-cyan-600 text-white px-8 py-3.5 rounded-xl font-bold text-xs sm:text-sm transition-all shadow-[0_0_20px_rgba(6,182,212,0.4)] flex items-center justify-center gap-2 border border-cyan-400/50 mt-2">
