@@ -165,62 +165,67 @@ export default function AuditReportPage() {
     dynamicSeverityTier = 'MODERATE';
   }
 
-  // State-of-the-art smooth live breathing telemetry wave component driven by requestAnimationFrame
-  const LiveTelemetryWave = ({ isAlert }: { isAlert: boolean }) => {
+  // State-of-the-art smooth live breathing telemetry wave component. 
+  // If isFlat is true, it renders a completely stable horizontal line.
+  const LiveTelemetryWave = ({ isFlat, isAlert }: { isFlat: boolean; isAlert: boolean }) => {
     const [phase, setPhase] = useState(0);
 
     useEffect(() => {
+      if (isFlat) return; // Keep flat if optimized/0%
       let animationFrameId: number;
       const render = () => {
-        setPhase((prev) => (prev + (isAlert ? 0.08 : 0.03)) % (Math.PI * 2));
+        setPhase((prev) => (prev + (isAlert ? 0.07 : 0.03)) % (Math.PI * 2));
         animationFrameId = requestAnimationFrame(render);
       };
       animationFrameId = requestAnimationFrame(render);
       return () => cancelAnimationFrame(animationFrameId);
-    }, [isAlert]);
+    }, [isFlat, isAlert]);
 
     const points = [];
     const width = 300;
     const height = 30;
     const centerY = height / 2;
 
-    for (let x = 0; x <= width; x += 3) {
-      const freq = isAlert ? 0.05 : 0.02;
-      const amplitude = isAlert ? 9 : 4.5;
-      
-      let y = centerY + Math.sin(x * freq + phase) * amplitude;
-      
-      const modX = (x + phase * 20) % 150;
-      if (modX > 65 && modX < 85) {
-        if (modX < 72) y -= (modX - 65) * (isAlert ? 3.2 : 1.8);
-        else if (modX < 78) y += (modX - 72) * (isAlert ? 5.5 : 3);
-        else y -= (85 - modX) * (isAlert ? 1.2 : 0.8);
+    for (let x = 0; x <= width; x += 2) {
+      let y = centerY;
+      if (!isFlat) {
+        const freq = isAlert ? 0.045 : 0.02;
+        const amplitude = isAlert ? 7.5 : 3.5;
+        
+        y = centerY + Math.sin(x * freq + phase) * amplitude;
+        
+        // Organic ECG heartbeat spike
+        const cycle = (x + phase * 22) % 120;
+        if (cycle > 50 && cycle < 70) {
+          if (cycle < 58) y -= (cycle - 50) * (isAlert ? 2.8 : 1.4);
+          else if (cycle < 64) y += (cycle - 58) * (isAlert ? 4.5 : 2.2);
+          else y -= (70 - cycle) * (isAlert ? 1.2 : 0.6);
+        }
       }
-
       points.push(`${x === 0 ? 'M' : 'L'} ${x},${y}`);
     }
 
     const pathData = points.join(' ');
-    const strokeColor = isAlert ? '#ef4444' : '#06b6d4';
+    const strokeColor = isFlat ? '#10b981' : isAlert ? '#ef4444' : '#06b6d4';
 
     return (
       <div className="w-full h-8 overflow-hidden relative mt-3 flex items-center">
         <svg className="w-full h-full" viewBox={`0 0 ${width} ${height}`} preserveAspectRatio="none">
           <defs>
-            <linearGradient id={isAlert ? "alertGrad" : "cyanGrad"} x1="0%" y1="0%" x2="100%" y2="0%">
-              <stop offset="0%" stopColor={strokeColor} stopOpacity="0.15" />
+            <linearGradient id={`grad-${strokeColor.replace('#','')}`} x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stopColor={strokeColor} stopOpacity={isFlat ? "0.6" : "0.2"} />
               <stop offset="50%" stopColor={strokeColor} stopOpacity="1" />
-              <stop offset="100%" stopColor={strokeColor} stopOpacity="0.15" />
+              <stop offset="100%" stopColor={strokeColor} stopOpacity={isFlat ? "0.6" : "0.2"} />
             </linearGradient>
           </defs>
           <path 
             d={pathData} 
             fill="none" 
-            stroke={`url(#${isAlert ? "alertGrad" : "cyanGrad"})`}
-            strokeWidth="2.2" 
+            stroke={`url(#grad-${strokeColor.replace('#','')})`}
+            strokeWidth="2" 
             strokeLinecap="round"
             strokeLinejoin="round"
-            className={isAlert ? "drop-shadow-[0_0_10px_rgba(239,68,68,0.9)]" : "drop-shadow-[0_0_8px_rgba(6,182,212,0.7)]"}
+            className={isFlat ? "opacity-75" : isAlert ? "drop-shadow-[0_0_8px_rgba(239,68,68,0.8)]" : "drop-shadow-[0_0_6px_rgba(6,182,212,0.6)]"}
           />
         </svg>
       </div>
@@ -296,7 +301,7 @@ export default function AuditReportPage() {
                        ? 'Foundational code is solid, but slow visual assets or server response times are actively deflating conversions.' 
                        : 'Latency is actively deflating your conversion rate. Traffic is abandoning the pipeline before checkout.')}
                 </p>
-                <LiveTelemetryWave isAlert={parseFloat(revenueLeakagePercent) > 0} />
+                <LiveTelemetryWave isFlat={parseFloat(revenueLeakagePercent) === 0} isAlert={parseFloat(revenueLeakagePercent) > 0} />
               </div>
               <div className="relative z-10 mt-4">
                 <button 
@@ -335,7 +340,7 @@ export default function AuditReportPage() {
                     ? 'Main thread is unblocked. User interactions are instantly registered by the browser.'
                     : `The screen appears loaded, but user taps are ignored for ${ghostTapWindow} seconds due to main-thread blocking.`}
                 </p>
-                <LiveTelemetryWave isAlert={!isGhostOptimal} />
+                <LiveTelemetryWave isFlat={isGhostOptimal} isAlert={!isGhostOptimal} />
               </div>
               <div className="relative z-10 mt-4">
                 <button 
@@ -374,7 +379,7 @@ export default function AuditReportPage() {
                     ? `INP exceeds 200ms threshold. Google algorithms are actively suppressing your Google Maps visibility due to poor UX.` 
                     : `INP is within passing limits. Local SEO and Maps visibility are unaffected by interaction latency.`}
                 </p>
-                <LiveTelemetryWave isAlert={isMapPenalized} />
+                <LiveTelemetryWave isFlat={!isMapPenalized} isAlert={isMapPenalized} />
               </div>
               <div className="relative z-10 mt-4">
                 <button 
@@ -413,7 +418,7 @@ export default function AuditReportPage() {
                     ? 'Zero external tracking scripts detected. Pipeline resource consumption is clean.'
                     : `${thirdPartyCount} external marketing scripts are responsible for ${parasiteImpact}% of your mobile lag.`}
                 </p>
-                <LiveTelemetryWave isAlert={parseFloat(parasiteImpact) > 0} />
+                <LiveTelemetryWave isFlat={parseFloat(parasiteImpact) === 0} isAlert={parseFloat(parasiteImpact) > 0} />
               </div>
               <div className="relative z-10 mt-4">
                 <button 
@@ -454,7 +459,7 @@ export default function AuditReportPage() {
                     ? `Missing DMARC/SPF protocols. Automated free-trial follow-ups are highly likely routing to client spam folders.`
                     : `Domain authentication protocols are intact. Lead nurture deliverability is protected.`}
                 </p>
-                <LiveTelemetryWave isAlert={isEmailVulnerable} />
+                <LiveTelemetryWave isFlat={!isEmailVulnerable} isAlert={isEmailVulnerable} />
               </div>
               <div className="relative z-10 mt-4">
                 <button 
@@ -493,7 +498,7 @@ export default function AuditReportPage() {
                     ? 'HTML structure is highly optimized. Low node count ensures rapid rendering.'
                     : 'Massive HTML node count is draining mobile batteries and risking browser crashes.'}
                 </p>
-                <LiveTelemetryWave isAlert={isFragile} />
+                <LiveTelemetryWave isFlat={!isFragile} isAlert={isFragile} />
               </div>
               <div className="relative z-10 mt-4">
                 <button 
