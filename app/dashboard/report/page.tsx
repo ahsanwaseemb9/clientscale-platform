@@ -165,20 +165,34 @@ export default function AuditReportPage() {
     dynamicSeverityTier = 'MODERATE';
   }
 
-  // Reusable Heart Monitor Lifeline SVG Component
+  // Fluctuating Heart Monitor Lifeline SVG Component
   const LifelineSvg = ({ isAlert }: { isAlert: boolean }) => (
-    <div className="w-full h-8 overflow-hidden relative mt-3 opacity-80">
-      <svg className="w-full h-full" viewBox="0 0 300 30" preserveAspectRatio="none">
+    <div className="w-full h-8 overflow-hidden relative mt-3 opacity-90">
+      <svg className="w-full h-full" viewBox="0 0 600 30" preserveAspectRatio="none">
         <path 
-          d="M0,15 L60,15 L70,5 L80,25 L90,10 L100,20 L110,15 L300,15" 
+          d="M0,15 L40,15 L45,5 L50,25 L55,10 L60,20 L65,15 L120,15 L150,15 L155,2 L160,28 L165,12 L170,18 L175,15 L230,15 L260,15 L265,5 L270,25 L275,10 L280,20 L285,15 L340,15 L370,15 L375,2 L380,28 L385,12 L390,18 L395,15 L450,15 L480,15 L485,5 L490,25 L495,10 L500,20 L505,15 L600,15" 
           fill="none" 
           stroke={isAlert ? '#ef4444' : '#06b6d4'} 
-          strokeWidth="2" 
+          strokeWidth="2.5" 
           strokeLinecap="round"
           strokeLinejoin="round"
-          className={isAlert ? "animate-pulse" : "drop-shadow-[0_0_8px_rgba(6,182,212,0.6)]"}
+          style={{
+            strokeDasharray: '600',
+            animation: isAlert ? 'pulse-wave 1.2s ease-in-out infinite' : 'flow-wave 4s linear infinite'
+          }}
+          className={isAlert ? "drop-shadow-[0_0_10px_rgba(239,68,68,0.8)]" : "drop-shadow-[0_0_8px_rgba(6,182,212,0.6)]"}
         />
       </svg>
+      <style jsx>{`
+        @keyframes flow-wave {
+          0% { transform: translateX(0); }
+          100% { transform: translateX(-300px); }
+        }
+        @keyframes pulse-wave {
+          0%, 100% { opacity: 0.3; transform: scaleY(0.8); }
+          50% { opacity: 1; transform: scaleY(1.2); }
+        }
+      `}</style>
     </div>
   );
 
