@@ -165,6 +165,73 @@ export default function AuditReportPage() {
     dynamicSeverityTier = 'MODERATE';
   }
 
+  // High-End APM Streaming Telemetry Component with Pure White Lifeline
+  const LiveTelemetryWave = ({ isFlat, isAlert }: { isFlat: boolean; isAlert: boolean }) => {
+    const [points, setPoints] = useState<number[]>([]);
+
+    useEffect(() => {
+      if (isFlat) {
+        setPoints(Array(35).fill(18));
+        return;
+      }
+
+      const initial = Array.from({ length: 35 }, () => 18 + (Math.random() * 10 - 5));
+      setPoints(initial);
+
+      const interval = setInterval(() => {
+        setPoints((prev) => {
+          const nextVal = 18 + (Math.random() * (isAlert ? 24 : 8) - (isAlert ? 12 : 4));
+          const clamped = Math.max(4, Math.min(32, nextVal));
+          return [...prev.slice(1), clamped];
+        });
+      }, 400);
+
+      return () => clearInterval(interval);
+    }, [isFlat, isAlert]);
+
+    const width = 500;
+    const height = 36;
+    const dx = width / (points.length - 1 || 1);
+
+    let pathString = '';
+    if (points.length > 0) {
+      pathString = `M 0,${points[0]}`;
+      for (let i = 0; i < points.length - 1; i++) {
+        const xCurrent = i * dx;
+        const yCurrent = points[i];
+        const xNext = (i + 1) * dx;
+        const yNext = points[i + 1];
+        const xMid = (xCurrent + xNext) / 2;
+        pathString += ` Q ${xMid},${yCurrent} ${xNext},${yNext}`;
+      }
+    }
+
+    const strokeColor = '#ffffff';
+
+    return (
+      <div className="w-full h-10 overflow-hidden relative mt-4 flex items-center bg-[#12121c]/90 border border-zinc-600/50 rounded-xl px-2 shadow-inner">
+        <svg className="w-full h-full" viewBox={`0 0 ${width} ${height}`} preserveAspectRatio="none">
+          <defs>
+            <linearGradient id={`grad-white`} x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stopColor={strokeColor} stopOpacity={isFlat ? "0.7" : "0.3"} />
+              <stop offset="50%" stopColor={strokeColor} stopOpacity="1" />
+              <stop offset="100%" stopColor={strokeColor} stopOpacity={isFlat ? "0.7" : "0.3"} />
+            </linearGradient>
+          </defs>
+          <path 
+            d={pathString} 
+            fill="none" 
+            stroke="url(#grad-white)"
+            strokeWidth="2.5" 
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            className="drop-shadow-[0_0_8px_rgba(255,255,255,0.7)]"
+          />
+        </svg>
+      </div>
+    );
+  };
+
   // --- VERCEL STYLE OBSERVABILITY GRAPH ---
   const VercelGraph = ({ title, series, yUnit = '', xLabels = ['6h ago', '2m ago'], maxVal = 100 }: any) => {
     const [dataLines, setDataLines] = useState<number[][]>(() => 
@@ -389,7 +456,7 @@ export default function AuditReportPage() {
             <Info size={22} className="opacity-95" />
           </div>
           <div className="relative z-10 max-w-3xl">
-            <h4 className="text-xs sm:text-sm font-mono font-extrabold text-cyan-400 uppercase tracking-widest mb-3 whitespace-nowrap sm:whitespace-normal overflow-hidden text-ellipsis">
+            <h4 className="text-[11px] xs:text-xs sm:text-sm md:text-base font-mono font-extrabold text-cyan-400 uppercase tracking-tight sm:tracking-widest mb-3 whitespace-nowrap sm:whitespace-normal overflow-hidden text-ellipsis">
               Live Telemetry Volatility Warning
             </h4>
             <p className="text-sm sm:text-base md:text-lg text-white leading-relaxed font-normal">
@@ -436,7 +503,23 @@ export default function AuditReportPage() {
               <ShieldCheck size={14} /> The Business Translation
             </h4>
             <p className="text-xs sm:text-sm text-zinc-200 leading-relaxed font-light">
-              The telemetry above illustrates the compounding nature of frontend technical debt. A structural base of <strong>{domSize} DOM elements</strong> paired with <strong>{parasiteImpact}% external script overhead</strong> forces the mobile device main-thread to lock. This results in <strong>{ghostTapWindow}s of complete UI unresponsiveness</strong> and pushes the Interaction to Next Paint (INP) to <strong>{rawInp}ms</strong>. Search algorithms penalize this exact latency profile in local rankings, while the resulting user friction guarantees a minimum baseline <strong>revenue leakage of {revenueLeakagePercent}%</strong> before your prospects ever reach the checkout funnel.
+              {parseFloat(revenueLeakagePercent) === 0 ? (
+                <>
+                  The telemetry above confirms a highly optimized frontend architecture. A streamlined base of <strong>{domSize} DOM elements</strong> 
+                  {parseFloat(parasiteImpact) === 0 ? " and zero external script overhead " : ` alongside managed script execution `} 
+                  keeps the mobile device main-thread completely unblocked. This results in <strong>instant UI responsiveness</strong> and an exceptional Interaction to Next Paint (INP) of <strong>{rawInp}ms</strong>. Search algorithms reward this performance in local rankings, and the lack of user friction ensures <strong>zero estimated revenue leakage</strong> from technical bottlenecks.
+                </>
+              ) : (
+                <>
+                  The telemetry above illustrates the compounding nature of frontend technical debt. A structural base of <strong>{domSize} DOM elements</strong> 
+                  {parseFloat(parasiteImpact) > 0 ? (
+                    <span> paired with <strong>{parasiteImpact}% external script overhead</strong> forces</span>
+                  ) : (
+                    <span> alone forces</span>
+                  )} the mobile device main-thread to lock. This results in <strong>{ghostTapWindow}s of UI unresponsiveness</strong> and pushes the Interaction to Next Paint (INP) to <strong>{rawInp}ms</strong>. 
+                  {isMapPenalized ? " Search algorithms penalize this exact latency profile in local rankings, while the" : " The"} resulting user friction guarantees a minimum baseline <strong>revenue leakage of {revenueLeakagePercent}%</strong> before your prospects ever reach the checkout funnel.
+                </>
+              )}
             </p>
           </div>
         </div>
@@ -723,22 +806,14 @@ export default function AuditReportPage() {
           {activeDrawer === 'revenue' && (
             <div className="animate-in fade-in duration-500 text-zinc-100 space-y-4">
               <h3 className="text-xl sm:text-2xl font-bold text-white mb-6">Revenue Leakage Algorithm</h3>
-              {parseFloat(revenueLeakagePercent) === 0 ? (
-                <p className="text-xs sm:text-sm leading-relaxed font-light">
-                  Your website performance score has reached optimal levels, neutralizing latency-driven conversion drops according to the <strong>Deloitte & Google "Milliseconds Make Millions" baseline study</strong>.
-                </p>
-              ) : (
-                <>
-                  <p className="text-xs sm:text-sm leading-relaxed font-light">
-                    This calculation is strictly derived from the <strong>Deloitte & Google "Milliseconds Make Millions" baseline study</strong>.
-                  </p>
-                  <ul className="space-y-3 list-disc pl-5 text-xs sm:text-sm font-light text-zinc-200">
-                    <li>Retail and lead-generation conversion rates are mathematically bound to rendering latency.</li>
-                    <li>The study proved conclusively that a mere <strong>0.1-second delay</strong> in mobile load times directly causes up to an <strong>8.4% drop in conversions</strong>.</li>
-                    <li><strong>Why we use an estimate:</strong> Rather than guessing, we take your exact live Lighthouse performance deficit and run it through standardized conversion-loss curves to calculate the mathematical floor of your monthly revenue losses.</li>
-                  </ul>
-                </>
-              )}
+              <p className="text-xs sm:text-sm leading-relaxed font-light">
+                This calculation is strictly derived from the <strong>Deloitte & Google "Milliseconds Make Millions" baseline study</strong>.
+              </p>
+              <ul className="space-y-3 list-disc pl-5 text-xs sm:text-sm font-light text-zinc-200">
+                <li>Retail and lead-generation conversion rates are mathematically bound to rendering latency.</li>
+                <li>The study proved conclusively that a mere <strong>0.1-second delay</strong> in mobile load times directly causes up to an <strong>8.4% drop in conversions</strong>.</li>
+                <li><strong>Why we use an estimate:</strong> Rather than guessing, we take your exact live Lighthouse performance deficit and run it through standardized conversion-loss curves to calculate the mathematical floor of your monthly revenue losses.</li>
+              </ul>
             </div>
           )}
 
