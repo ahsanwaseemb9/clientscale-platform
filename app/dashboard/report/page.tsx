@@ -492,7 +492,7 @@ export default function AuditReportPage() {
             <Info size={22} className="opacity-95" />
           </div>
           <div className="relative z-10 max-w-3xl">
-            <h4 className="text-xs sm:text-sm font-mono font-extrabold text-cyan-400 uppercase tracking-widest mb-3 whitespace-nowrap sm:whitespace-normal overflow-hidden text-ellipsis">
+            <h4 className="text-[11px] xs:text-xs sm:text-sm md:text-base font-mono font-extrabold text-cyan-400 uppercase tracking-tight sm:tracking-widest mb-3 whitespace-nowrap sm:whitespace-normal overflow-hidden text-ellipsis">
               Live Telemetry Volatility Warning
             </h4>
             <p className="text-sm sm:text-base md:text-lg text-white leading-relaxed font-normal">
@@ -503,13 +503,17 @@ export default function AuditReportPage() {
 
         {/* --- EXECUTIVE SYNTHESIS / OBSERVABILITY GRAPHS --- */}
         <div className="mb-6 sm:mb-8 bg-gradient-to-b from-[#151522] to-[#0e0e14] border border-zinc-500/60 rounded-2xl p-6 sm:p-8 backdrop-blur-xl shadow-2xl">
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4 border-b border-zinc-700/80 pb-6">
-            <div>
-              <h2 className="text-xs sm:text-sm font-mono font-bold text-white uppercase tracking-widest flex items-center gap-2">
-                <Activity size={18} className="text-cyan-400" />
-                Pipeline Observability & Business Impact
-              </h2>
-              <p className="text-[11px] sm:text-xs text-zinc-400 mt-2 font-mono">Live correlation of structural friction against conversion health.</p>
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4 border-b border-zinc-700/80 pb-6 overflow-hidden">
+            <div className="w-full min-w-0">
+              <div className="flex items-center gap-2 w-full">
+                <Activity size={18} className="text-cyan-400 shrink-0" />
+                <h2 className="text-[10px] sm:text-xs md:text-sm font-mono font-bold text-white uppercase tracking-tight sm:tracking-widest truncate">
+                  Pipeline Observability & Business Impact
+                </h2>
+              </div>
+              <p className="text-[9px] sm:text-[11px] md:text-xs text-zinc-400 mt-2 font-mono truncate sm:whitespace-normal">
+                Live correlation of structural friction against conversion health.
+              </p>
             </div>
           </div>
 
