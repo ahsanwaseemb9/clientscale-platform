@@ -263,7 +263,7 @@ export default function AuditReportPage() {
           
           {/* X-Axis */}
           <div className="absolute bottom-0 left-9 right-0 flex justify-between pt-2 border-t border-zinc-800/60">
-            {xLabels.map((l, i) => (
+            {xLabels.map((l: string, i: number) => (
               <span key={i} className="text-[9px] font-mono text-zinc-500">{l}</span>
             ))}
           </div>
@@ -389,11 +389,54 @@ export default function AuditReportPage() {
             <Info size={22} className="opacity-95" />
           </div>
           <div className="relative z-10 max-w-3xl">
-            <h4 className="text-[11px] xs:text-xs sm:text-sm md:text-base font-mono font-extrabold text-cyan-400 uppercase tracking-tight sm:tracking-widest mb-3 whitespace-nowrap sm:whitespace-normal overflow-hidden text-ellipsis">
+            <h4 className="text-xs sm:text-sm font-mono font-extrabold text-cyan-400 uppercase tracking-widest mb-3 whitespace-nowrap sm:whitespace-normal overflow-hidden text-ellipsis">
               Live Telemetry Volatility Warning
             </h4>
             <p className="text-sm sm:text-base md:text-lg text-white leading-relaxed font-normal">
               Because this target domain relies on a traditional origin server, the telemetry below fluctuates based on live traffic and CPU strain. Migrating to the ClientScale Edge Network removes this instability, permanently locking these metrics into an optimized state.
+            </p>
+          </div>
+        </div>
+
+        {/* --- EXECUTIVE SYNTHESIS / OBSERVABILITY GRAPHS --- */}
+        <div className="mb-6 sm:mb-8 bg-gradient-to-b from-[#151522] to-[#0e0e14] border border-zinc-500/60 rounded-2xl p-6 sm:p-8 backdrop-blur-xl shadow-2xl">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4 border-b border-zinc-700/80 pb-6">
+            <div>
+              <h2 className="text-xs sm:text-sm font-mono font-bold text-white uppercase tracking-widest flex items-center gap-2">
+                <Activity size={18} className="text-cyan-400" />
+                Pipeline Observability & Business Impact
+              </h2>
+              <p className="text-[11px] sm:text-xs text-zinc-400 mt-2 font-mono">Live correlation of structural friction against conversion health.</p>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
+            <VercelGraph 
+              title="Conversion Disruption"
+              yUnit="%"
+              maxVal={100}
+              series={[
+                { label: 'Parasite Load', color: '#f59e0b', currentDisplay: `${parasiteImpact}%`, base: parseFloat(parasiteImpact) || 5, variance: 8, fill: true },
+                { label: 'Revenue Leakage', color: '#3b82f6', currentDisplay: `${revenueLeakagePercent}%`, base: parseFloat(revenueLeakagePercent) || 2, variance: 3, fill: false }
+              ]}
+            />
+            <VercelGraph 
+              title="Interaction & Render Latency"
+              yUnit="ms"
+              maxVal={1000}
+              series={[
+                { label: 'INP Latency', color: '#8b5cf6', currentDisplay: `${rawInp}ms`, base: rawInp || 150, variance: 150, fill: true },
+                { label: 'TBT (Thread Lock)', color: '#ef4444', currentDisplay: `${rawTbt}ms`, base: rawTbt || 300, variance: 200, fill: false }
+              ]}
+            />
+          </div>
+
+          <div className="bg-[#12121c]/80 border border-cyan-500/20 rounded-xl p-5 sm:p-6 shadow-inner">
+            <h4 className="text-[10px] font-mono font-bold text-cyan-400 uppercase tracking-widest mb-3 flex items-center gap-2">
+              <ShieldCheck size={14} /> The Business Translation
+            </h4>
+            <p className="text-xs sm:text-sm text-zinc-200 leading-relaxed font-light">
+              The telemetry above illustrates the compounding nature of frontend technical debt. A structural base of <strong>{domSize} DOM elements</strong> paired with <strong>{parasiteImpact}% external script overhead</strong> forces the mobile device main-thread to lock. This results in <strong>{ghostTapWindow}s of complete UI unresponsiveness</strong> and pushes the Interaction to Next Paint (INP) to <strong>{rawInp}ms</strong>. Search algorithms penalize this exact latency profile in local rankings, while the resulting user friction guarantees a minimum baseline <strong>revenue leakage of {revenueLeakagePercent}%</strong> before your prospects ever reach the checkout funnel.
             </p>
           </div>
         </div>
@@ -452,49 +495,6 @@ export default function AuditReportPage() {
                 </div>
               );
             })}
-          </div>
-        </div>
-
-        {/* --- EXECUTIVE SYNTHESIS / OBSERVABILITY GRAPHS --- */}
-        <div className="mb-6 sm:mb-8 bg-gradient-to-b from-[#151522] to-[#0e0e14] border border-zinc-500/60 rounded-2xl p-6 sm:p-8 backdrop-blur-xl shadow-2xl">
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4 border-b border-zinc-700/80 pb-6">
-            <div>
-              <h2 className="text-xs sm:text-sm font-mono font-bold text-white uppercase tracking-widest flex items-center gap-2">
-                <Activity size={18} className="text-cyan-400" />
-                Pipeline Observability & Business Impact
-              </h2>
-              <p className="text-[11px] sm:text-xs text-zinc-400 mt-2 font-mono">Live correlation of structural friction against conversion health.</p>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
-            <VercelGraph 
-              title="Conversion Disruption"
-              yUnit="%"
-              maxVal={100}
-              series={[
-                { label: 'Parasite Load', color: '#f59e0b', currentDisplay: `${parasiteImpact}%`, base: parseFloat(parasiteImpact) || 5, variance: 8, fill: true },
-                { label: 'Revenue Leakage', color: '#3b82f6', currentDisplay: `${revenueLeakagePercent}%`, base: parseFloat(revenueLeakagePercent) || 2, variance: 3, fill: false }
-              ]}
-            />
-            <VercelGraph 
-              title="Interaction & Render Latency"
-              yUnit="ms"
-              maxVal={1000}
-              series={[
-                { label: 'INP Latency', color: '#8b5cf6', currentDisplay: `${rawInp}ms`, base: rawInp || 150, variance: 150, fill: true },
-                { label: 'TBT (Thread Lock)', color: '#ef4444', currentDisplay: `${rawTbt}ms`, base: rawTbt || 300, variance: 200, fill: false }
-              ]}
-            />
-          </div>
-
-          <div className="bg-[#12121c]/80 border border-cyan-500/20 rounded-xl p-5 sm:p-6 shadow-inner">
-            <h4 className="text-[10px] font-mono font-bold text-cyan-400 uppercase tracking-widest mb-3 flex items-center gap-2">
-              <ShieldCheck size={14} /> The Business Translation
-            </h4>
-            <p className="text-xs sm:text-sm text-zinc-200 leading-relaxed font-light">
-              The telemetry above illustrates the compounding nature of frontend technical debt. A structural base of <strong>{domSize} DOM elements</strong> paired with <strong>{parasiteImpact}% external script overhead</strong> forces the mobile device main-thread to lock. This results in <strong>{ghostTapWindow}s of complete UI unresponsiveness</strong> and pushes the Interaction to Next Paint (INP) to <strong>{rawInp}ms</strong>. Search algorithms penalize this exact latency profile in local rankings, while the resulting user friction guarantees a minimum baseline <strong>revenue leakage of {revenueLeakagePercent}%</strong> before your prospects ever reach the checkout funnel.
-            </p>
           </div>
         </div>
 
@@ -595,12 +595,12 @@ export default function AuditReportPage() {
 
           {/* --- TECH STACK FINGERPRINT & UPGRADE PATH --- */}
           <div className="bg-gradient-to-b from-[#151522] to-[#0e0e14] border border-zinc-500/60 rounded-2xl p-6 sm:p-8 backdrop-blur-xl shadow-2xl flex flex-col lg:max-h-[600px] relative overflow-hidden">
-            <div className="flex flex-row justify-between items-center mb-6 border-b border-zinc-700/80 pb-4 gap-2 flex-wrap sm:flex-nowrap overflow-hidden">
+            <div className="flex flex-row justify-between items-center mb-6 border-b border-zinc-700/80 pb-4 gap-2 flex-nowrap overflow-hidden">
               <div className="flex items-center gap-2 min-w-0 shrink">
                 <Layers className="text-purple-300 shrink-0" size={18} />
                 <h2 className="text-[11px] sm:text-xs md:text-sm font-mono font-bold text-zinc-100 uppercase tracking-wider truncate">Tech Stack & Upgrade Path</h2>
               </div>
-              <span className="text-[9px] sm:text-[10px] font-mono text-zinc-300 uppercase tracking-wider shrink-0 whitespace-nowrap sm:ml-1 mt-1 sm:mt-0">
+              <span className="text-[9px] sm:text-[10px] font-mono text-zinc-300 uppercase tracking-wider shrink-0 whitespace-nowrap ml-1">
                 {infrastructure.length} Technologies Detected
               </span>
             </div>
@@ -723,14 +723,22 @@ export default function AuditReportPage() {
           {activeDrawer === 'revenue' && (
             <div className="animate-in fade-in duration-500 text-zinc-100 space-y-4">
               <h3 className="text-xl sm:text-2xl font-bold text-white mb-6">Revenue Leakage Algorithm</h3>
-              <p className="text-xs sm:text-sm leading-relaxed font-light">
-                This calculation is strictly derived from the <strong>Deloitte & Google "Milliseconds Make Millions" baseline study</strong>.
-              </p>
-              <ul className="space-y-3 list-disc pl-5 text-xs sm:text-sm font-light text-zinc-200">
-                <li>Retail and lead-generation conversion rates are mathematically bound to rendering latency.</li>
-                <li>The study proved conclusively that a mere <strong>0.1-second delay</strong> in mobile load times directly causes up to an <strong>8.4% drop in conversions</strong>.</li>
-                <li><strong>Why we use an estimate:</strong> Rather than guessing, we take your exact live Lighthouse performance deficit and run it through standardized conversion-loss curves to calculate the mathematical floor of your monthly revenue losses.</li>
-              </ul>
+              {parseFloat(revenueLeakagePercent) === 0 ? (
+                <p className="text-xs sm:text-sm leading-relaxed font-light">
+                  Your website performance score has reached optimal levels, neutralizing latency-driven conversion drops according to the <strong>Deloitte & Google "Milliseconds Make Millions" baseline study</strong>.
+                </p>
+              ) : (
+                <>
+                  <p className="text-xs sm:text-sm leading-relaxed font-light">
+                    This calculation is strictly derived from the <strong>Deloitte & Google "Milliseconds Make Millions" baseline study</strong>.
+                  </p>
+                  <ul className="space-y-3 list-disc pl-5 text-xs sm:text-sm font-light text-zinc-200">
+                    <li>Retail and lead-generation conversion rates are mathematically bound to rendering latency.</li>
+                    <li>The study proved conclusively that a mere <strong>0.1-second delay</strong> in mobile load times directly causes up to an <strong>8.4% drop in conversions</strong>.</li>
+                    <li><strong>Why we use an estimate:</strong> Rather than guessing, we take your exact live Lighthouse performance deficit and run it through standardized conversion-loss curves to calculate the mathematical floor of your monthly revenue losses.</li>
+                  </ul>
+                </>
+              )}
             </div>
           )}
 
