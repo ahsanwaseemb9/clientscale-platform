@@ -165,7 +165,7 @@ export default function AuditReportPage() {
     dynamicSeverityTier = 'MODERATE';
   }
 
-  // High-End APM Streaming Telemetry Component with Pure White Lifeline
+  // High-End APM Streaming Telemetry Component
   const LiveTelemetryWave = ({ isFlat, isAlert }: { isFlat: boolean; isAlert: boolean }) => {
     const [points, setPoints] = useState<number[]>([]);
 
@@ -351,6 +351,7 @@ export default function AuditReportPage() {
         ? 'Performance is fully optimized. Zero estimated revenue leakage due to latency.'
         : 'Latency is actively deflating your conversion rate. Traffic is abandoning the pipeline before checkout.',
       drawerKey: 'revenue' as const,
+      isZero: parseFloat(revenueLeakagePercent) === 0,
       iconComp: DollarSign
     },
     {
@@ -363,6 +364,7 @@ export default function AuditReportPage() {
         ? 'Main thread is unblocked. User interactions are instantly registered by the browser.'
         : `The screen appears loaded, but user taps are ignored for ${ghostTapWindow} seconds due to main-thread blocking.`,
       drawerKey: 'ghost' as const,
+      isZero: isGhostOptimal,
       iconComp: Ghost
     },
     {
@@ -375,6 +377,7 @@ export default function AuditReportPage() {
         ? `INP exceeds 200ms threshold. Google algorithms are actively suppressing your Google Maps visibility due to poor UX.` 
         : `INP is within passing limits. Local SEO and Maps visibility are unaffected by interaction latency.`,
       drawerKey: 'inp' as const,
+      isZero: !isMapPenalized,
       iconComp: MapPin
     },
     {
@@ -387,6 +390,7 @@ export default function AuditReportPage() {
         ? 'Zero external tracking scripts detected. Pipeline resource consumption is clean.'
         : `${thirdPartyCount} external marketing scripts are responsible for ${parasiteImpact}% of your mobile lag.`,
       drawerKey: 'parasite' as const,
+      isZero: parseFloat(parasiteImpact) === 0,
       iconComp: ShieldAlert
     },
     {
@@ -399,6 +403,7 @@ export default function AuditReportPage() {
         ? `Missing DMARC/SPF protocols. Automated free-trial follow-ups are highly likely routing to client spam folders.`
         : `Domain authentication protocols are intact. Lead nurture deliverability is protected.`,
       drawerKey: 'dns' as const,
+      isZero: !isEmailVulnerable,
       iconComp: MailWarning
     },
     {
@@ -411,12 +416,43 @@ export default function AuditReportPage() {
         ? 'HTML structure is highly optimized. Low node count ensures rapid rendering.'
         : 'Massive HTML node count is draining mobile batteries and risking browser crashes.',
       drawerKey: 'dom' as const,
+      isZero: !isFragile,
       iconComp: Database
     }
   ];
 
   // Dynamically sort cards so non-green (blue/alerts) come first, and green (optimized) cards appear below
   frictionCards.sort((a, b) => (a.isGreen === b.isGreen ? 0 : a.isGreen ? 1 : -1));
+
+  // --- HYPER-DYNAMIC BUSINESS TRANSLATION GENERATOR ---
+  let dynamicSynthesis = '';
+  
+  if (parseFloat(revenueLeakagePercent) === 0 && isGhostOptimal && !isMapPenalized && !isFragile && parseFloat(parasiteImpact) === 0) {
+    dynamicSynthesis = `The telemetry above confirms a perfectly optimized frontend architecture. A streamlined base of ${domSize} DOM elements and zero external script overhead keeps the mobile device main-thread completely unblocked. This results in instant UI responsiveness and an exceptional Interaction to Next Paint (INP) of ${rawInp}ms. Search algorithms reward this performance, ensuring zero estimated revenue leakage from technical bottlenecks.`;
+  } else {
+    const sentence1 = isFragile 
+      ? `A heavy structural base of ${domSize} DOM elements` 
+      : `A structural base of ${domSize} DOM elements`;
+      
+    const sentence2 = parseFloat(parasiteImpact) > 0 
+      ? ` paired with ${parasiteImpact}% external script overhead` 
+      : ``;
+      
+    const sentence3 = !isGhostOptimal 
+      ? ` forces the mobile device main-thread to lock, resulting in ${ghostTapWindow}s of complete UI unresponsiveness.` 
+      : ` is currently maintaining an unblocked main-thread for instant tap responsiveness.`;
+
+    const sentence4 = isMapPenalized 
+      ? ` However, the Interaction to Next Paint (INP) sits at ${rawInp}ms, which search algorithms actively penalize in local rankings.` 
+      : ` The Interaction to Next Paint (INP) sits at a healthy ${rawInp}ms.`;
+      
+    const sentence5 = parseFloat(revenueLeakagePercent) > 0 
+      ? ` The compounding nature of this technical friction guarantees a minimum baseline revenue leakage of ${revenueLeakagePercent}% before prospects ever reach the checkout funnel.`
+      : ` Despite some structural warnings, baseline rendering is fast enough to currently estimate zero direct revenue leakage.`;
+
+    dynamicSynthesis = `${sentence1}${sentence2}${sentence3}${sentence4}${sentence5}`;
+  }
+
 
   return (
     <main className="flex min-h-[100dvh] w-full flex-col items-center bg-[#020205] text-white antialiased selection:bg-cyan-500/30 selection:text-cyan-200 overflow-x-hidden pb-24 relative">
@@ -456,7 +492,7 @@ export default function AuditReportPage() {
             <Info size={22} className="opacity-95" />
           </div>
           <div className="relative z-10 max-w-3xl">
-            <h4 className="text-[11px] xs:text-xs sm:text-sm md:text-base font-mono font-extrabold text-cyan-400 uppercase tracking-tight sm:tracking-widest mb-3 whitespace-nowrap sm:whitespace-normal overflow-hidden text-ellipsis">
+            <h4 className="text-xs sm:text-sm font-mono font-extrabold text-cyan-400 uppercase tracking-widest mb-3 whitespace-nowrap sm:whitespace-normal overflow-hidden text-ellipsis">
               Live Telemetry Volatility Warning
             </h4>
             <p className="text-sm sm:text-base md:text-lg text-white leading-relaxed font-normal">
@@ -503,23 +539,7 @@ export default function AuditReportPage() {
               <ShieldCheck size={14} /> The Business Translation
             </h4>
             <p className="text-xs sm:text-sm text-zinc-200 leading-relaxed font-light">
-              {parseFloat(revenueLeakagePercent) === 0 ? (
-                <>
-                  The telemetry above confirms a highly optimized frontend architecture. A streamlined base of <strong>{domSize} DOM elements</strong> 
-                  {parseFloat(parasiteImpact) === 0 ? " and zero external script overhead " : ` alongside managed script execution `} 
-                  keeps the mobile device main-thread completely unblocked. This results in <strong>instant UI responsiveness</strong> and an exceptional Interaction to Next Paint (INP) of <strong>{rawInp}ms</strong>. Search algorithms reward this performance in local rankings, and the lack of user friction ensures <strong>zero estimated revenue leakage</strong> from technical bottlenecks.
-                </>
-              ) : (
-                <>
-                  The telemetry above illustrates the compounding nature of frontend technical debt. A structural base of <strong>{domSize} DOM elements</strong> 
-                  {parseFloat(parasiteImpact) > 0 ? (
-                    <span> paired with <strong>{parasiteImpact}% external script overhead</strong> forces</span>
-                  ) : (
-                    <span> alone forces</span>
-                  )} the mobile device main-thread to lock. This results in <strong>{ghostTapWindow}s of UI unresponsiveness</strong> and pushes the Interaction to Next Paint (INP) to <strong>{rawInp}ms</strong>. 
-                  {isMapPenalized ? " Search algorithms penalize this exact latency profile in local rankings, while the" : " The"} resulting user friction guarantees a minimum baseline <strong>revenue leakage of {revenueLeakagePercent}%</strong> before your prospects ever reach the checkout funnel.
-                </>
-              )}
+              {dynamicSynthesis}
             </p>
           </div>
         </div>
@@ -678,12 +698,12 @@ export default function AuditReportPage() {
 
           {/* --- TECH STACK FINGERPRINT & UPGRADE PATH --- */}
           <div className="bg-gradient-to-b from-[#151522] to-[#0e0e14] border border-zinc-500/60 rounded-2xl p-6 sm:p-8 backdrop-blur-xl shadow-2xl flex flex-col lg:max-h-[600px] relative overflow-hidden">
-            <div className="flex flex-row justify-between items-center mb-6 border-b border-zinc-700/80 pb-4 gap-2 flex-nowrap overflow-hidden">
+            <div className="flex flex-row justify-between items-center mb-6 border-b border-zinc-700/80 pb-4 gap-2 flex-wrap sm:flex-nowrap overflow-hidden">
               <div className="flex items-center gap-2 min-w-0 shrink">
                 <Layers className="text-purple-300 shrink-0" size={18} />
                 <h2 className="text-[11px] sm:text-xs md:text-sm font-mono font-bold text-zinc-100 uppercase tracking-wider truncate">Tech Stack & Upgrade Path</h2>
               </div>
-              <span className="text-[9px] sm:text-[10px] font-mono text-zinc-300 uppercase tracking-wider shrink-0 whitespace-nowrap ml-1">
+              <span className="text-[9px] sm:text-[10px] font-mono text-zinc-300 uppercase tracking-wider shrink-0 whitespace-nowrap sm:ml-1 mt-1 sm:mt-0">
                 {infrastructure.length} Technologies Detected
               </span>
             </div>
