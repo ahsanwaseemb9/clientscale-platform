@@ -209,7 +209,7 @@ export default function AuditReportPage() {
     const strokeColor = '#ffffff';
 
     return (
-      <div className="w-full h-10 overflow-hidden relative mt-4 flex items-center bg-[#12121c]/90 border border-zinc-600/50 rounded-xl px-2 shadow-inner">
+      <div className="w-full h-12 overflow-hidden relative mb-4 flex items-center bg-[#050508]/50 border border-zinc-700/30 rounded-xl px-2 shadow-inner">
         <svg className="w-full h-full" viewBox={`0 0 ${width} ${height}`} preserveAspectRatio="none">
           <defs>
             <linearGradient id={`grad-white`} x1="0%" y1="0%" x2="100%" y2="0%">
@@ -350,14 +350,14 @@ export default function AuditReportPage() {
           </button>
         </div>
 
-        {/* --- LIVE TELEMETRY VOLATILITY WARNING (Cyan Blue Heading & Increased Spacing to Paragraph) --- */}
+        {/* --- LIVE TELEMETRY VOLATILITY WARNING --- */}
         <div className="bg-[#12121c]/95 border border-blue-400/40 rounded-2xl p-6 sm:p-8 flex flex-col items-center text-center gap-4 relative overflow-hidden group backdrop-blur-xl shadow-xl mb-16 sm:mb-20">
           <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-transparent pointer-events-none" />
           <div className="w-11 h-11 rounded-xl bg-blue-500/20 border border-blue-400/40 flex items-center justify-center text-blue-300 shrink-0 relative z-10 shadow-[0_0_10px_rgba(59,130,246,0.3)]">
             <Info size={22} className="opacity-95" />
           </div>
           <div className="relative z-10 max-w-3xl">
-            <h4 className="text-xs sm:text-sm font-mono font-extrabold text-cyan-400 uppercase tracking-widest mb-4 sm:mb-5 whitespace-nowrap sm:whitespace-normal overflow-hidden text-ellipsis">
+            <h4 className="text-[11px] xs:text-xs sm:text-sm md:text-base font-mono font-extrabold text-cyan-400 uppercase tracking-tight sm:tracking-widest mb-3 whitespace-nowrap sm:whitespace-normal overflow-hidden text-ellipsis">
               Live Telemetry Volatility Warning
             </h4>
             <p className="text-sm sm:text-base md:text-lg text-white leading-relaxed font-normal">
@@ -401,7 +401,6 @@ export default function AuditReportPage() {
                     <p className="text-xs sm:text-sm text-zinc-100 leading-relaxed font-normal max-w-xl">
                       {card.description}
                     </p>
-                    <LiveTelemetryWave isFlat={card.isZero} isAlert={!card.isZero} />
                   </div>
                   <div className="relative z-10 mt-6">
                     <button 
@@ -654,10 +653,8 @@ export default function AuditReportPage() {
                   <p className="text-xs sm:text-sm leading-relaxed font-light">
                     Your website performance score has reached optimal levels, neutralizing latency-driven conversion drops according to the <strong>Deloitte & Google "Milliseconds Make Millions" baseline study</strong>.
                   </p>
-                  <div className="p-4 sm:p-5 bg-green-950/30 border-l-2 border-green-400 rounded-r-xl">
-                    <h4 className="text-[10px] font-mono font-bold text-green-400 uppercase tracking-widest mb-2 flex items-center gap-2">
-                      <CheckCircle size={14} className="shrink-0" /> Optimized Status
-                    </h4>
+                  <div className="p-4 sm:p-5 bg-green-950/30 border-l-2 border-green-400 rounded-r-xl mt-4">
+                    <LiveTelemetryWave isFlat={true} isAlert={false} />
                     <p className="text-xs sm:text-sm text-green-100 italic leading-relaxed">
                       "Zero revenue leakage detected. Your site's loading velocity is fully optimized, allowing traffic to move smoothly through the conversion pipeline without latency friction."
                     </p>
@@ -674,9 +671,7 @@ export default function AuditReportPage() {
                     <li><strong>Why we use an estimate:</strong> Rather than guessing, we take your exact live Lighthouse performance deficit and run it through standardized conversion-loss curves to calculate the mathematical floor of your monthly revenue losses.</li>
                   </ul>
                   <div className="p-4 sm:p-5 bg-cyan-950/30 border-l-2 border-cyan-400 rounded-r-xl mt-4">
-                    <h4 className="text-[10px] font-mono font-bold text-cyan-300 uppercase tracking-widest mb-2 flex items-center gap-2">
-                      <Activity size={14} className="shrink-0" /> The Business Translation
-                    </h4>
+                    <LiveTelemetryWave isFlat={false} isAlert={true} />
                     {isGhostOptimal && parseFloat(parasiteImpact) === 0 ? (
                       <p className="text-xs sm:text-sm text-cyan-100 italic leading-relaxed">
                         "Your foundational code is actually incredibly clean. You don't have dangerous third-party scripts, your buttons are instantly interactive, and your HTML structure is solid. However, you are still bleeding <strong>{revenueLeakagePercent}%</strong> of your revenue because your visual assets or your hosting server are dragging you down. Your customers are staring at a white screen waiting for a massive image to load or for your server to respond. Even though the code is good, modern consumers won't wait 4 seconds for a picture to render—they just leave."
@@ -700,10 +695,8 @@ export default function AuditReportPage() {
                   <p className="text-xs sm:text-sm leading-relaxed font-light">
                     A forensic extraction confirms zero Main Thread blocking occurring on your primary interface.
                   </p>
-                  <div className="p-4 sm:p-5 bg-green-950/30 border-l-2 border-green-400 rounded-r-xl">
-                    <h4 className="text-[10px] font-mono font-bold text-green-400 uppercase tracking-widest mb-2 flex items-center gap-2">
-                      <CheckCircle size={14} className="shrink-0" /> Interactive Status
-                    </h4>
+                  <div className="p-4 sm:p-5 bg-green-950/30 border-l-2 border-green-400 rounded-r-xl mt-4">
+                    <LiveTelemetryWave isFlat={true} isAlert={false} />
                     <p className="text-xs sm:text-sm text-green-100 italic leading-relaxed">
                       "Your UI is immediately responsive. There is zero 'ghost tap' window, meaning user inputs like 'Book Now' will never be ignored by a locked rendering pipeline."
                     </p>
@@ -719,9 +712,7 @@ export default function AuditReportPage() {
                     <li>We measure the exact <strong>Total Blocking Time (TBT)</strong>. During this window, user inputs (like tapping a "Book Now" button or opening a menu) are completely ignored by the device.</li>
                   </ul>
                   <div className="p-4 sm:p-5 bg-cyan-950/30 border-l-2 border-cyan-400 rounded-r-xl mt-4">
-                    <h4 className="text-[10px] font-mono font-bold text-cyan-300 uppercase tracking-widest mb-2 flex items-center gap-2">
-                      <Activity size={14} className="shrink-0" /> The Business Translation
-                    </h4>
+                    <LiveTelemetryWave isFlat={false} isAlert={true} />
                     <p className="text-xs sm:text-sm text-cyan-100 italic leading-relaxed">
                       "For <strong>{ghostTapWindow} entire seconds</strong>, your website is essentially a frozen picture. If a customer tries to tap your 'Book Now' button during this window, their phone will ignore the tap. It makes your brand look broken."
                     </p>
@@ -739,10 +730,8 @@ export default function AuditReportPage() {
                   <p className="text-xs sm:text-sm leading-relaxed font-light">
                     Your <strong>Interaction to Next Paint (INP)</strong> easily clears Google's Core Web Vitals thresholds.
                   </p>
-                  <div className="p-4 sm:p-5 bg-green-950/30 border-l-2 border-green-400 rounded-r-xl">
-                    <h4 className="text-[10px] font-mono font-bold text-green-400 uppercase tracking-widest mb-2 flex items-center gap-2">
-                      <CheckCircle size={14} className="shrink-0" /> Search Status
-                    </h4>
+                  <div className="p-4 sm:p-5 bg-green-950/30 border-l-2 border-green-400 rounded-r-xl mt-4">
+                    <LiveTelemetryWave isFlat={true} isAlert={false} />
                     <p className="text-xs sm:text-sm text-green-100 italic leading-relaxed">
                       "INP is within optimal limits. Local SEO and Google Maps visibility are completely unaffected by interaction latency penalties."
                     </p>
@@ -758,9 +747,7 @@ export default function AuditReportPage() {
                     <li>Google Maps and Local Search algorithms officially penalize domains with an INP above 200 milliseconds.</li>
                   </ul>
                   <div className="p-4 sm:p-5 bg-cyan-950/30 border-l-2 border-cyan-400 rounded-r-xl mt-4">
-                    <h4 className="text-[10px] font-mono font-bold text-cyan-300 uppercase tracking-widest mb-2 flex items-center gap-2">
-                      <Activity size={14} className="shrink-0" /> The Business Translation
-                    </h4>
+                    <LiveTelemetryWave isFlat={false} isAlert={true} />
                     <p className="text-xs sm:text-sm text-cyan-100 italic leading-relaxed">
                       "Your interaction latency is currently {rawInp}ms, which crosses Google's penalty threshold. Because of this sluggishness, Google's algorithm is actively demoting your business in Local Search and Google Maps, handing those leads to your faster competitors."
                     </p>
@@ -778,10 +765,8 @@ export default function AuditReportPage() {
                   <p className="text-xs sm:text-sm leading-relaxed font-light">
                     A forensic extraction confirms zero unmanaged third-party network requests or marketing scripts hijacking your local rendering pipeline.
                   </p>
-                  <div className="p-4 sm:p-5 bg-green-950/30 border-l-2 border-green-400 rounded-r-xl">
-                    <h4 className="text-[10px] font-mono font-bold text-green-400 uppercase tracking-widest mb-2 flex items-center gap-2">
-                      <CheckCircle size={14} className="shrink-0" /> Clean Architecture
-                    </h4>
+                  <div className="p-4 sm:p-5 bg-green-950/30 border-l-2 border-green-400 rounded-r-xl mt-4">
+                    <LiveTelemetryWave isFlat={true} isAlert={false} />
                     <p className="text-xs sm:text-sm text-green-100 italic leading-relaxed">
                       "Your rendering pipeline is completely pristine. No external marketing trackers or heavy scripts are burdening the mobile browser's main thread."
                     </p>
@@ -793,9 +778,7 @@ export default function AuditReportPage() {
                     A forensic extraction of third-party network requests hijacking your local rendering pipeline.
                   </p>
                   <div className="p-4 sm:p-5 bg-cyan-950/30 border-l-2 border-cyan-400 rounded-r-xl mb-4">
-                    <h4 className="text-[10px] font-mono font-bold text-cyan-300 uppercase tracking-widest mb-2 flex items-center gap-2">
-                      <Activity size={14} className="shrink-0" /> The Business Translation
-                    </h4>
+                    <LiveTelemetryWave isFlat={false} isAlert={true} />
                     <p className="text-xs sm:text-sm text-cyan-100 italic leading-relaxed">
                       "<strong>{parasiteImpact}%</strong> of your website's freezing isn't even your fault. It is caused by {thirdPartyCount} external marketing trackers feeding on your site's resources. Our AI Edge proxy can defer these instantly."
                     </p>
@@ -837,10 +820,8 @@ export default function AuditReportPage() {
               <p className="text-xs sm:text-sm leading-relaxed font-light">
                 Images lacking alternative (alt) text prevent screen readers from interpreting visual content for visually impaired users and strip away valuable local image-search ranking signals.
               </p>
-              <div className="p-4 sm:p-5 bg-blue-950/30 border-l-2 border-blue-400 rounded-r-xl">
-                <h4 className="text-[10px] font-mono font-bold text-blue-300 uppercase tracking-widest mb-2 flex items-center gap-2">
-                  <Activity size={14} className="shrink-0" /> The Business Translation
-                </h4>
+              <div className="p-4 sm:p-5 bg-blue-950/30 border-l-2 border-blue-400 rounded-r-xl mt-4">
+                <LiveTelemetryWave isFlat={false} isAlert={true} />
                 <p className="text-xs sm:text-sm text-blue-100 italic leading-relaxed">
                   "Your website currently has <strong>{a11y.missingAlt || missingAltList.length} images</strong> missing critical alt tags. This creates legal accessibility liabilities and blocks Google Images from indexing your product or location visuals."
                 </p>
@@ -856,10 +837,8 @@ export default function AuditReportPage() {
                   <p className="text-xs sm:text-sm leading-relaxed font-light">
                     We check the raw DNS records for missing <strong>SPF and DMARC</strong> email authentication protocols.
                   </p>
-                  <div className="p-4 sm:p-5 bg-green-950/30 border-l-2 border-green-400 rounded-r-xl">
-                    <h4 className="text-[10px] font-mono font-bold text-green-400 uppercase tracking-widest mb-2 flex items-center gap-2">
-                      <CheckCircle size={14} className="shrink-0" /> Security Status
-                    </h4>
+                  <div className="p-4 sm:p-5 bg-green-950/30 border-l-2 border-green-400 rounded-r-xl mt-4">
+                    <LiveTelemetryWave isFlat={true} isAlert={false} />
                     <p className="text-xs sm:text-sm text-green-100 italic leading-relaxed">
                       "Domain authentication protocols are intact. Lead nurture deliverability is protected and will bypass modern Google/Microsoft spam filters."
                     </p>
@@ -871,9 +850,7 @@ export default function AuditReportPage() {
                     We check the raw DNS records for missing <strong>SPF and DMARC</strong> email authentication protocols.
                   </p>
                   <div className="p-4 sm:p-5 bg-cyan-950/30 border-l-2 border-cyan-400 rounded-r-xl mt-4">
-                    <h4 className="text-[10px] font-mono font-bold text-cyan-300 uppercase tracking-widest mb-2 flex items-center gap-2">
-                      <Activity size={14} className="shrink-0" /> The Business Translation
-                    </h4>
+                    <LiveTelemetryWave isFlat={false} isAlert={true} />
                     <p className="text-xs sm:text-sm text-cyan-100 italic leading-relaxed">
                       "Your domain is missing basic email security protocols. When a lead signs up for a free trial or downloads your guide, Gmail and Outlook are highly likely sending your automated follow-ups directly to their spam folder. You are paying for leads you cannot legally email."
                     </p>
@@ -891,10 +868,8 @@ export default function AuditReportPage() {
                   <p className="text-xs sm:text-sm leading-relaxed font-light">
                     This references Google's official developer thresholds for structural HTML health.
                   </p>
-                  <div className="p-4 sm:p-5 bg-green-950/30 border-l-2 border-green-400 rounded-r-xl">
-                    <h4 className="text-[10px] font-mono font-bold text-green-400 uppercase tracking-widest mb-2 flex items-center gap-2">
-                      <CheckCircle size={14} className="shrink-0" /> Clean Architecture
-                    </h4>
+                  <div className="p-4 sm:p-5 bg-green-950/30 border-l-2 border-green-400 rounded-r-xl mt-4">
+                    <LiveTelemetryWave isFlat={true} isAlert={false} />
                     <p className="text-xs sm:text-sm text-green-100 italic leading-relaxed">
                       "Your website's code is structurally optimized. Only {domSize} elements ensure rapid rendering."
                     </p>
@@ -906,9 +881,7 @@ export default function AuditReportPage() {
                     This references Google's official developer thresholds for structural HTML health.
                   </p>
                   <div className="p-4 sm:p-5 bg-cyan-950/30 border-l-2 border-cyan-400 rounded-r-xl mt-4">
-                    <h4 className="text-[10px] font-mono font-bold text-cyan-300 uppercase tracking-widest mb-2 flex items-center gap-2">
-                      <Activity size={14} className="shrink-0" /> The Business Translation
-                    </h4>
+                    <LiveTelemetryWave isFlat={false} isAlert={true} />
                     <p className="text-xs sm:text-sm text-cyan-100 italic leading-relaxed">
                       "Your website's code is structurally obese. It forces a mobile phone to download <strong>{domSize}</strong> individual elements just to show a landing page, which drains the user's battery and causes older phones to crash."
                     </p>
