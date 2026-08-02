@@ -209,7 +209,7 @@ export default function AuditReportPage() {
     const strokeColor = '#ffffff';
 
     return (
-      <div className="w-full h-12 overflow-hidden relative mb-4 flex items-center bg-[#050508]/50 border border-zinc-700/30 rounded-xl px-2 shadow-inner">
+      <div className="w-full h-10 overflow-hidden relative mt-4 flex items-center bg-[#12121c]/90 border border-zinc-600/50 rounded-xl px-2 shadow-inner">
         <svg className="w-full h-full" viewBox={`0 0 ${width} ${height}`} preserveAspectRatio="none">
           <defs>
             <linearGradient id={`grad-white`} x1="0%" y1="0%" x2="100%" y2="0%">
@@ -401,6 +401,7 @@ export default function AuditReportPage() {
                     <p className="text-xs sm:text-sm text-zinc-100 leading-relaxed font-normal max-w-xl">
                       {card.description}
                     </p>
+                    <LiveTelemetryWave isFlat={card.isZero} isAlert={!card.isZero} />
                   </div>
                   <div className="relative z-10 mt-6">
                     <button 
@@ -521,11 +522,11 @@ export default function AuditReportPage() {
           {/* --- TECH STACK FINGERPRINT & UPGRADE PATH --- */}
           <div className="bg-gradient-to-b from-[#151522] to-[#0e0e14] border border-zinc-500/60 rounded-2xl p-6 sm:p-8 backdrop-blur-xl shadow-2xl flex flex-col lg:max-h-[600px] relative overflow-hidden">
             <div className="flex flex-row justify-between items-center mb-6 border-b border-zinc-700/80 pb-4 gap-2 flex-nowrap overflow-hidden">
-              <div className="flex items-center gap-3 min-w-0 shrink-0">
-                <Layers className="text-purple-300 shrink-0" size={20} />
-                <h2 className="text-[11px] sm:text-xs md:text-sm font-mono font-bold text-zinc-100 uppercase tracking-widest shrink-0 whitespace-nowrap">Tech Stack & Upgrade Path</h2>
+              <div className="flex items-center gap-2 min-w-0 shrink">
+                <Layers className="text-purple-300 shrink-0" size={18} />
+                <h2 className="text-[11px] sm:text-xs md:text-sm font-mono font-bold text-zinc-100 uppercase tracking-wider truncate">Tech Stack & Upgrade Path</h2>
               </div>
-              <span className="text-[9px] sm:text-[10px] font-mono text-zinc-300 uppercase tracking-widest shrink-0 whitespace-nowrap ml-1">
+              <span className="text-[9px] sm:text-[10px] font-mono text-zinc-300 uppercase tracking-wider shrink-0 whitespace-nowrap ml-1">
                 {infrastructure.length} Technologies Detected
               </span>
             </div>
@@ -649,17 +650,9 @@ export default function AuditReportPage() {
             <div className="animate-in fade-in duration-500 text-zinc-100 space-y-4">
               <h3 className="text-xl sm:text-2xl font-bold text-white mb-6">Revenue Leakage Algorithm</h3>
               {parseFloat(revenueLeakagePercent) === 0 ? (
-                <>
-                  <p className="text-xs sm:text-sm leading-relaxed font-light">
-                    Your website performance score has reached optimal levels, neutralizing latency-driven conversion drops according to the <strong>Deloitte & Google "Milliseconds Make Millions" baseline study</strong>.
-                  </p>
-                  <div className="p-4 sm:p-5 bg-green-950/30 border-l-2 border-green-400 rounded-r-xl mt-4">
-                    <LiveTelemetryWave isFlat={true} isAlert={false} />
-                    <p className="text-xs sm:text-sm text-green-100 italic leading-relaxed">
-                      "Zero revenue leakage detected. Your site's loading velocity is fully optimized, allowing traffic to move smoothly through the conversion pipeline without latency friction."
-                    </p>
-                  </div>
-                </>
+                <p className="text-xs sm:text-sm leading-relaxed font-light">
+                  Your website performance score has reached optimal levels, neutralizing latency-driven conversion drops according to the <strong>Deloitte & Google "Milliseconds Make Millions" baseline study</strong>.
+                </p>
               ) : (
                 <>
                   <p className="text-xs sm:text-sm leading-relaxed font-light">
@@ -670,18 +663,6 @@ export default function AuditReportPage() {
                     <li>The study proved conclusively that a mere <strong>0.1-second delay</strong> in mobile load times directly causes up to an <strong>8.4% drop in conversions</strong>.</li>
                     <li><strong>Why we use an estimate:</strong> Rather than guessing, we take your exact live Lighthouse performance deficit and run it through standardized conversion-loss curves to calculate the mathematical floor of your monthly revenue losses.</li>
                   </ul>
-                  <div className="p-4 sm:p-5 bg-cyan-950/30 border-l-2 border-cyan-400 rounded-r-xl mt-4">
-                    <LiveTelemetryWave isFlat={false} isAlert={true} />
-                    {isGhostOptimal && parseFloat(parasiteImpact) === 0 ? (
-                      <p className="text-xs sm:text-sm text-cyan-100 italic leading-relaxed">
-                        "Your foundational code is actually incredibly clean. You don't have dangerous third-party scripts, your buttons are instantly interactive, and your HTML structure is solid. However, you are still bleeding <strong>{revenueLeakagePercent}%</strong> of your revenue because your visual assets or your hosting server are dragging you down. Your customers are staring at a white screen waiting for a massive image to load or for your server to respond. Even though the code is good, modern consumers won't wait 4 seconds for a picture to render—they just leave."
-                      </p>
-                    ) : (
-                      <p className="text-xs sm:text-sm text-cyan-100 italic leading-relaxed">
-                        "Because your website is technically unoptimized, we estimate that <strong>{revenueLeakagePercent}%</strong> of your traffic is getting frustrated and abandoning the pipeline before they ever submit a lead or make a purchase."
-                      </p>
-                    )}
-                  </div>
                 </>
               )}
             </div>
@@ -691,17 +672,9 @@ export default function AuditReportPage() {
             <div className="animate-in fade-in duration-500 text-zinc-100 space-y-4">
               <h3 className="text-xl sm:text-2xl font-bold text-white mb-6">Ghost Tap Window</h3>
               {isGhostOptimal ? (
-                <>
-                  <p className="text-xs sm:text-sm leading-relaxed font-light">
-                    A forensic extraction confirms zero Main Thread blocking occurring on your primary interface.
-                  </p>
-                  <div className="p-4 sm:p-5 bg-green-950/30 border-l-2 border-green-400 rounded-r-xl mt-4">
-                    <LiveTelemetryWave isFlat={true} isAlert={false} />
-                    <p className="text-xs sm:text-sm text-green-100 italic leading-relaxed">
-                      "Your UI is immediately responsive. There is zero 'ghost tap' window, meaning user inputs like 'Book Now' will never be ignored by a locked rendering pipeline."
-                    </p>
-                  </div>
-                </>
+                <p className="text-xs sm:text-sm leading-relaxed font-light">
+                  A forensic extraction confirms zero Main Thread blocking occurring on your primary interface.
+                </p>
               ) : (
                 <>
                   <p className="text-xs sm:text-sm leading-relaxed font-light">
@@ -711,12 +684,6 @@ export default function AuditReportPage() {
                     <li>When a site visually loads, users assume it is interactive. However, if background JavaScript is still executing, the browser's <strong>Main Thread</strong> is locked.</li>
                     <li>We measure the exact <strong>Total Blocking Time (TBT)</strong>. During this window, user inputs (like tapping a "Book Now" button or opening a menu) are completely ignored by the device.</li>
                   </ul>
-                  <div className="p-4 sm:p-5 bg-cyan-950/30 border-l-2 border-cyan-400 rounded-r-xl mt-4">
-                    <LiveTelemetryWave isFlat={false} isAlert={true} />
-                    <p className="text-xs sm:text-sm text-cyan-100 italic leading-relaxed">
-                      "For <strong>{ghostTapWindow} entire seconds</strong>, your website is essentially a frozen picture. If a customer tries to tap your 'Book Now' button during this window, their phone will ignore the tap. It makes your brand look broken."
-                    </p>
-                  </div>
                 </>
               )}
             </div>
@@ -726,17 +693,9 @@ export default function AuditReportPage() {
             <div className="animate-in fade-in duration-500 text-zinc-100 space-y-4">
               <h3 className="text-xl sm:text-2xl font-bold text-white mb-6">Local Search & Latency Risk</h3>
               {!isMapPenalized ? (
-                <>
-                  <p className="text-xs sm:text-sm leading-relaxed font-light">
-                    Your <strong>Interaction to Next Paint (INP)</strong> easily clears Google's Core Web Vitals thresholds.
-                  </p>
-                  <div className="p-4 sm:p-5 bg-green-950/30 border-l-2 border-green-400 rounded-r-xl mt-4">
-                    <LiveTelemetryWave isFlat={true} isAlert={false} />
-                    <p className="text-xs sm:text-sm text-green-100 italic leading-relaxed">
-                      "INP is within optimal limits. Local SEO and Google Maps visibility are completely unaffected by interaction latency penalties."
-                    </p>
-                  </div>
-                </>
+                <p className="text-xs sm:text-sm leading-relaxed font-light">
+                  Your <strong>Interaction to Next Paint (INP)</strong> easily clears Google's Core Web Vitals thresholds.
+                </p>
               ) : (
                 <>
                   <p className="text-xs sm:text-sm leading-relaxed font-light">
@@ -746,12 +705,6 @@ export default function AuditReportPage() {
                     <li>INP measures the actual latency between a user interacting with the page and the browser visually updating.</li>
                     <li>Google Maps and Local Search algorithms officially penalize domains with an INP above 200 milliseconds.</li>
                   </ul>
-                  <div className="p-4 sm:p-5 bg-cyan-950/30 border-l-2 border-cyan-400 rounded-r-xl mt-4">
-                    <LiveTelemetryWave isFlat={false} isAlert={true} />
-                    <p className="text-xs sm:text-sm text-cyan-100 italic leading-relaxed">
-                      "Your interaction latency is currently {rawInp}ms, which crosses Google's penalty threshold. Because of this sluggishness, Google's algorithm is actively demoting your business in Local Search and Google Maps, handing those leads to your faster competitors."
-                    </p>
-                  </div>
                 </>
               )}
             </div>
@@ -761,29 +714,15 @@ export default function AuditReportPage() {
             <div className="animate-in fade-in duration-500 text-zinc-100 space-y-4">
               <h3 className="text-xl sm:text-2xl font-bold text-white mb-6">Parasite Load Tracking</h3>
               {parseFloat(parasiteImpact) === 0 ? (
-                <>
-                  <p className="text-xs sm:text-sm leading-relaxed font-light">
-                    A forensic extraction confirms zero unmanaged third-party network requests or marketing scripts hijacking your local rendering pipeline.
-                  </p>
-                  <div className="p-4 sm:p-5 bg-green-950/30 border-l-2 border-green-400 rounded-r-xl mt-4">
-                    <LiveTelemetryWave isFlat={true} isAlert={false} />
-                    <p className="text-xs sm:text-sm text-green-100 italic leading-relaxed">
-                      "Your rendering pipeline is completely pristine. No external marketing trackers or heavy scripts are burdening the mobile browser's main thread."
-                    </p>
-                  </div>
-                </>
+                <p className="text-xs sm:text-sm leading-relaxed font-light">
+                  A forensic extraction confirms zero unmanaged third-party network requests or marketing scripts hijacking your local rendering pipeline.
+                </p>
               ) : (
                 <>
                   <p className="text-xs sm:text-sm leading-relaxed font-light">
                     A forensic extraction of third-party network requests hijacking your local rendering pipeline.
                   </p>
-                  <div className="p-4 sm:p-5 bg-cyan-950/30 border-l-2 border-cyan-400 rounded-r-xl mb-4">
-                    <LiveTelemetryWave isFlat={false} isAlert={true} />
-                    <p className="text-xs sm:text-sm text-cyan-100 italic leading-relaxed">
-                      "<strong>{parasiteImpact}%</strong> of your website's freezing isn't even your fault. It is caused by {thirdPartyCount} external marketing trackers feeding on your site's resources. Our AI Edge proxy can defer these instantly."
-                    </p>
-                  </div>
-                  <div className="mb-4">
+                  <div className="mt-4">
                     <h4 className="text-[10px] font-mono font-bold text-zinc-300 uppercase tracking-widest mb-3 flex items-center gap-2">
                       <ShieldAlert size={14} className="text-yellow-400 shrink-0" /> Detected Network Hijackers
                     </h4>
@@ -820,74 +759,24 @@ export default function AuditReportPage() {
               <p className="text-xs sm:text-sm leading-relaxed font-light">
                 Images lacking alternative (alt) text prevent screen readers from interpreting visual content for visually impaired users and strip away valuable local image-search ranking signals.
               </p>
-              <div className="p-4 sm:p-5 bg-blue-950/30 border-l-2 border-blue-400 rounded-r-xl mt-4">
-                <LiveTelemetryWave isFlat={false} isAlert={true} />
-                <p className="text-xs sm:text-sm text-blue-100 italic leading-relaxed">
-                  "Your website currently has <strong>{a11y.missingAlt || missingAltList.length} images</strong> missing critical alt tags. This creates legal accessibility liabilities and blocks Google Images from indexing your product or location visuals."
-                </p>
-              </div>
             </div>
           )}
 
           {activeDrawer === 'dns' && (
             <div className="animate-in fade-in duration-500 text-zinc-100 space-y-4">
               <h3 className="text-xl sm:text-2xl font-bold text-white mb-6">Marketing Nurture Trust Risk</h3>
-              {!isEmailVulnerable ? (
-                <>
-                  <p className="text-xs sm:text-sm leading-relaxed font-light">
-                    We check the raw DNS records for missing <strong>SPF and DMARC</strong> email authentication protocols.
-                  </p>
-                  <div className="p-4 sm:p-5 bg-green-950/30 border-l-2 border-green-400 rounded-r-xl mt-4">
-                    <LiveTelemetryWave isFlat={true} isAlert={false} />
-                    <p className="text-xs sm:text-sm text-green-100 italic leading-relaxed">
-                      "Domain authentication protocols are intact. Lead nurture deliverability is protected and will bypass modern Google/Microsoft spam filters."
-                    </p>
-                  </div>
-                </>
-              ) : (
-                <>
-                  <p className="text-xs sm:text-sm leading-relaxed font-light">
-                    We check the raw DNS records for missing <strong>SPF and DMARC</strong> email authentication protocols.
-                  </p>
-                  <div className="p-4 sm:p-5 bg-cyan-950/30 border-l-2 border-cyan-400 rounded-r-xl mt-4">
-                    <LiveTelemetryWave isFlat={false} isAlert={true} />
-                    <p className="text-xs sm:text-sm text-cyan-100 italic leading-relaxed">
-                      "Your domain is missing basic email security protocols. When a lead signs up for a free trial or downloads your guide, Gmail and Outlook are highly likely sending your automated follow-ups directly to their spam folder. You are paying for leads you cannot legally email."
-                    </p>
-                  </div>
-                </>
-              )}
+              <p className="text-xs sm:text-sm leading-relaxed font-light">
+                We check the raw DNS records for missing <strong>SPF and DMARC</strong> email authentication protocols.
+              </p>
             </div>
           )}
 
           {activeDrawer === 'dom' && (
             <div className="animate-in fade-in duration-500 text-zinc-100 space-y-4">
               <h3 className="text-xl sm:text-2xl font-bold text-white mb-6">DOM Fragility Index</h3>
-              {!isFragile ? (
-                <>
-                  <p className="text-xs sm:text-sm leading-relaxed font-light">
-                    This references Google's official developer thresholds for structural HTML health.
-                  </p>
-                  <div className="p-4 sm:p-5 bg-green-950/30 border-l-2 border-green-400 rounded-r-xl mt-4">
-                    <LiveTelemetryWave isFlat={true} isAlert={false} />
-                    <p className="text-xs sm:text-sm text-green-100 italic leading-relaxed">
-                      "Your website's code is structurally optimized. Only {domSize} elements ensure rapid rendering."
-                    </p>
-                  </div>
-                </>
-              ) : (
-                <>
-                  <p className="text-xs sm:text-sm leading-relaxed font-light">
-                    This references Google's official developer thresholds for structural HTML health.
-                  </p>
-                  <div className="p-4 sm:p-5 bg-cyan-950/30 border-l-2 border-cyan-400 rounded-r-xl mt-4">
-                    <LiveTelemetryWave isFlat={false} isAlert={true} />
-                    <p className="text-xs sm:text-sm text-cyan-100 italic leading-relaxed">
-                      "Your website's code is structurally obese. It forces a mobile phone to download <strong>{domSize}</strong> individual elements just to show a landing page, which drains the user's battery and causes older phones to crash."
-                    </p>
-                  </div>
-                </>
-              )}
+              <p className="text-xs sm:text-sm leading-relaxed font-light">
+                This references Google's official developer thresholds for structural HTML health.
+              </p>
             </div>
           )}
         </div>
