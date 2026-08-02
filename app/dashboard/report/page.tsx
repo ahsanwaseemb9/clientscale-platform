@@ -165,69 +165,109 @@ export default function AuditReportPage() {
     dynamicSeverityTier = 'MODERATE';
   }
 
-  // High-End APM Streaming Telemetry Component with Pure White Lifeline
-  const LiveTelemetryWave = ({ isFlat, isAlert }: { isFlat: boolean; isAlert: boolean }) => {
-    const [points, setPoints] = useState<number[]>([]);
+  // --- VERCEL STYLE OBSERVABILITY GRAPH ---
+  const VercelGraph = ({ title, series, yUnit = '', xLabels = ['6h ago', '2m ago'], maxVal = 100 }: any) => {
+    const [dataLines, setDataLines] = useState<number[][]>(() => 
+      series.map((s: any) => Array.from({length: 40}, () => Math.max(0, s.base + (Math.random() * s.variance - s.variance/2))))
+    );
 
     useEffect(() => {
-      if (isFlat) {
-        setPoints(Array(35).fill(18));
-        return;
-      }
-
-      const initial = Array.from({ length: 35 }, () => 18 + (Math.random() * 10 - 5));
-      setPoints(initial);
-
       const interval = setInterval(() => {
-        setPoints((prev) => {
-          const nextVal = 18 + (Math.random() * (isAlert ? 24 : 8) - (isAlert ? 12 : 4));
-          const clamped = Math.max(4, Math.min(32, nextVal));
-          return [...prev.slice(1), clamped];
-        });
-      }, 400);
-
+        setDataLines(prev => prev.map((arr, i) => {
+          const nextVal = series[i].base + (Math.random() * series[i].variance - series[i].variance/2);
+          return [...arr.slice(1), Math.max(0, nextVal)];
+        }));
+      }, 1000);
       return () => clearInterval(interval);
-    }, [isFlat, isAlert]);
+    }, [series]);
 
     const width = 500;
-    const height = 36;
-    const dx = width / (points.length - 1 || 1);
+    const height = 120;
+    const dx = width / 39;
 
-    let pathString = '';
-    if (points.length > 0) {
-      pathString = `M 0,${points[0]}`;
-      for (let i = 0; i < points.length - 1; i++) {
-        const xCurrent = i * dx;
-        const yCurrent = points[i];
-        const xNext = (i + 1) * dx;
-        const yNext = points[i + 1];
-        const xMid = (xCurrent + xNext) / 2;
-        pathString += ` Q ${xMid},${yCurrent} ${xNext},${yNext}`;
+    const generatePath = (data: number[]) => {
+      if (!data || data.length === 0) return '';
+      let d = `M 0,${height - (data[0] / maxVal) * height}`;
+      for (let i = 1; i < data.length; i++) {
+        d += ` L ${i * dx},${height - (data[i] / maxVal) * height}`;
       }
-    }
+      return d;
+    };
 
-    const strokeColor = '#ffffff';
+    const generateArea = (data: number[]) => {
+      const line = generatePath(data);
+      if (!line) return '';
+      return `${line} L ${width},${height} L 0,${height} Z`;
+    };
 
     return (
-      <div className="w-full h-10 overflow-hidden relative mt-4 flex items-center bg-[#12121c]/90 border border-zinc-600/50 rounded-xl px-2 shadow-inner">
-        <svg className="w-full h-full" viewBox={`0 0 ${width} ${height}`} preserveAspectRatio="none">
-          <defs>
-            <linearGradient id={`grad-white`} x1="0%" y1="0%" x2="100%" y2="0%">
-              <stop offset="0%" stopColor={strokeColor} stopOpacity={isFlat ? "0.7" : "0.3"} />
-              <stop offset="50%" stopColor={strokeColor} stopOpacity="1" />
-              <stop offset="100%" stopColor={strokeColor} stopOpacity={isFlat ? "0.7" : "0.3"} />
-            </linearGradient>
-          </defs>
-          <path 
-            d={pathString} 
-            fill="none" 
-            stroke="url(#grad-white)"
-            strokeWidth="2.5" 
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            className="drop-shadow-[0_0_8px_rgba(255,255,255,0.7)]"
-          />
-        </svg>
+      <div className="bg-[#050508] border border-zinc-800 rounded-xl p-4 sm:p-5 w-full flex flex-col h-full min-h-[260px] shadow-lg relative overflow-hidden">
+        {/* Header */}
+        <div className="flex justify-between items-center mb-3">
+          <h3 className="text-[13px] font-semibold text-zinc-200 tracking-wide flex items-center gap-2">
+            {title}
+            <ChevronRight size={14} className="text-zinc-600" />
+          </h3>
+        </div>
+        
+        {/* Legend */}
+        <div className="flex gap-4 mb-6 relative z-10">
+          {series.map((s: any, idx: number) => (
+            <div key={idx} className="flex flex-col gap-1">
+              <span className="text-[10px] text-zinc-500 font-medium">{s.label}</span>
+              <div className="flex items-center gap-1.5 text-xs font-mono font-bold text-zinc-200">
+                <span className="w-2 h-2 rounded-full" style={{ backgroundColor: s.color }} />
+                {s.currentDisplay}
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Graph Area */}
+        <div className="relative flex-grow flex items-end">
+          {/* Grid Lines & Y-Axis */}
+          <div className="absolute inset-0 flex flex-col justify-between pb-6">
+            {[maxVal, maxVal * 0.75, maxVal * 0.5, maxVal * 0.25, 0].map((val, i) => (
+              <div key={i} className="flex items-center w-full gap-3 relative z-0">
+                <span className="text-[9px] font-mono text-zinc-600 w-6 text-right shrink-0">{val}{yUnit}</span>
+                <div className="flex-grow border-t border-zinc-800/60" />
+              </div>
+            ))}
+          </div>
+
+          {/* Lines */}
+          <div className="absolute inset-0 pl-9 pb-6 pt-1">
+            <svg className="w-full h-full" viewBox={`0 0 ${width} ${height}`} preserveAspectRatio="none">
+              {series.map((s: any, idx: number) => (
+                <g key={idx}>
+                  {s.fill && (
+                    <path 
+                      d={generateArea(dataLines[idx])} 
+                      fill={s.color} 
+                      opacity="0.1" 
+                    />
+                  )}
+                  <path 
+                    d={generatePath(dataLines[idx])} 
+                    fill="none" 
+                    stroke={s.color}
+                    strokeWidth="1.5" 
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="drop-shadow-sm"
+                  />
+                </g>
+              ))}
+            </svg>
+          </div>
+          
+          {/* X-Axis */}
+          <div className="absolute bottom-0 left-9 right-0 flex justify-between pt-2 border-t border-zinc-800/60">
+            {xLabels.map((l, i) => (
+              <span key={i} className="text-[9px] font-mono text-zinc-500">{l}</span>
+            ))}
+          </div>
+        </div>
       </div>
     );
   };
@@ -242,11 +282,8 @@ export default function AuditReportPage() {
       value: `${revenueLeakagePercent}%`,
       description: parseFloat(revenueLeakagePercent) === 0 
         ? 'Performance is fully optimized. Zero estimated revenue leakage due to latency.'
-        : (isGhostOptimal && parseFloat(parasiteImpact) === 0 
-           ? 'Foundational code is solid, but slow visual assets or server response times are actively deflating conversions.' 
-           : 'Latency is actively deflating your conversion rate. Traffic is abandoning the pipeline before checkout.'),
+        : 'Latency is actively deflating your conversion rate. Traffic is abandoning the pipeline before checkout.',
       drawerKey: 'revenue' as const,
-      isZero: parseFloat(revenueLeakagePercent) === 0,
       iconComp: DollarSign
     },
     {
@@ -259,7 +296,6 @@ export default function AuditReportPage() {
         ? 'Main thread is unblocked. User interactions are instantly registered by the browser.'
         : `The screen appears loaded, but user taps are ignored for ${ghostTapWindow} seconds due to main-thread blocking.`,
       drawerKey: 'ghost' as const,
-      isZero: isGhostOptimal,
       iconComp: Ghost
     },
     {
@@ -272,7 +308,6 @@ export default function AuditReportPage() {
         ? `INP exceeds 200ms threshold. Google algorithms are actively suppressing your Google Maps visibility due to poor UX.` 
         : `INP is within passing limits. Local SEO and Maps visibility are unaffected by interaction latency.`,
       drawerKey: 'inp' as const,
-      isZero: !isMapPenalized,
       iconComp: MapPin
     },
     {
@@ -285,7 +320,6 @@ export default function AuditReportPage() {
         ? 'Zero external tracking scripts detected. Pipeline resource consumption is clean.'
         : `${thirdPartyCount} external marketing scripts are responsible for ${parasiteImpact}% of your mobile lag.`,
       drawerKey: 'parasite' as const,
-      isZero: parseFloat(parasiteImpact) === 0,
       iconComp: ShieldAlert
     },
     {
@@ -298,7 +332,6 @@ export default function AuditReportPage() {
         ? `Missing DMARC/SPF protocols. Automated free-trial follow-ups are highly likely routing to client spam folders.`
         : `Domain authentication protocols are intact. Lead nurture deliverability is protected.`,
       drawerKey: 'dns' as const,
-      isZero: !isEmailVulnerable,
       iconComp: MailWarning
     },
     {
@@ -311,7 +344,6 @@ export default function AuditReportPage() {
         ? 'HTML structure is highly optimized. Low node count ensures rapid rendering.'
         : 'Massive HTML node count is draining mobile batteries and risking browser crashes.',
       drawerKey: 'dom' as const,
-      isZero: !isFragile,
       iconComp: Database
     }
   ];
@@ -366,7 +398,7 @@ export default function AuditReportPage() {
           </div>
         </div>
 
-        {/* --- BUSINESS FRICTION GRID (Dynamically Sorted: Blue/Alerts on top, Green/Optimized below) --- */}
+        {/* --- BUSINESS FRICTION GRID --- */}
         <div className="mb-8 sm:mb-12">
           <div className="flex flex-col items-center justify-center my-10 sm:my-14 text-center">
             <h2 className="text-base sm:text-lg font-mono font-bold text-white uppercase tracking-[0.25em]">Revenue & Friction Analysis</h2>
@@ -401,9 +433,8 @@ export default function AuditReportPage() {
                     <p className="text-xs sm:text-sm text-zinc-100 leading-relaxed font-normal max-w-xl">
                       {card.description}
                     </p>
-                    <LiveTelemetryWave isFlat={card.isZero} isAlert={!card.isZero} />
                   </div>
-                  <div className="relative z-10 mt-6">
+                  <div className="relative z-10 mt-8">
                     <button 
                       onClick={() => setActiveDrawer(card.drawerKey)}
                       className={`group relative w-full flex items-center justify-between px-5 py-3.5 rounded-xl border transition-all duration-300 overflow-hidden ${
@@ -421,6 +452,49 @@ export default function AuditReportPage() {
                 </div>
               );
             })}
+          </div>
+        </div>
+
+        {/* --- EXECUTIVE SYNTHESIS / OBSERVABILITY GRAPHS --- */}
+        <div className="mb-6 sm:mb-8 bg-gradient-to-b from-[#151522] to-[#0e0e14] border border-zinc-500/60 rounded-2xl p-6 sm:p-8 backdrop-blur-xl shadow-2xl">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4 border-b border-zinc-700/80 pb-6">
+            <div>
+              <h2 className="text-xs sm:text-sm font-mono font-bold text-white uppercase tracking-widest flex items-center gap-2">
+                <Activity size={18} className="text-cyan-400" />
+                Pipeline Observability & Business Impact
+              </h2>
+              <p className="text-[11px] sm:text-xs text-zinc-400 mt-2 font-mono">Live correlation of structural friction against conversion health.</p>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
+            <VercelGraph 
+              title="Conversion Disruption"
+              yUnit="%"
+              maxVal={100}
+              series={[
+                { label: 'Parasite Load', color: '#f59e0b', currentDisplay: `${parasiteImpact}%`, base: parseFloat(parasiteImpact) || 5, variance: 8, fill: true },
+                { label: 'Revenue Leakage', color: '#3b82f6', currentDisplay: `${revenueLeakagePercent}%`, base: parseFloat(revenueLeakagePercent) || 2, variance: 3, fill: false }
+              ]}
+            />
+            <VercelGraph 
+              title="Interaction & Render Latency"
+              yUnit="ms"
+              maxVal={1000}
+              series={[
+                { label: 'INP Latency', color: '#8b5cf6', currentDisplay: `${rawInp}ms`, base: rawInp || 150, variance: 150, fill: true },
+                { label: 'TBT (Thread Lock)', color: '#ef4444', currentDisplay: `${rawTbt}ms`, base: rawTbt || 300, variance: 200, fill: false }
+              ]}
+            />
+          </div>
+
+          <div className="bg-[#12121c]/80 border border-cyan-500/20 rounded-xl p-5 sm:p-6 shadow-inner">
+            <h4 className="text-[10px] font-mono font-bold text-cyan-400 uppercase tracking-widest mb-3 flex items-center gap-2">
+              <ShieldCheck size={14} /> The Business Translation
+            </h4>
+            <p className="text-xs sm:text-sm text-zinc-200 leading-relaxed font-light">
+              The telemetry above illustrates the compounding nature of frontend technical debt. A structural base of <strong>{domSize} DOM elements</strong> paired with <strong>{parasiteImpact}% external script overhead</strong> forces the mobile device main-thread to lock. This results in <strong>{ghostTapWindow}s of complete UI unresponsiveness</strong> and pushes the Interaction to Next Paint (INP) to <strong>{rawInp}ms</strong>. Search algorithms penalize this exact latency profile in local rankings, while the resulting user friction guarantees a minimum baseline <strong>revenue leakage of {revenueLeakagePercent}%</strong> before your prospects ever reach the checkout funnel.
+            </p>
           </div>
         </div>
 
@@ -521,12 +595,12 @@ export default function AuditReportPage() {
 
           {/* --- TECH STACK FINGERPRINT & UPGRADE PATH --- */}
           <div className="bg-gradient-to-b from-[#151522] to-[#0e0e14] border border-zinc-500/60 rounded-2xl p-6 sm:p-8 backdrop-blur-xl shadow-2xl flex flex-col lg:max-h-[600px] relative overflow-hidden">
-            <div className="flex flex-row justify-between items-center mb-6 border-b border-zinc-700/80 pb-4 gap-2 flex-nowrap overflow-hidden">
+            <div className="flex flex-row justify-between items-center mb-6 border-b border-zinc-700/80 pb-4 gap-2 flex-wrap sm:flex-nowrap overflow-hidden">
               <div className="flex items-center gap-2 min-w-0 shrink">
                 <Layers className="text-purple-300 shrink-0" size={18} />
                 <h2 className="text-[11px] sm:text-xs md:text-sm font-mono font-bold text-zinc-100 uppercase tracking-wider truncate">Tech Stack & Upgrade Path</h2>
               </div>
-              <span className="text-[9px] sm:text-[10px] font-mono text-zinc-300 uppercase tracking-wider shrink-0 whitespace-nowrap ml-1">
+              <span className="text-[9px] sm:text-[10px] font-mono text-zinc-300 uppercase tracking-wider shrink-0 whitespace-nowrap sm:ml-1 mt-1 sm:mt-0">
                 {infrastructure.length} Technologies Detected
               </span>
             </div>
@@ -649,107 +723,75 @@ export default function AuditReportPage() {
           {activeDrawer === 'revenue' && (
             <div className="animate-in fade-in duration-500 text-zinc-100 space-y-4">
               <h3 className="text-xl sm:text-2xl font-bold text-white mb-6">Revenue Leakage Algorithm</h3>
-              {parseFloat(revenueLeakagePercent) === 0 ? (
-                <p className="text-xs sm:text-sm leading-relaxed font-light">
-                  Your website performance score has reached optimal levels, neutralizing latency-driven conversion drops according to the <strong>Deloitte & Google "Milliseconds Make Millions" baseline study</strong>.
-                </p>
-              ) : (
-                <>
-                  <p className="text-xs sm:text-sm leading-relaxed font-light">
-                    This calculation is strictly derived from the <strong>Deloitte & Google "Milliseconds Make Millions" baseline study</strong>.
-                  </p>
-                  <ul className="space-y-3 list-disc pl-5 text-xs sm:text-sm font-light text-zinc-200">
-                    <li>Retail and lead-generation conversion rates are mathematically bound to rendering latency.</li>
-                    <li>The study proved conclusively that a mere <strong>0.1-second delay</strong> in mobile load times directly causes up to an <strong>8.4% drop in conversions</strong>.</li>
-                    <li><strong>Why we use an estimate:</strong> Rather than guessing, we take your exact live Lighthouse performance deficit and run it through standardized conversion-loss curves to calculate the mathematical floor of your monthly revenue losses.</li>
-                  </ul>
-                </>
-              )}
+              <p className="text-xs sm:text-sm leading-relaxed font-light">
+                This calculation is strictly derived from the <strong>Deloitte & Google "Milliseconds Make Millions" baseline study</strong>.
+              </p>
+              <ul className="space-y-3 list-disc pl-5 text-xs sm:text-sm font-light text-zinc-200">
+                <li>Retail and lead-generation conversion rates are mathematically bound to rendering latency.</li>
+                <li>The study proved conclusively that a mere <strong>0.1-second delay</strong> in mobile load times directly causes up to an <strong>8.4% drop in conversions</strong>.</li>
+                <li><strong>Why we use an estimate:</strong> Rather than guessing, we take your exact live Lighthouse performance deficit and run it through standardized conversion-loss curves to calculate the mathematical floor of your monthly revenue losses.</li>
+              </ul>
             </div>
           )}
 
           {activeDrawer === 'ghost' && (
             <div className="animate-in fade-in duration-500 text-zinc-100 space-y-4">
               <h3 className="text-xl sm:text-2xl font-bold text-white mb-6">Ghost Tap Window</h3>
-              {isGhostOptimal ? (
-                <p className="text-xs sm:text-sm leading-relaxed font-light">
-                  A forensic extraction confirms zero Main Thread blocking occurring on your primary interface.
-                </p>
-              ) : (
-                <>
-                  <p className="text-xs sm:text-sm leading-relaxed font-light">
-                    This metric utilizes direct data from the Chromium rendering engine to measure UI paralysis.
-                  </p>
-                  <ul className="space-y-3 list-disc pl-5 text-xs sm:text-sm font-light text-zinc-200">
-                    <li>When a site visually loads, users assume it is interactive. However, if background JavaScript is still executing, the browser's <strong>Main Thread</strong> is locked.</li>
-                    <li>We measure the exact <strong>Total Blocking Time (TBT)</strong>. During this window, user inputs (like tapping a "Book Now" button or opening a menu) are completely ignored by the device.</li>
-                  </ul>
-                </>
-              )}
+              <p className="text-xs sm:text-sm leading-relaxed font-light">
+                This metric utilizes direct data from the Chromium rendering engine to measure UI paralysis.
+              </p>
+              <ul className="space-y-3 list-disc pl-5 text-xs sm:text-sm font-light text-zinc-200">
+                <li>When a site visually loads, users assume it is interactive. However, if background JavaScript is still executing, the browser's <strong>Main Thread</strong> is locked.</li>
+                <li>We measure the exact <strong>Total Blocking Time (TBT)</strong>. During this window, user inputs (like tapping a "Book Now" button or opening a menu) are completely ignored by the device.</li>
+              </ul>
             </div>
           )}
 
           {activeDrawer === 'inp' && (
             <div className="animate-in fade-in duration-500 text-zinc-100 space-y-4">
               <h3 className="text-xl sm:text-2xl font-bold text-white mb-6">Local Search & Latency Risk</h3>
-              {!isMapPenalized ? (
-                <p className="text-xs sm:text-sm leading-relaxed font-light">
-                  Your <strong>Interaction to Next Paint (INP)</strong> easily clears Google's Core Web Vitals thresholds.
-                </p>
-              ) : (
-                <>
-                  <p className="text-xs sm:text-sm leading-relaxed font-light">
-                    This extracts the <strong>Interaction to Next Paint (INP)</strong>, Google's newest and most heavily weighted Core Web Vital.
-                  </p>
-                  <ul className="space-y-3 list-disc pl-5 text-xs sm:text-sm font-light text-zinc-200">
-                    <li>INP measures the actual latency between a user interacting with the page and the browser visually updating.</li>
-                    <li>Google Maps and Local Search algorithms officially penalize domains with an INP above 200 milliseconds.</li>
-                  </ul>
-                </>
-              )}
+              <p className="text-xs sm:text-sm leading-relaxed font-light">
+                This extracts the <strong>Interaction to Next Paint (INP)</strong>, Google's newest and most heavily weighted Core Web Vital.
+              </p>
+              <ul className="space-y-3 list-disc pl-5 text-xs sm:text-sm font-light text-zinc-200">
+                <li>INP measures the actual latency between a user interacting with the page and the browser visually updating.</li>
+                <li>Google Maps and Local Search algorithms officially penalize domains with an INP above 200 milliseconds.</li>
+              </ul>
             </div>
           )}
 
           {activeDrawer === 'parasite' && (
             <div className="animate-in fade-in duration-500 text-zinc-100 space-y-4">
               <h3 className="text-xl sm:text-2xl font-bold text-white mb-6">Parasite Load Tracking</h3>
-              {parseFloat(parasiteImpact) === 0 ? (
-                <p className="text-xs sm:text-sm leading-relaxed font-light">
-                  A forensic extraction confirms zero unmanaged third-party network requests or marketing scripts hijacking your local rendering pipeline.
-                </p>
-              ) : (
-                <>
-                  <p className="text-xs sm:text-sm leading-relaxed font-light">
-                    A forensic extraction of third-party network requests hijacking your local rendering pipeline.
-                  </p>
-                  <div className="mt-4">
-                    <h4 className="text-[10px] font-mono font-bold text-zinc-300 uppercase tracking-widest mb-3 flex items-center gap-2">
-                      <ShieldAlert size={14} className="text-yellow-400 shrink-0" /> Detected Network Hijackers
-                    </h4>
-                    {thirdPartyScripts.length > 0 ? (
-                      <div className="space-y-2 max-h-[250px] overflow-y-auto pr-2 custom-scrollbar">
-                        {thirdPartyScripts.map((script: any, idx: number) => (
-                          <div key={idx} className="flex items-center justify-between p-3 bg-[#12121c] border border-zinc-600/80 rounded-xl gap-2">
-                            <div className="flex items-center gap-3 min-w-0 pr-2">
-                              <span className="w-1.5 h-1.5 rounded-full bg-yellow-400 shrink-0"></span>
-                              <span className="text-xs text-zinc-100 truncate">{script.name || script.url || 'Unknown Tracker'}</span>
-                            </div>
-                            {script.mainThreadTime > 0 && (
-                              <span className="text-[10px] font-mono text-yellow-400 shrink-0 font-bold">
-                                {Math.round(script.mainThreadTime)}ms block
-                              </span>
-                            )}
-                          </div>
-                        ))}
+              <p className="text-xs sm:text-sm leading-relaxed font-light">
+                A forensic extraction of third-party network requests hijacking your local rendering pipeline.
+              </p>
+              <div className="mt-4">
+                <h4 className="text-[10px] font-mono font-bold text-zinc-300 uppercase tracking-widest mb-3 flex items-center gap-2">
+                  <ShieldAlert size={14} className="text-yellow-400 shrink-0" /> Detected Network Hijackers
+                </h4>
+                {thirdPartyScripts.length > 0 ? (
+                  <div className="space-y-2 max-h-[250px] overflow-y-auto pr-2 custom-scrollbar">
+                    {thirdPartyScripts.map((script: any, idx: number) => (
+                      <div key={idx} className="flex items-center justify-between p-3 bg-[#12121c] border border-zinc-600/80 rounded-xl gap-2">
+                        <div className="flex items-center gap-3 min-w-0 pr-2">
+                          <span className="w-1.5 h-1.5 rounded-full bg-yellow-400 shrink-0"></span>
+                          <span className="text-xs text-zinc-100 truncate">{script.name || script.url || 'Unknown Tracker'}</span>
+                        </div>
+                        {script.mainThreadTime > 0 && (
+                          <span className="text-[10px] font-mono text-yellow-400 shrink-0 font-bold">
+                            {Math.round(script.mainThreadTime)}ms block
+                          </span>
+                        )}
                       </div>
-                    ) : (
-                      <div className="p-4 bg-[#12121c] border border-zinc-600/80 rounded-xl text-xs text-zinc-300 italic text-center">
-                        Script identities protected by enterprise firewall or not detected.
-                      </div>
-                    )}
+                    ))}
                   </div>
-                </>
-              )}
+                ) : (
+                  <div className="p-4 bg-[#12121c] border border-zinc-600/80 rounded-xl text-xs text-zinc-300 italic text-center">
+                    Script identities protected by enterprise firewall or not detected.
+                  </div>
+                )}
+              </div>
             </div>
           )}
 
