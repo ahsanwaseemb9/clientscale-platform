@@ -163,9 +163,9 @@ export default function Home() {
             <DecryptedLogo text="Client Scale Systems" />
           </div>
 
-          <div className="text-zinc-300 text-sm md:text-base tracking-wider max-w-[90vw] sm:max-w-2xl mx-auto pt-0 leading-relaxed px-4 antialiased font-light uppercase">
+          <div className="text-zinc-300 text-sm md:text-base tracking-wider max-w-[90vw] sm:max-w-2xl mx-auto pt-0 leading-relaxed px-4 antialiased font-light">
             <span className="font-mono block sm:inline whitespace-normal sm:whitespace-nowrap">
-              We turn <span className="text-cyan-400 font-semibold drop-shadow-[0_0_15px_rgba(6,182,212,0.4)] normal-case">Websites into</span> <span className="text-blue-400 font-semibold drop-shadow-[0_0_15px_rgba(59,130,246,0.4)] normal-case">Client Acquisition Machines</span>
+              We Turn <span className="text-cyan-400 font-semibold drop-shadow-[0_0_15px_rgba(6,182,212,0.4)]">Websites into</span> <span className="text-blue-400 font-semibold drop-shadow-[0_0_15px_rgba(59,130,246,0.4)]">Client Acquisition Machines</span>
             </span>
           </div>
         </div>
