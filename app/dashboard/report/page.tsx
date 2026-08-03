@@ -118,6 +118,11 @@ export default function AuditReportPage() {
   const ghostTapWindow = (rawTbt / 1000).toFixed(1); 
   const isGhostOptimal = parseFloat(ghostTapWindow) === 0;
 
+  // --- DYNAMIC Y-AXIS SCALER ---
+  // Automatically bounds the graph to the highest latency metric to prevent clipping
+  const maxLatencyValue = Math.max(rawInp, rawTbt);
+  const dynamicLatencyYAxis = Math.max(1000, Math.ceil((maxLatencyValue + 300) / 400) * 400);
+
   const parasiteImpact = Math.min(95, (thirdPartyCount * 12)).toFixed(0);
   
   let fallbackDomNodes = 1200;
@@ -530,7 +535,7 @@ export default function AuditReportPage() {
             <VercelGraph 
               title="Interaction & Render Latency"
               yUnit="ms"
-              maxVal={1000}
+              maxVal={dynamicLatencyYAxis} // Dynamic Scaling Applied
               series={[
                 { label: 'INP Latency', color: '#8b5cf6', currentDisplay: `${rawInp}ms`, base: rawInp || 150, variance: 150, fill: true },
                 { label: 'TBT (Thread Lock)', color: '#ef4444', currentDisplay: `${rawTbt}ms`, base: rawTbt || 300, variance: 200, fill: false }
