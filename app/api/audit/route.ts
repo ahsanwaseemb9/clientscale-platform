@@ -1,17 +1,17 @@
 import { NextResponse } from 'next/server';
 
+// 1. OVERRIDE SERVERLESS TIMEOUT LIMITS (Set to 60 seconds)
+export const maxDuration = 60;
+export const dynamic = 'force-dynamic';
+
 // @ts-ignore
 import { Wappalyzer, technologies, categories } from 'wapalyzer-core';
-
-// Import the newly created forensic modules
 import { auditDomainSecurity } from '../../lib/audit/dns';
 import { auditHtmlMetadata } from '../../lib/audit/html';
 
-// Initialize the local analysis engine
 Wappalyzer.setTechnologies(technologies);
 Wappalyzer.setCategories(categories);
 
-// CUSTOM FORENSIC DETECTOR
 function detectNextJs(html: string, headers: Record<string, string[]>) {
   const hasHeader = headers['x-powered-by']?.some(h => h.includes('Next.js'));
   const hasNextPath = html.includes('/_next/static/');
@@ -22,62 +22,40 @@ function detectNextJs(html: string, headers: Record<string, string[]>) {
     : null;
 }
 
-// LEAKAGE RISK ALGORITHM
-function calculateLeakageRisk(
-  inpString: string, 
-  tbtString: string, 
-  altCompliance: number, 
-  securityRisk: string,
-  scriptCount: number
-) {
+function calculateLeakageRisk(inpString: string, tbtString: string, altCompliance: number, securityRisk: string, scriptCount: number) {
   let riskScore = 0;
   const leakageFactors = [];
 
-  // 1. Speed Friction (Parses numbers from "150 ms")
-  const inpMatch = inpString.match(/\d+/);
-  const tbtMatch = tbtString.match(/\d+/);
+  const inpMatch = String(inpString).match(/\d+/);
+  const tbtMatch = String(tbtString).match(/\d+/);
   
-  if (inpMatch) {
+  if (inpMatch && inpString !== 'N/A') {
     const inp = parseInt(inpMatch[0], 10);
-    if (inp > 500) { 
-      riskScore += 40; 
-      leakageFactors.push("Severe interaction delay (INP >500ms)"); 
-    } else if (inp > 200) { 
-      riskScore += 25; 
-      leakageFactors.push("Noticeable input lag (INP >200ms)"); 
-    }
-  } else if (tbtMatch) {
+    if (inp > 500) { riskScore += 40; leakageFactors.push("Severe interaction delay (INP >500ms)"); } 
+    else if (inp > 200) { riskScore += 25; leakageFactors.push("Noticeable input lag (INP >200ms)"); }
+  } else if (tbtMatch && tbtString !== 'N/A') {
     const tbt = parseInt(tbtMatch[0], 10);
-    if (tbt > 600) { 
-      riskScore += 30; 
-      leakageFactors.push("High main-thread blocking"); 
-    } else if (tbt > 200) { 
-      riskScore += 15; 
-      leakageFactors.push("Moderate thread blocking"); 
-    }
+    if (tbt > 600) { riskScore += 30; leakageFactors.push("High main-thread blocking"); } 
+    else if (tbt > 200) { riskScore += 15; leakageFactors.push("Moderate thread blocking"); }
   }
 
-  // 2. Accessibility Friction
   if (altCompliance < 100) {
     const penalty = Math.min(20, Math.round((100 - altCompliance) * 0.4));
     riskScore += penalty;
     if (penalty >= 10) leakageFactors.push("Significant accessibility barriers");
   }
 
-  // 3. Security / Marketing Funnel Friction
   if (securityRisk === 'HIGH') {
     riskScore += 25;
     leakageFactors.push("Email deliverability risk (Missing SPF/DMARC)");
   }
 
-  // 4. Bloat / Distraction Friction
   if (scriptCount > 5) {
     const penalty = Math.min(15, Math.round(scriptCount * 1.5));
     riskScore += penalty;
     if (penalty >= 10) leakageFactors.push("Excessive third-party script bloat");
   }
 
-  // Normalize to a 0-100 scale
   riskScore = Math.min(100, riskScore);
   
   let riskTier = "OPTIMIZED";
@@ -88,6 +66,23 @@ function calculateLeakageRisk(
   return { riskScore, riskTier, leakageFactors };
 }
 
+const fetchWithTimeout = async (promise: Promise<any>, ms: number, fallbackValue: any, serviceName: string) => {
+  let timeoutId: NodeJS.Timeout;
+  const timeoutPromise = new Promise((_, reject) => {
+    timeoutId = setTimeout(() => { reject(new Error(`Timeout after ${ms}ms`)); }, ms);
+  });
+
+  try {
+    const result = await Promise.race([promise, timeoutPromise]);
+    clearTimeout(timeoutId!);
+    return result;
+  } catch (error: any) {
+    clearTimeout(timeoutId!);
+    console.warn(`[Timeout/Error Caught in ${serviceName}]:`, error.message);
+    return fallbackValue;
+  }
+};
+
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const rawUrl = searchParams.get('url');
@@ -97,30 +92,51 @@ export async function GET(request: Request) {
   const hostname = new URL(targetUrl).hostname;
 
   try {
-    // 1. Fetch Raw Page Data & DNS Security concurrently
-    const [targetResponse, dnsResult] = await Promise.all([
-      fetch(targetUrl, { headers: { 'User-Agent': 'ClientScale-Forensic-Engine/1.0' } }),
-      auditDomainSecurity(hostname)
-    ]);
-    
-    const htmlText = await targetResponse.text();
+    let targetResponse;
+    try {
+      targetResponse = await fetch(targetUrl, { headers: { 'User-Agent': 'ClientScale-Forensic-Engine/1.0' } });
+    } catch (e) {
+      return NextResponse.json({ error: 'Target domain firewalls blocked diagnostic sweep.' }, { status: 502 });
+    }
+
+    const dnsResult = await auditDomainSecurity(hostname);
+    const htmlText = await targetResponse.text() || '';
     const serverHeaders: Record<string, string[]> = {};
     targetResponse.headers.forEach((value, key) => { serverHeaders[key] = [value]; });
 
-    // 2. Run Wappalyzer and PageSpeed Sweeps in parallel
-    const googleApiKey = "AIzaSyCUJORk1Q4OyTQZu-MeIEZXescMJYuxa_k";
+    const googleApiKey = process.env.GOOGLE_PAGESPEED_API_KEY || "AIzaSyCUJORk1Q4OyTQZu-MeIEZXescMJYuxa_k";
     const pageSpeedUrl = `https://www.googleapis.com/pagespeedonline/v5/runPagespeed?url=${encodeURIComponent(targetUrl)}&strategy=mobile&key=${googleApiKey}`;
     
     const [techDetections, pageSpeedRes] = await Promise.all([
-      Wappalyzer.analyze({ url: targetUrl, headers: serverHeaders, html: htmlText, meta: {}, scriptSrc: [] }),
-      fetch(pageSpeedUrl).then(res => res.json()).catch(() => null)
+      fetchWithTimeout(
+        Wappalyzer.analyze({ url: targetUrl, headers: serverHeaders, html: htmlText, meta: {}, scriptSrc: [] }),
+        25000, 
+        [],
+        "Wappalyzer"
+      ),
+      // 2. EXPLICIT ERROR LOGGING FOR GOOGLE API
+      fetchWithTimeout(
+        fetch(pageSpeedUrl).then(async (res) => {
+          if (!res.ok) {
+            console.error(`PageSpeed HTTP Error: ${res.status} ${res.statusText}`);
+            return null;
+          }
+          const data = await res.json();
+          if (data.error) {
+            console.error(`PageSpeed API Internal Error:`, data.error);
+            return null;
+          }
+          return data;
+        }),
+        25000,
+        null,
+        "Google PageSpeed"
+      )
     ]);
 
-    // 3. Process the Local HTML analysis
     const htmlAudit = auditHtmlMetadata(htmlText);
-    const lighthouse = pageSpeedRes?.lighthouseResult;
+    const lighthouse = pageSpeedRes?.lighthouseResult || null;
 
-    // Sanitize infrastructure data
     let cleanInfrastructure = Array.isArray(techDetections)
       ? techDetections.map((item: any) => ({
           name: (item.technology || item).name || 'Unknown',
@@ -130,22 +146,15 @@ export async function GET(request: Request) {
       : [];
 
     const nextJsMatch = detectNextJs(htmlText, serverHeaders);
-    if (nextJsMatch && !cleanInfrastructure.find(t => t.name === "Next.js")) {
-      cleanInfrastructure.push(nextJsMatch);
-    }
+    if (nextJsMatch && !cleanInfrastructure.find((t: any) => t.name === "Next.js")) cleanInfrastructure.push(nextJsMatch);
 
-    // 4. Construct Unified Payload & Calculate Leakage
     const tbtValue = lighthouse?.audits?.['total-blocking-time']?.displayValue || 'N/A';
     const inpValue = pageSpeedRes?.loadingExperience?.metrics?.INTERACTION_TO_NEXT_PAINT?.percentile 
       ? `${pageSpeedRes.loadingExperience.metrics.INTERACTION_TO_NEXT_PAINT.percentile} ms` 
       : 'N/A';
 
     const leakageData = calculateLeakageRisk(
-      inpValue,
-      tbtValue,
-      htmlAudit.accessibility.altComplianceScore,
-      dnsResult.riskLevel,
-      htmlAudit.thirdPartyScriptCount
+      inpValue, tbtValue, htmlAudit.accessibility.altComplianceScore, dnsResult.riskLevel, htmlAudit.thirdPartyScriptCount
     );
 
     const unifiedPayload = {
@@ -156,13 +165,8 @@ export async function GET(request: Request) {
       metaAndSocial: htmlAudit.socialPreview,
       accessibility: htmlAudit.accessibility,
       diagnostics: {
-        performanceScore: lighthouse?.categories?.performance?.score 
-          ? Math.round(lighthouse.categories.performance.score * 100) 
-          : null,
-        latency: {
-          tbt: tbtValue,
-          inp: inpValue,
-        },
+        performanceScore: lighthouse?.categories?.performance?.score ? Math.round(lighthouse.categories.performance.score * 100) : null, 
+        latency: { tbt: tbtValue, inp: inpValue },
         thirdPartyScriptCount: htmlAudit.thirdPartyScriptCount,
       },
       infrastructure: cleanInfrastructure,
@@ -175,8 +179,8 @@ export async function GET(request: Request) {
 
     return NextResponse.json(unifiedPayload, { status: 200 });
 
-  } catch (error) {
-    console.error('Diagnostic Error:', error);
+  } catch (error: any) {
+    console.error('Diagnostic Error:', error.message);
     return NextResponse.json({ error: 'Sweep failed' }, { status: 500 });
   }
 }
