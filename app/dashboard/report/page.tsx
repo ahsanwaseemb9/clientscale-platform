@@ -439,29 +439,60 @@ export default function AuditReportPage() {
   frictionCards.sort((a, b) => (a.isGreen === b.isGreen ? 0 : a.isGreen ? 1 : -1));
 
   // --- HYPER-DYNAMIC BUSINESS TRANSLATION GENERATOR ---
+  
+  // 1. Determine Business Archetype based on Technical Footprint
+  let industryTerms = {
+    action: 'prospects ever reach the conversion funnel',
+    scale: 'digital pipeline',
+    penalty: 'organic search visibility'
+  };
+
+  if (rawDomNodes > 1800 || thirdPartyCount >= 7) {
+    // Enterprise / eCommerce Retailer (e.g., Currys)
+    industryTerms = {
+      action: 'high-intent shoppers ever reach the checkout cart',
+      scale: 'enterprise catalog',
+      penalty: 'competitive retail search rankings'
+    };
+  } else if (rawDomNodes > 800) {
+    // Mid-Market / B2B SaaS / Large Agency
+    industryTerms = {
+      action: 'qualified leads can complete the onboarding flow',
+      scale: 'lead acquisition engine',
+      penalty: 'B2B search visibility'
+    };
+  } else {
+    // Boutique / Local Business
+    industryTerms = {
+      action: 'potential clients can complete a booking or inquiry',
+      scale: 'brand storefront',
+      penalty: 'local map packs and mobile search'
+    };
+  }
+
   let dynamicSynthesis = '';
   
   if (parseFloat(revenueLeakagePercent) === 0 && isGhostOptimal && !isMapPenalized && !isFragile && parseFloat(parasiteImpact) === 0) {
-    dynamicSynthesis = `The telemetry above confirms a perfectly optimized frontend architecture. A streamlined base of ${domSize} DOM elements and zero external script overhead keeps the mobile device main-thread completely unblocked. This results in instant UI responsiveness and an exceptional Interaction to Next Paint (INP) of ${rawInp}ms. Search algorithms reward this performance, ensuring zero estimated revenue leakage from technical bottlenecks.`;
+    dynamicSynthesis = `The telemetry above confirms a perfectly optimized frontend architecture for this ${industryTerms.scale}. A streamlined base of ${domSize} DOM elements and zero external script overhead keeps the mobile device main-thread completely unblocked. This results in instant UI responsiveness and an exceptional Interaction to Next Paint (INP) of ${rawInp}ms. Search algorithms reward this performance, ensuring zero estimated revenue leakage from technical bottlenecks.`;
   } else {
     const sentence1 = isFragile 
-      ? `A heavy structural base of ${domSize} DOM elements` 
-      : `A structural base of ${domSize} DOM elements`;
+      ? `Operating at ${industryTerms.scale} scale, a heavy structural base of ${domSize} DOM elements` 
+      : `For this ${industryTerms.scale}, a structural base of ${domSize} DOM elements`;
       
     const sentence2 = parseFloat(parasiteImpact) > 0 
-      ? ` paired with ${parasiteImpact}% external script overhead` 
+      ? ` paired with a ${parasiteImpact}% external marketing script overhead` 
       : ``;
       
     const sentence3 = !isGhostOptimal 
-      ? ` forces the mobile device main-thread to lock, resulting in ${ghostTapWindow}s of complete UI unresponsiveness.` 
-      : ` is currently maintaining an unblocked main-thread for instant tap responsiveness.`;
+      ? ` actively chokes the mobile device's CPU, resulting in a "Thread Lock" that causes ${ghostTapWindow}s of complete UI paralysis where user taps are completely ignored.` 
+      : ` is currently maintaining an unblocked main-thread, allowing for instant tap responsiveness.`;
 
     const sentence4 = isMapPenalized 
-      ? ` However, the Interaction to Next Paint (INP) sits at ${rawInp}ms, which search algorithms actively penalize in local rankings.` 
-      : ` The Interaction to Next Paint (INP) sits at a healthy ${rawInp}ms.`;
+      ? ` Furthermore, the Interaction to Next Paint (INP) sits at a sluggish ${rawInp}ms, a direct violation of Google's Core Web Vitals that actively suppresses ${industryTerms.penalty}.` 
+      : ` Fortunately, the Interaction to Next Paint (INP) sits at a healthy ${rawInp}ms, protecting ${industryTerms.penalty}.`;
       
     const sentence5 = parseFloat(revenueLeakagePercent) > 0 
-      ? ` The compounding nature of this technical friction guarantees a minimum baseline revenue leakage of ${revenueLeakagePercent}% before prospects ever reach the checkout funnel.`
+      ? ` The compounding severity of this technical friction guarantees a minimum baseline revenue leakage of ${revenueLeakagePercent}%—hemorrhaging capital before ${industryTerms.action}.`
       : ` Despite some structural warnings, baseline rendering is fast enough to currently estimate zero direct revenue leakage.`;
 
     dynamicSynthesis = `${sentence1}${sentence2}${sentence3}${sentence4}${sentence5}`;
