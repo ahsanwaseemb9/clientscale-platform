@@ -93,10 +93,20 @@ export default function AuditReportPage() {
     );
   }
 
+  // --- DEFENSIVE DATA SANITIZER (THE BOUNCER) ---
+  // Guaranteed to return a valid number, completely preventing NaN SVG crashes
+  const safeExtractNumber = (val: any, fallback: number): number => {
+    if (val === null || val === undefined || val === 'N/A') return fallback;
+    const parsed = parseInt(String(val).replace(/[^0-9-]/g, ''), 10);
+    return isNaN(parsed) ? fallback : Math.max(0, parsed); // Prevent negative math errors
+  };
+
   // --- BUSINESS FRICTION ALGORITHMS ---
-  const perfScore = auditData?.diagnostics?.performanceScore || 50;
-  const rawTbt = parseInt(auditData?.diagnostics?.latency?.tbt?.replace(/[^0-9]/g, '') || '800');
-  const thirdPartyCount = auditData?.diagnostics?.thirdPartyScriptCount || 0;
+  const perfScore = safeExtractNumber(auditData?.diagnostics?.performanceScore, 50);
+  const rawTbt = safeExtractNumber(auditData?.diagnostics?.latency?.tbt, 800);
+  const rawInp = safeExtractNumber(auditData?.diagnostics?.latency?.inp, 340);
+  const thirdPartyCount = safeExtractNumber(auditData?.diagnostics?.thirdPartyScriptCount, 0);
+
   const thirdPartyScripts = auditData?.diagnostics?.thirdPartyScripts?.length > 0 
     ? auditData.diagnostics.thirdPartyScripts 
     : Array.from({ length: thirdPartyCount > 0 ? thirdPartyCount : 5 }, (_, i) => ({
@@ -109,7 +119,6 @@ export default function AuditReportPage() {
         mainThreadTime: Math.floor(Math.random() * 450) + 120
       }));
 
-  const rawInp = parseInt(auditData?.diagnostics?.latency?.inp?.replace(/[^0-9]/g, '') || '340');
   const isMapPenalized = rawInp > 200;
   const hasDmarc = auditData?.security?.dmarcConfigured === true; 
   const isEmailVulnerable = !hasDmarc;
@@ -135,23 +144,23 @@ export default function AuditReportPage() {
   }
   fallbackDomNodes += (thirdPartyCount * 15); 
 
-  const rawDomNodes = auditData?.diagnostics?.domElements || fallbackDomNodes;
+  const rawDomNodes = safeExtractNumber(auditData?.diagnostics?.domElements, fallbackDomNodes);
   const domSize = rawDomNodes.toLocaleString();
   const isFragile = rawDomNodes > 800;
 
-  const infrastructure = auditData?.infrastructure || [];
+  const infrastructure = Array.isArray(auditData?.infrastructure) ? auditData.infrastructure : [];
   const funnel = auditData?.conversionFunnel || {};
   const meta = auditData?.metaAndSocial || {};
   const a11y = auditData?.accessibility || {};
-  const missingAltList = a11y.missingAltImages?.length > 0 
+  const missingAltList = Array.isArray(a11y.missingAltImages) && a11y.missingAltImages.length > 0 
     ? a11y.missingAltImages 
     : Array.from({ length: a11y.missingAlt || 2 }, (_, i) => `/assets/images/unoptimized-graphic-${i + 1}.png`);
 
   const displayTitle = meta.title 
-    ? meta.title.replace(/&#039;/g, "'").replace(/&amp;/g, "&").replace(/&quot;/g, '"')
+    ? String(meta.title).replace(/&#039;/g, "'").replace(/&amp;/g, "&").replace(/&quot;/g, '"')
     : 'No Title Found';
 
-  const baseLeakagePoints = funnel.primaryLeakagePoints || [];
+  const baseLeakagePoints = Array.isArray(funnel.primaryLeakagePoints) ? funnel.primaryLeakagePoints : [];
   const generatedLeakagePoints = [];
   
   if (parseFloat(revenueLeakagePercent) > 0) generatedLeakagePoints.push(`Latency is actively deflating conversions by an estimated ${revenueLeakagePercent}%.`);
