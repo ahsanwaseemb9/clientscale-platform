@@ -33,12 +33,11 @@ function calculateLeakageRisk(
   let riskScore = 0;
   const leakageFactors = [];
 
-  // --- DEFENSIVE PARSING (THE BOUNCER) ---
-  // Safely extract numbers or default to 0 if "N/A"
-  const inpMatch = String(inpString).match(/\d+/);
-  const tbtMatch = String(tbtString).match(/\d+/);
+  // 1. Speed Friction (Parses numbers from "150 ms")
+  const inpMatch = inpString.match(/\d+/);
+  const tbtMatch = tbtString.match(/\d+/);
   
-  if (inpMatch && inpString !== 'N/A') {
+  if (inpMatch) {
     const inp = parseInt(inpMatch[0], 10);
     if (inp > 500) { 
       riskScore += 40; 
@@ -47,7 +46,7 @@ function calculateLeakageRisk(
       riskScore += 25; 
       leakageFactors.push("Noticeable input lag (INP >200ms)"); 
     }
-  } else if (tbtMatch && tbtString !== 'N/A') {
+  } else if (tbtMatch) {
     const tbt = parseInt(tbtMatch[0], 10);
     if (tbt > 600) { 
       riskScore += 30; 
@@ -89,28 +88,6 @@ function calculateLeakageRisk(
   return { riskScore, riskTier, leakageFactors };
 }
 
-// --- TIMEOUT FALLBACK PATTERN ---
-// Creates a promise that rejects after a set time, preventing serverless function timeouts
-const fetchWithTimeout = async (promise: Promise<any>, ms: number, fallbackValue: any) => {
-  let timeoutId: NodeJS.Timeout;
-  
-  const timeoutPromise = new Promise((_, reject) => {
-    timeoutId = setTimeout(() => {
-      reject(new Error(`Timeout after ${ms}ms`));
-    }, ms);
-  });
-
-  try {
-    const result = await Promise.race([promise, timeoutPromise]);
-    clearTimeout(timeoutId!);
-    return result;
-  } catch (error) {
-    clearTimeout(timeoutId!);
-    console.warn(`[Timeout Caught]: Returning fallback data.`);
-    return fallbackValue;
-  }
-};
-
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const rawUrl = searchParams.get('url');
@@ -121,41 +98,27 @@ export async function GET(request: Request) {
 
   try {
     // 1. Fetch Raw Page Data & DNS Security concurrently
-    let targetResponse;
-    try {
-      targetResponse = await fetch(targetUrl, { headers: { 'User-Agent': 'ClientScale-Forensic-Engine/1.0' } });
-    } catch (e) {
-      // WAF Block Failsafe
-      return NextResponse.json({ error: 'Target domain firewalls blocked diagnostic sweep.' }, { status: 502 });
-    }
-
-    const dnsResult = await auditDomainSecurity(hostname);
+    const [targetResponse, dnsResult] = await Promise.all([
+      fetch(targetUrl, { headers: { 'User-Agent': 'ClientScale-Forensic-Engine/1.0' } }),
+      auditDomainSecurity(hostname)
+    ]);
     
-    const htmlText = await targetResponse.text() || '';
+    const htmlText = await targetResponse.text();
     const serverHeaders: Record<string, string[]> = {};
     targetResponse.headers.forEach((value, key) => { serverHeaders[key] = [value]; });
 
-    // 2. Run Wappalyzer and PageSpeed Sweeps in parallel (WITH TIMEOUTS)
-    const googleApiKey = process.env.GOOGLE_PAGESPEED_API_KEY || "AIzaSyCUJORk1Q4OyTQZu-MeIEZXescMJYuxa_k";
+    // 2. Run Wappalyzer and PageSpeed Sweeps in parallel
+    const googleApiKey = "AIzaSyCUJORk1Q4OyTQZu-MeIEZXescMJYuxa_k";
     const pageSpeedUrl = `https://www.googleapis.com/pagespeedonline/v5/runPagespeed?url=${encodeURIComponent(targetUrl)}&strategy=mobile&key=${googleApiKey}`;
     
-    // We race the slow APIs against an 8-second timer. If they take too long, we inject empty arrays/null to let the UI handle it gracefully.
     const [techDetections, pageSpeedRes] = await Promise.all([
-      fetchWithTimeout(
-        Wappalyzer.analyze({ url: targetUrl, headers: serverHeaders, html: htmlText, meta: {}, scriptSrc: [] }).catch(() => []),
-        25000, 
-        [] // Fallback: empty array if Wappalyzer hangs
-      ),
-      fetchWithTimeout(
-        fetch(pageSpeedUrl).then(res => res.json()).catch(() => null),
-        25000,
-        null // Fallback: null if Google PSI hangs
-      )
+      Wappalyzer.analyze({ url: targetUrl, headers: serverHeaders, html: htmlText, meta: {}, scriptSrc: [] }),
+      fetch(pageSpeedUrl).then(res => res.json()).catch(() => null)
     ]);
 
     // 3. Process the Local HTML analysis
     const htmlAudit = auditHtmlMetadata(htmlText);
-    const lighthouse = pageSpeedRes?.lighthouseResult || null;
+    const lighthouse = pageSpeedRes?.lighthouseResult;
 
     // Sanitize infrastructure data
     let cleanInfrastructure = Array.isArray(techDetections)
@@ -167,12 +130,11 @@ export async function GET(request: Request) {
       : [];
 
     const nextJsMatch = detectNextJs(htmlText, serverHeaders);
-    if (nextJsMatch && !cleanInfrastructure.find((t: any) => t.name === "Next.js")) {
+    if (nextJsMatch && !cleanInfrastructure.find(t => t.name === "Next.js")) {
       cleanInfrastructure.push(nextJsMatch);
     }
 
     // 4. Construct Unified Payload & Calculate Leakage
-    // DEFENSIVE BOUNCER: Handle null lighthouse objects if Google blocked the scan or timed out
     const tbtValue = lighthouse?.audits?.['total-blocking-time']?.displayValue || 'N/A';
     const inpValue = pageSpeedRes?.loadingExperience?.metrics?.INTERACTION_TO_NEXT_PAINT?.percentile 
       ? `${pageSpeedRes.loadingExperience.metrics.INTERACTION_TO_NEXT_PAINT.percentile} ms` 
@@ -194,10 +156,9 @@ export async function GET(request: Request) {
       metaAndSocial: htmlAudit.socialPreview,
       accessibility: htmlAudit.accessibility,
       diagnostics: {
-        // Fallback to null if lighthouse completely failed to render a score (UI will handle it)
         performanceScore: lighthouse?.categories?.performance?.score 
           ? Math.round(lighthouse.categories.performance.score * 100) 
-          : null, 
+          : null,
         latency: {
           tbt: tbtValue,
           inp: inpValue,
