@@ -528,8 +528,22 @@ export default function AuditReportPage() {
               yUnit="%"
               maxVal={100}
               series={[
-                { label: 'Parasite Load', color: '#f59e0b', currentDisplay: `${parasiteImpact}%`, base: parseFloat(parasiteImpact) || 5, variance: 8, fill: true },
-                { label: 'Revenue Leakage', color: '#3b82f6', currentDisplay: `${revenueLeakagePercent}%`, base: parseFloat(revenueLeakagePercent) || 2, variance: 3, fill: false }
+                { 
+                  label: 'Parasite Load', 
+                  color: '#f59e0b', 
+                  currentDisplay: `${parasiteImpact}%`, 
+                  base: isNaN(parseFloat(parasiteImpact)) ? 0 : parseFloat(parasiteImpact), 
+                  variance: parseFloat(parasiteImpact) === 0 ? 0 : 8, 
+                  fill: true 
+                },
+                { 
+                  label: 'Revenue Leakage', 
+                  color: '#3b82f6', 
+                  currentDisplay: `${revenueLeakagePercent}%`, 
+                  base: isNaN(parseFloat(revenueLeakagePercent)) ? 0 : parseFloat(revenueLeakagePercent), 
+                  variance: parseFloat(revenueLeakagePercent) === 0 ? 0 : 3, 
+                  fill: false 
+                }
               ]}
             />
             <VercelGraph 
@@ -537,8 +551,22 @@ export default function AuditReportPage() {
               yUnit="ms"
               maxVal={dynamicLatencyYAxis} // Dynamic Scaling Applied
               series={[
-                { label: 'INP Latency', color: '#8b5cf6', currentDisplay: `${rawInp}ms`, base: rawInp || 150, variance: 150, fill: true },
-                { label: 'TBT (Thread Lock)', color: '#ef4444', currentDisplay: `${rawTbt}ms`, base: rawTbt || 300, variance: 200, fill: false }
+                { 
+                  label: 'INP Latency', 
+                  color: '#8b5cf6', 
+                  currentDisplay: `${rawInp}ms`, 
+                  base: isNaN(rawInp) ? 0 : rawInp, 
+                  variance: rawInp === 0 ? 0 : 150, 
+                  fill: true 
+                },
+                { 
+                  label: 'TBT (Thread Lock)', 
+                  color: '#ef4444', 
+                  currentDisplay: `${rawTbt}ms`, 
+                  base: isNaN(rawTbt) ? 0 : rawTbt, 
+                  variance: rawTbt === 0 ? 0 : 200, 
+                  fill: false 
+                }
               ]}
             />
           </div>
