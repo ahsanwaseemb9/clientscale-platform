@@ -440,60 +440,84 @@ export default function AuditReportPage() {
 
   // --- HYPER-DYNAMIC BUSINESS TRANSLATION GENERATOR ---
   
-  // 1. Determine Business Archetype based on Technical Footprint
-  let industryTerms = {
-    action: 'prospects ever reach the conversion funnel',
-    scale: 'digital pipeline',
-    penalty: 'organic search visibility'
+  // 1. Extract Clean Brand Name from Target Domain or Meta
+  const getBrandName = (targetUrl: string): string => {
+    try {
+      const hostname = new URL(targetUrl).hostname.replace(/^www\./, '');
+      const rawName = hostname.split('.')[0];
+      if (!rawName) return 'This business';
+      return rawName.charAt(0).toUpperCase() + rawName.slice(1);
+    } catch {
+      return 'This business';
+    }
   };
 
-  if (rawDomNodes > 1800 || thirdPartyCount >= 7) {
-    // Enterprise / eCommerce Retailer (e.g., Currys)
+  const brandName = getBrandName(auditData?.target || '');
+  const pageMetaText = `${meta?.title || ''} ${meta?.description || ''}`.toLowerCase();
+  
+  // 2. Smart E-Commerce & Retail Detection
+  const hasRetailKeywords = /shop|store|buy|cart|checkout|catalog|catalogue|retail|product|price|deal|argos|currys/i.test(pageMetaText);
+  const hasEcommerceTech = infrastructure.some((tech: any) => 
+    /eCommerce|Commerce|Shopify|Magento|WooCommerce|BigCommerce/i.test(tech.name || '') ||
+    (Array.isArray(tech.categories) && tech.categories.some((c: string) => /eCommerce|Cart/i.test(c)))
+  );
+
+  const isRetailEcommerce = hasRetailKeywords || hasEcommerceTech || rawDomNodes > 1800;
+
+  // 3. Select Contextual Copy Tier based on Business Model
+  let industryTerms = {
+    action: `prospects can complete their journey on ${brandName}`,
+    scale: 'digital presence',
+    penalty: 'search engine visibility'
+  };
+
+  if (isRetailEcommerce) {
+    // Enterprise / Retail eCommerce (e.g., Argos, Currys)
     industryTerms = {
-      action: 'high-intent shoppers ever reach the checkout cart',
-      scale: 'enterprise catalog',
-      penalty: 'competitive retail search rankings'
+      action: `mobile shoppers can add items to their cart and complete checkout on ${brandName}`,
+      scale: `digital retail catalog`,
+      penalty: `high-intent shopping and retail search rankings`
     };
   } else if (rawDomNodes > 800) {
-    // Mid-Market / B2B SaaS / Large Agency
+    // B2B / Professional Services / SaaS
     industryTerms = {
-      action: 'qualified leads can complete the onboarding flow',
-      scale: 'lead acquisition engine',
-      penalty: 'B2B search visibility'
+      action: `qualified leads can complete the inquiry flow on ${brandName}`,
+      scale: `lead acquisition pipeline`,
+      penalty: `organic B2B search rankings`
     };
   } else {
     // Boutique / Local Business
     industryTerms = {
-      action: 'potential clients can complete a booking or inquiry',
-      scale: 'brand storefront',
-      penalty: 'local map packs and mobile search'
+      action: `clients can complete a booking or contact request on ${brandName}`,
+      scale: `online storefront`,
+      penalty: `local map packs and mobile search placement`
     };
   }
 
   let dynamicSynthesis = '';
   
   if (parseFloat(revenueLeakagePercent) === 0 && isGhostOptimal && !isMapPenalized && !isFragile && parseFloat(parasiteImpact) === 0) {
-    dynamicSynthesis = `The telemetry above confirms a perfectly optimized frontend architecture for this ${industryTerms.scale}. A streamlined base of ${domSize} DOM elements and zero external script overhead keeps the mobile device main-thread completely unblocked. This results in instant UI responsiveness and an exceptional Interaction to Next Paint (INP) of ${rawInp}ms. Search algorithms reward this performance, ensuring zero estimated revenue leakage from technical bottlenecks.`;
+    dynamicSynthesis = `The telemetry above confirms a perfectly optimized architecture for ${brandName}'s ${industryTerms.scale}. A streamlined base of ${domSize} DOM elements keeps the mobile device main-thread completely unblocked, allowing instant UI responsiveness with an exceptional Interaction to Next Paint (INP) of ${rawInp}ms. Search engines reward this speed, securing ${brandName}'s ${industryTerms.penalty} with zero estimated revenue leakage.`;
   } else {
     const sentence1 = isFragile 
-      ? `Operating at ${industryTerms.scale} scale, a heavy structural base of ${domSize} DOM elements` 
-      : `For this ${industryTerms.scale}, a structural base of ${domSize} DOM elements`;
+      ? `For ${brandName}'s ${industryTerms.scale}, a heavy structural base of ${domSize} DOM elements` 
+      : `Across ${brandName}'s ${industryTerms.scale}, a structural base of ${domSize} DOM elements`;
       
     const sentence2 = parseFloat(parasiteImpact) > 0 
-      ? ` paired with a ${parasiteImpact}% external marketing script overhead` 
+      ? ` combined with a ${parasiteImpact}% external tracking overhead` 
       : ``;
       
     const sentence3 = !isGhostOptimal 
-      ? ` actively chokes the mobile device's CPU, resulting in a "Thread Lock" that causes ${ghostTapWindow}s of complete UI paralysis where user taps are completely ignored.` 
-      : ` is currently maintaining an unblocked main-thread, allowing for instant tap responsiveness.`;
+      ? ` locks the mobile device CPU, creating a ${ghostTapWindow}s "Thread Lock" window where customer taps on product links, filters, or cart buttons are ignored.` 
+      : ` maintains an unblocked main-thread for rapid touch response.`;
 
     const sentence4 = isMapPenalized 
-      ? ` Furthermore, the Interaction to Next Paint (INP) sits at a sluggish ${rawInp}ms, a direct violation of Google's Core Web Vitals that actively suppresses ${industryTerms.penalty}.` 
-      : ` Fortunately, the Interaction to Next Paint (INP) sits at a healthy ${rawInp}ms, protecting ${industryTerms.penalty}.`;
+      ? ` Additionally, an Interaction to Next Paint (INP) of ${rawInp}ms triggers Core Web Vital penalties that actively degrade ${brandName}'s ${industryTerms.penalty}.` 
+      : ` An Interaction to Next Paint (INP) of ${rawInp}ms stays within healthy thresholds, protecting ${industryTerms.penalty}.`;
       
     const sentence5 = parseFloat(revenueLeakagePercent) > 0 
-      ? ` The compounding severity of this technical friction guarantees a minimum baseline revenue leakage of ${revenueLeakagePercent}%—hemorrhaging capital before ${industryTerms.action}.`
-      : ` Despite some structural warnings, baseline rendering is fast enough to currently estimate zero direct revenue leakage.`;
+      ? ` This technical friction drives an estimated minimum revenue leakage of ${revenueLeakagePercent}%—draining conversions before ${industryTerms.action}.`
+      : ` Despite structural warnings, rendering speed is sufficient to estimate zero immediate revenue loss.`;
 
     dynamicSynthesis = `${sentence1}${sentence2}${sentence3}${sentence4}${sentence5}`;
   }
