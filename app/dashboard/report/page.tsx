@@ -148,7 +148,16 @@ export default function AuditReportPage() {
   const domSize = rawDomNodes.toLocaleString();
   const isFragile = rawDomNodes > 800;
 
-  const infrastructure = Array.isArray(auditData?.infrastructure) ? auditData.infrastructure : [];
+  // --- INFRASTRUCTURE DEDUPLICATION ---
+  const rawInfrastructure = Array.isArray(auditData?.infrastructure) ? auditData.infrastructure : [];
+  const infrastructure = Array.from(
+    new Map(
+      rawInfrastructure
+        .filter((tech: any) => tech && tech.name)
+        .map((tech: any) => [String(tech.name).toLowerCase().trim(), tech])
+    ).values()
+  );
+
   const funnel = auditData?.conversionFunnel || {};
   const meta = auditData?.metaAndSocial || {};
   const a11y = auditData?.accessibility || {};
