@@ -181,6 +181,205 @@ export default function AuditReportPage() {
     dynamicSeverityTier = 'MODERATE';
   }
 
+  // --- HYPER-DYNAMIC BUSINESS TRANSLATION GENERATOR ---
+  
+  const getBrandName = (targetUrl: string): string => {
+    try {
+      const hostname = new URL(targetUrl).hostname.replace(/^www\./, '');
+      const rawName = hostname.split('.')[0];
+      if (!rawName) return 'This business';
+      return rawName.charAt(0).toUpperCase() + rawName.slice(1);
+    } catch {
+      return 'This business';
+    }
+  };
+
+  const brandName = getBrandName(auditData?.target || '');
+  const pageMetaText = `${meta?.title || ''} ${meta?.description || ''}`.toLowerCase();
+  
+  // Advanced Archetype Detection Engine
+  const isLogistics = /freight|logistics|shipping|cargo|transport|haulage|courier|supply chain|transit/i.test(pageMetaText);
+  const isLegal = /law|legal|solicitor|attorney|lawyer|litigation/i.test(pageMetaText);
+  
+  const hasRetailKeywords = /shop|cart|checkout|catalog|catalogue|ecommerce/i.test(pageMetaText); // Removed vague words
+  const hasEcommerceTech = infrastructure.some((tech: any) => 
+    /eCommerce|Commerce|Shopify|Magento|WooCommerce|BigCommerce/i.test(tech.name || '') ||
+    (Array.isArray(tech.categories) && tech.categories.some((c: string) => /eCommerce|Cart/i.test(c)))
+  );
+  
+  const isRetailEcommerce = hasRetailKeywords || hasEcommerceTech;
+
+  let industryTerms = {
+    action: `prospects can complete their journey on ${brandName}`,
+    shortAction: `convert`,
+    scale: 'digital presence',
+    penalty: 'search engine visibility',
+    userType: 'visitors',
+    buttons: 'forms and contact buttons'
+  };
+
+  // Prioritize highly specific niches first
+  if (isLogistics) {
+    industryTerms = {
+      action: `commercial clients can request quotes or book shipments on ${brandName}`,
+      shortAction: `request a quote or track a shipment`,
+      scale: `freight and logistics portal`,
+      penalty: `commercial transport search rankings`,
+      userType: `commercial shippers`,
+      buttons: `quote request forms and tracking links`
+    };
+  } else if (isLegal) {
+    industryTerms = {
+      action: `prospective clients can submit a consultation request to ${brandName}`,
+      shortAction: `book a consultation`,
+      scale: `legal practice portal`,
+      penalty: `local legal and solicitor search rankings`,
+      userType: `prospective clients`,
+      buttons: `consultation forms and contact links`
+    };
+  } else if (isRetailEcommerce || rawDomNodes > 1800) {
+    industryTerms = {
+      action: `mobile shoppers can add items to their cart and complete checkout on ${brandName}`,
+      shortAction: `complete checkout`,
+      scale: `digital retail catalog`,
+      penalty: `high-intent shopping search rankings`,
+      userType: `shoppers`,
+      buttons: `product links and checkout buttons`
+    };
+  } else if (rawDomNodes > 800) {
+    industryTerms = {
+      action: `qualified leads can complete the inquiry flow on ${brandName}`,
+      shortAction: `complete onboarding`,
+      scale: `lead acquisition pipeline`,
+      penalty: `organic B2B search rankings`,
+      userType: `qualified leads`,
+      buttons: `inquiry forms and booking links`
+    };
+  } else {
+    industryTerms = {
+      action: `clients can complete a booking or contact request on ${brandName}`,
+      shortAction: `book a service`,
+      scale: `online storefront`,
+      penalty: `local map packs and mobile search placement`,
+      userType: `potential clients`,
+      buttons: `contact forms and booking buttons`
+    };
+  }
+
+  let dynamicSynthesis = '';
+  
+  if (parseFloat(revenueLeakagePercent) === 0 && isGhostOptimal && !isMapPenalized && !isFragile && parseFloat(parasiteImpact) === 0) {
+    dynamicSynthesis = `The telemetry above confirms a perfectly optimized architecture for ${brandName}'s ${industryTerms.scale}. A streamlined base of ${domSize} DOM elements keeps the mobile device main-thread completely unblocked, allowing instant UI responsiveness with an exceptional Interaction to Next Paint (INP) of ${rawInp}ms. Search engines reward this speed, securing ${brandName}'s ${industryTerms.penalty} with zero estimated revenue leakage.`;
+  } else {
+    const sentence1 = isFragile 
+      ? `For ${brandName}'s ${industryTerms.scale}, a heavy structural base of ${domSize} DOM elements` 
+      : `Across ${brandName}'s ${industryTerms.scale}, a structural base of ${domSize} DOM elements`;
+      
+    const sentence2 = parseFloat(parasiteImpact) > 0 
+      ? ` combined with a ${parasiteImpact}% external tracking overhead` 
+      : ``;
+      
+    const sentence3 = !isGhostOptimal 
+      ? ` locks the mobile device CPU, creating a ${ghostTapWindow}s "Thread Lock" window where customer taps on ${industryTerms.buttons} are ignored.` 
+      : ` maintains an unblocked main-thread for rapid touch response.`;
+
+    const sentence4 = isMapPenalized 
+      ? ` Additionally, an Interaction to Next Paint (INP) of ${rawInp}ms triggers Core Web Vital penalties that actively degrade ${brandName}'s ${industryTerms.penalty}.` 
+      : ` An Interaction to Next Paint (INP) of ${rawInp}ms stays within healthy thresholds, protecting ${industryTerms.penalty}.`;
+      
+    const sentence5 = parseFloat(revenueLeakagePercent) > 0 
+      ? ` This technical friction drives an estimated minimum revenue leakage of ${revenueLeakagePercent}%—draining conversions before ${industryTerms.action}.`
+      : ` Despite structural warnings, rendering speed is sufficient to estimate zero immediate revenue loss.`;
+
+    dynamicSynthesis = `${sentence1}${sentence2}${sentence3}${sentence4}${sentence5}`;
+  }
+
+
+  // --- DYNAMIC CARDS CONFIGURATION & SORTING (MOVED BELOW TERMINOLOGY) ---
+  const frictionCards = [
+    {
+      id: 'revenue',
+      isGreen: parseFloat(revenueLeakagePercent) === 0,
+      title: 'Revenue Leakage',
+      icon: AlertTriangle,
+      value: `${revenueLeakagePercent}%`,
+      description: parseFloat(revenueLeakagePercent) === 0 
+        ? 'Performance is fully optimized. Zero estimated revenue leakage due to latency.'
+        : `Latency is actively deflating your conversion rate. ${industryTerms.userType.charAt(0).toUpperCase() + industryTerms.userType.slice(1)} are abandoning the pipeline before they can ${industryTerms.shortAction}.`,
+      drawerKey: 'revenue' as const,
+      isZero: parseFloat(revenueLeakagePercent) === 0,
+      iconComp: DollarSign
+    },
+    {
+      id: 'ghost',
+      isGreen: isGhostOptimal,
+      title: 'Ghost Tap Window',
+      icon: Ghost,
+      value: isGhostOptimal ? '0.0s' : `${ghostTapWindow}s`,
+      description: isGhostOptimal 
+        ? 'Main thread is unblocked. User interactions are instantly registered by the browser.'
+        : `The screen appears loaded, but user taps on ${industryTerms.buttons} are ignored for ${ghostTapWindow} seconds due to main-thread blocking.`,
+      drawerKey: 'ghost' as const,
+      isZero: isGhostOptimal,
+      iconComp: Ghost
+    },
+    {
+      id: 'inp',
+      isGreen: !isMapPenalized,
+      title: 'Local SEO Penalty',
+      icon: MapPin,
+      value: `${rawInp}ms`,
+      description: isMapPenalized 
+        ? `INP exceeds 200ms threshold. Google algorithms are actively suppressing your ${industryTerms.penalty} due to poor UX.` 
+        : `INP is within passing limits. Local SEO and ${brandName}'s visibility are unaffected by interaction latency.`,
+      drawerKey: 'inp' as const,
+      isZero: !isMapPenalized,
+      iconComp: MapPin
+    },
+    {
+      id: 'parasite',
+      isGreen: parseFloat(parasiteImpact) === 0,
+      title: 'Parasite Load',
+      icon: ServerCrash,
+      value: `${parasiteImpact}%`,
+      description: parseFloat(parasiteImpact) === 0
+        ? 'Zero external tracking scripts detected. Pipeline resource consumption is clean.'
+        : `${thirdPartyCount} external marketing scripts are responsible for ${parasiteImpact}% of your mobile lag.`,
+      drawerKey: 'parasite' as const,
+      isZero: parseFloat(parasiteImpact) === 0,
+      iconComp: ShieldAlert
+    },
+    {
+      id: 'dns',
+      isGreen: !isEmailVulnerable,
+      title: 'Nurture Trust Risk',
+      icon: MailWarning,
+      value: isEmailVulnerable ? 'VULNERABLE' : 'SECURE',
+      description: isEmailVulnerable 
+        ? `Missing DMARC/SPF protocols. Automated free-trial follow-ups and outreach are highly likely routing to client spam folders.`
+        : `Domain authentication protocols are intact. Lead nurture deliverability is protected.`,
+      drawerKey: 'dns' as const,
+      isZero: !isEmailVulnerable,
+      iconComp: MailWarning
+    },
+    {
+      id: 'dom',
+      isGreen: !isFragile,
+      title: 'DOM Fragility',
+      icon: Database,
+      value: domSize,
+      description: !isFragile 
+        ? `HTML structure is highly optimized. Low node count ensures rapid rendering for ${brandName}.`
+        : 'Massive HTML node count is draining mobile batteries and risking browser crashes.',
+      drawerKey: 'dom' as const,
+      isZero: !isFragile,
+      iconComp: Database
+    }
+  ];
+
+  frictionCards.sort((a, b) => (a.isGreen === b.isGreen ? 0 : a.isGreen ? 1 : -1));
+
+
   // High-End APM Streaming Telemetry Component
   const LiveTelemetryWave = ({ isFlat, isAlert }: { isFlat: boolean; isAlert: boolean }) => {
     const [points, setPoints] = useState<number[]>([]);
@@ -348,168 +547,6 @@ export default function AuditReportPage() {
       </div>
     );
   };
-
-  // --- DYNAMIC CARDS CONFIGURATION & SORTING ---
-  const frictionCards = [
-    {
-      id: 'revenue',
-      isGreen: parseFloat(revenueLeakagePercent) === 0,
-      title: 'Revenue Leakage',
-      icon: AlertTriangle,
-      value: `${revenueLeakagePercent}%`,
-      description: parseFloat(revenueLeakagePercent) === 0 
-        ? 'Performance is fully optimized. Zero estimated revenue leakage due to latency.'
-        : 'Latency is actively deflating your conversion rate. Traffic is abandoning the pipeline before checkout.',
-      drawerKey: 'revenue' as const,
-      isZero: parseFloat(revenueLeakagePercent) === 0,
-      iconComp: DollarSign
-    },
-    {
-      id: 'ghost',
-      isGreen: isGhostOptimal,
-      title: 'Ghost Tap Window',
-      icon: Ghost,
-      value: isGhostOptimal ? '0.0s' : `${ghostTapWindow}s`,
-      description: isGhostOptimal 
-        ? 'Main thread is unblocked. User interactions are instantly registered by the browser.'
-        : `The screen appears loaded, but user taps are ignored for ${ghostTapWindow} seconds due to main-thread blocking.`,
-      drawerKey: 'ghost' as const,
-      isZero: isGhostOptimal,
-      iconComp: Ghost
-    },
-    {
-      id: 'inp',
-      isGreen: !isMapPenalized,
-      title: 'Local SEO Penalty',
-      icon: MapPin,
-      value: `${rawInp}ms`,
-      description: isMapPenalized 
-        ? `INP exceeds 200ms threshold. Google algorithms are actively suppressing your Google Maps visibility due to poor UX.` 
-        : `INP is within passing limits. Local SEO and Maps visibility are unaffected by interaction latency.`,
-      drawerKey: 'inp' as const,
-      isZero: !isMapPenalized,
-      iconComp: MapPin
-    },
-    {
-      id: 'parasite',
-      isGreen: parseFloat(parasiteImpact) === 0,
-      title: 'Parasite Load',
-      icon: ServerCrash,
-      value: `${parasiteImpact}%`,
-      description: parseFloat(parasiteImpact) === 0
-        ? 'Zero external tracking scripts detected. Pipeline resource consumption is clean.'
-        : `${thirdPartyCount} external marketing scripts are responsible for ${parasiteImpact}% of your mobile lag.`,
-      drawerKey: 'parasite' as const,
-      isZero: parseFloat(parasiteImpact) === 0,
-      iconComp: ShieldAlert
-    },
-    {
-      id: 'dns',
-      isGreen: !isEmailVulnerable,
-      title: 'Nurture Trust Risk',
-      icon: MailWarning,
-      value: isEmailVulnerable ? 'VULNERABLE' : 'SECURE',
-      description: isEmailVulnerable 
-        ? `Missing DMARC/SPF protocols. Automated free-trial follow-ups are highly likely routing to client spam folders.`
-        : `Domain authentication protocols are intact. Lead nurture deliverability is protected.`,
-      drawerKey: 'dns' as const,
-      isZero: !isEmailVulnerable,
-      iconComp: MailWarning
-    },
-    {
-      id: 'dom',
-      isGreen: !isFragile,
-      title: 'DOM Fragility',
-      icon: Database,
-      value: domSize,
-      description: !isFragile 
-        ? 'HTML structure is highly optimized. Low node count ensures rapid rendering.'
-        : 'Massive HTML node count is draining mobile batteries and risking browser crashes.',
-      drawerKey: 'dom' as const,
-      isZero: !isFragile,
-      iconComp: Database
-    }
-  ];
-
-  frictionCards.sort((a, b) => (a.isGreen === b.isGreen ? 0 : a.isGreen ? 1 : -1));
-
-  // --- HYPER-DYNAMIC BUSINESS TRANSLATION GENERATOR ---
-  const getBrandName = (targetUrl: string): string => {
-    try {
-      const hostname = new URL(targetUrl).hostname.replace(/^www\./, '');
-      const rawName = hostname.split('.')[0];
-      if (!rawName) return 'This business';
-      return rawName.charAt(0).toUpperCase() + rawName.slice(1);
-    } catch {
-      return 'This business';
-    }
-  };
-
-  const brandName = getBrandName(auditData?.target || '');
-  const pageMetaText = `${meta?.title || ''} ${meta?.description || ''}`.toLowerCase();
-  
-  const hasRetailKeywords = /shop|store|buy|cart|checkout|catalog|catalogue|retail|product|price|deal|argos|currys/i.test(pageMetaText);
-  const hasEcommerceTech = infrastructure.some((tech: any) => 
-    /eCommerce|Commerce|Shopify|Magento|WooCommerce|BigCommerce/i.test(tech.name || '') ||
-    (Array.isArray(tech.categories) && tech.categories.some((c: string) => /eCommerce|Cart/i.test(c)))
-  );
-
-  const isRetailEcommerce = hasRetailKeywords || hasEcommerceTech || rawDomNodes > 1800;
-
-  let industryTerms = {
-    action: `prospects can complete their journey on ${brandName}`,
-    scale: 'digital presence',
-    penalty: 'search engine visibility'
-  };
-
-  if (isRetailEcommerce) {
-    industryTerms = {
-      action: `mobile shoppers can add items to their cart and complete checkout on ${brandName}`,
-      scale: `digital retail catalog`,
-      penalty: `high-intent shopping and retail search rankings`
-    };
-  } else if (rawDomNodes > 800) {
-    industryTerms = {
-      action: `qualified leads can complete the inquiry flow on ${brandName}`,
-      scale: `lead acquisition pipeline`,
-      penalty: `organic B2B search rankings`
-    };
-  } else {
-    industryTerms = {
-      action: `clients can complete a booking or contact request on ${brandName}`,
-      scale: `online storefront`,
-      penalty: `local map packs and mobile search placement`
-    };
-  }
-
-  let dynamicSynthesis = '';
-  
-  if (parseFloat(revenueLeakagePercent) === 0 && isGhostOptimal && !isMapPenalized && !isFragile && parseFloat(parasiteImpact) === 0) {
-    dynamicSynthesis = `The telemetry above confirms a perfectly optimized architecture for ${brandName}'s ${industryTerms.scale}. A streamlined base of ${domSize} DOM elements keeps the mobile device main-thread completely unblocked, allowing instant UI responsiveness with an exceptional Interaction to Next Paint (INP) of ${rawInp}ms. Search engines reward this speed, securing ${brandName}'s ${industryTerms.penalty} with zero estimated revenue leakage.`;
-  } else {
-    const sentence1 = isFragile 
-      ? `For ${brandName}'s ${industryTerms.scale}, a heavy structural base of ${domSize} DOM elements` 
-      : `Across ${brandName}'s ${industryTerms.scale}, a structural base of ${domSize} DOM elements`;
-      
-    const sentence2 = parseFloat(parasiteImpact) > 0 
-      ? ` combined with a ${parasiteImpact}% external tracking overhead` 
-      : ``;
-      
-    const sentence3 = !isGhostOptimal 
-      ? ` locks the mobile device CPU, creating a ${ghostTapWindow}s "Thread Lock" window where customer taps on product links, filters, or cart buttons are ignored.` 
-      : ` maintains an unblocked main-thread for rapid touch response.`;
-
-    const sentence4 = isMapPenalized 
-      ? ` Additionally, an Interaction to Next Paint (INP) of ${rawInp}ms triggers Core Web Vital penalties that actively degrade ${brandName}'s ${industryTerms.penalty}.` 
-      : ` An Interaction to Next Paint (INP) of ${rawInp}ms stays within healthy thresholds, protecting ${industryTerms.penalty}.`;
-      
-    const sentence5 = parseFloat(revenueLeakagePercent) > 0 
-      ? ` This technical friction drives an estimated minimum revenue leakage of ${revenueLeakagePercent}%—draining conversions before ${industryTerms.action}.`
-      : ` Despite structural warnings, rendering speed is sufficient to estimate zero immediate revenue loss.`;
-
-    dynamicSynthesis = `${sentence1}${sentence2}${sentence3}${sentence4}${sentence5}`;
-  }
-
 
   return (
     <main className="flex min-h-[100dvh] w-full flex-col items-center bg-[#020205] text-white antialiased selection:bg-cyan-500/30 selection:text-cyan-200 overflow-x-hidden pb-24 relative">
