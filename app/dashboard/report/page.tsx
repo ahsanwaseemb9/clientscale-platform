@@ -94,11 +94,10 @@ export default function AuditReportPage() {
   }
 
   // --- DEFENSIVE DATA SANITIZER (THE BOUNCER) ---
-  // Guaranteed to return a valid number, completely preventing NaN SVG crashes
   const safeExtractNumber = (val: any, fallback: number): number => {
     if (val === null || val === undefined || val === 'N/A') return fallback;
     const parsed = parseInt(String(val).replace(/[^0-9-]/g, ''), 10);
-    return isNaN(parsed) ? fallback : Math.max(0, parsed); // Prevent negative math errors
+    return isNaN(parsed) ? fallback : Math.max(0, parsed);
   };
 
   // --- BUSINESS FRICTION ALGORITHMS ---
@@ -120,15 +119,16 @@ export default function AuditReportPage() {
       }));
 
   const isMapPenalized = rawInp > 200;
-  const hasDmarc = auditData?.security?.dmarcConfigured === true; 
-  const isEmailVulnerable = !hasDmarc;
-  const revenueLeakagePercent = Math.max(0, (100 - perfScore) * 0.15).toFixed(1);
   
+  // Advanced DNS Variables extracted from payload
+  const hasDmarc = auditData?.security?.dmarcConfigured === true; 
+  const hasSpf = auditData?.security?.spfConfigured === true;
+  const isEmailVulnerable = !hasDmarc || !hasSpf;
+
+  const revenueLeakagePercent = Math.max(0, (100 - perfScore) * 0.15).toFixed(1);
   const ghostTapWindow = (rawTbt / 1000).toFixed(1); 
   const isGhostOptimal = parseFloat(ghostTapWindow) === 0;
 
-  // --- DYNAMIC Y-AXIS SCALER ---
-  // Automatically bounds the graph to the highest latency metric to prevent clipping
   const maxLatencyValue = Math.max(rawInp, rawTbt);
   const dynamicLatencyYAxis = Math.max(1000, Math.ceil((maxLatencyValue + 300) / 400) * 400);
 
@@ -152,9 +152,11 @@ export default function AuditReportPage() {
   const funnel = auditData?.conversionFunnel || {};
   const meta = auditData?.metaAndSocial || {};
   const a11y = auditData?.accessibility || {};
+  
+  // Real accessibility targets passed from backend
   const missingAltList = Array.isArray(a11y.missingAltImages) && a11y.missingAltImages.length > 0 
     ? a11y.missingAltImages 
-    : Array.from({ length: a11y.missingAlt || 2 }, (_, i) => `/assets/images/unoptimized-graphic-${i + 1}.png`);
+    : []; // Default to empty array if fully compliant
 
   const displayTitle = meta.title 
     ? String(meta.title).replace(/&#039;/g, "'").replace(/&amp;/g, "&").replace(/&quot;/g, '"')
@@ -283,7 +285,6 @@ export default function AuditReportPage() {
 
     return (
       <div className="bg-[#050508] border border-zinc-800 rounded-xl p-4 sm:p-5 w-full flex flex-col h-full min-h-[260px] shadow-lg relative overflow-hidden">
-        {/* Header */}
         <div className="flex justify-between items-center mb-3">
           <h3 className="text-[13px] font-semibold text-zinc-200 tracking-wide flex items-center gap-2">
             {title}
@@ -291,7 +292,6 @@ export default function AuditReportPage() {
           </h3>
         </div>
         
-        {/* Legend */}
         <div className="flex gap-4 mb-6 relative z-10">
           {series.map((s: any, idx: number) => (
             <div key={idx} className="flex flex-col gap-1">
@@ -304,9 +304,7 @@ export default function AuditReportPage() {
           ))}
         </div>
 
-        {/* Graph Area */}
         <div className="relative flex-grow flex items-end">
-          {/* Grid Lines & Y-Axis */}
           <div className="absolute inset-0 flex flex-col justify-between pb-6">
             {[maxVal, maxVal * 0.75, maxVal * 0.5, maxVal * 0.25, 0].map((val, i) => (
               <div key={i} className="flex items-center w-full gap-3 relative z-0">
@@ -316,7 +314,6 @@ export default function AuditReportPage() {
             ))}
           </div>
 
-          {/* Lines */}
           <div className="absolute inset-0 pl-9 pb-6 pt-1">
             <svg className="w-full h-full" viewBox={`0 0 ${width} ${height}`} preserveAspectRatio="none">
               {series.map((s: any, idx: number) => (
@@ -342,7 +339,6 @@ export default function AuditReportPage() {
             </svg>
           </div>
           
-          {/* X-Axis */}
           <div className="absolute bottom-0 left-9 right-0 flex justify-between pt-2 border-t border-zinc-800/60">
             {xLabels.map((l: string, i: number) => (
               <span key={i} className="text-[9px] font-mono text-zinc-500">{l}</span>
@@ -435,12 +431,9 @@ export default function AuditReportPage() {
     }
   ];
 
-  // Dynamically sort cards so non-green (blue/alerts) come first, and green (optimized) cards appear below
   frictionCards.sort((a, b) => (a.isGreen === b.isGreen ? 0 : a.isGreen ? 1 : -1));
 
   // --- HYPER-DYNAMIC BUSINESS TRANSLATION GENERATOR ---
-  
-  // 1. Extract Clean Brand Name from Target Domain or Meta
   const getBrandName = (targetUrl: string): string => {
     try {
       const hostname = new URL(targetUrl).hostname.replace(/^www\./, '');
@@ -455,7 +448,6 @@ export default function AuditReportPage() {
   const brandName = getBrandName(auditData?.target || '');
   const pageMetaText = `${meta?.title || ''} ${meta?.description || ''}`.toLowerCase();
   
-  // 2. Smart E-Commerce & Retail Detection
   const hasRetailKeywords = /shop|store|buy|cart|checkout|catalog|catalogue|retail|product|price|deal|argos|currys/i.test(pageMetaText);
   const hasEcommerceTech = infrastructure.some((tech: any) => 
     /eCommerce|Commerce|Shopify|Magento|WooCommerce|BigCommerce/i.test(tech.name || '') ||
@@ -464,7 +456,6 @@ export default function AuditReportPage() {
 
   const isRetailEcommerce = hasRetailKeywords || hasEcommerceTech || rawDomNodes > 1800;
 
-  // 3. Select Contextual Copy Tier based on Business Model
   let industryTerms = {
     action: `prospects can complete their journey on ${brandName}`,
     scale: 'digital presence',
@@ -472,21 +463,18 @@ export default function AuditReportPage() {
   };
 
   if (isRetailEcommerce) {
-    // Enterprise / Retail eCommerce (e.g., Argos, Currys)
     industryTerms = {
       action: `mobile shoppers can add items to their cart and complete checkout on ${brandName}`,
       scale: `digital retail catalog`,
       penalty: `high-intent shopping and retail search rankings`
     };
   } else if (rawDomNodes > 800) {
-    // B2B / Professional Services / SaaS
     industryTerms = {
       action: `qualified leads can complete the inquiry flow on ${brandName}`,
       scale: `lead acquisition pipeline`,
       penalty: `organic B2B search rankings`
     };
   } else {
-    // Boutique / Local Business
     industryTerms = {
       action: `clients can complete a booking or contact request on ${brandName}`,
       scale: `online storefront`,
@@ -999,21 +987,74 @@ export default function AuditReportPage() {
             </div>
           )}
 
+          {/* --- UPDATED ACCESSIBILITY DRAWER --- */}
           {activeDrawer === 'accessibility' && (
             <div className="animate-in fade-in duration-500 text-zinc-100 space-y-4">
               <h3 className="text-xl sm:text-2xl font-bold text-white mb-6">Accessibility & SEO Compliance</h3>
               <p className="text-xs sm:text-sm leading-relaxed font-light">
                 Images lacking alternative (alt) text prevent screen readers from interpreting visual content for visually impaired users and strip away valuable local image-search ranking signals.
               </p>
+              <div className="mt-6">
+                <h4 className="text-[10px] font-mono font-bold text-zinc-300 uppercase tracking-widest mb-3 flex items-center gap-2">
+                  <ImageIcon size={14} className="text-blue-400 shrink-0" /> {missingAltList.length} Non-Compliant Assets Detected
+                </h4>
+                {missingAltList.length > 0 ? (
+                  <div className="space-y-2 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
+                    {missingAltList.map((imgSrc: string, idx: number) => (
+                      <div key={idx} className="flex items-center gap-3 p-3 bg-[#12121c] border border-zinc-600/80 rounded-xl">
+                        <AlertTriangle size={14} className="text-yellow-400 shrink-0" />
+                        <span className="text-xs text-zinc-200 truncate font-mono" title={imgSrc}>{imgSrc}</span>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="p-4 bg-[#12121c] border border-green-900/40 rounded-xl flex items-center gap-3">
+                    <CheckCircle size={16} className="text-green-400" />
+                    <span className="text-xs text-zinc-200">All scanned images contain valid alt attributes.</span>
+                  </div>
+                )}
+              </div>
             </div>
           )}
 
+          {/* --- UPDATED DNS / NURTURE TRUST DRAWER --- */}
           {activeDrawer === 'dns' && (
             <div className="animate-in fade-in duration-500 text-zinc-100 space-y-4">
               <h3 className="text-xl sm:text-2xl font-bold text-white mb-6">Marketing Nurture Trust Risk</h3>
               <p className="text-xs sm:text-sm leading-relaxed font-light">
-                We check the raw DNS records for missing <strong>SPF and DMARC</strong> email authentication protocols.
+                We intercept and analyze the raw DNS records for critical email authentication protocols. Missing these guarantees automated client follow-ups (like abandoned carts or lead magnets) will trigger spam filters.
               </p>
+              <div className="mt-6 space-y-3">
+                
+                {/* SPF Checklist Item */}
+                <div className="flex items-center justify-between p-4 bg-[#12121c] border border-zinc-600/80 rounded-xl">
+                  <div className="flex items-center gap-3">
+                    {hasSpf ? <CheckCircle className="text-green-400" size={18} /> : <AlertCircle className="text-red-400" size={18} />}
+                    <div>
+                      <span className="text-sm font-bold text-zinc-100 block">SPF Protocol</span>
+                      <span className="text-[10px] text-zinc-400 font-mono">Sender Policy Framework</span>
+                    </div>
+                  </div>
+                  <span className={`text-xs font-bold font-mono px-2 py-1 rounded ${hasSpf ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'}`}>
+                    {hasSpf ? 'DETECTED' : 'MISSING'}
+                  </span>
+                </div>
+
+                {/* DMARC Checklist Item */}
+                <div className="flex items-center justify-between p-4 bg-[#12121c] border border-zinc-600/80 rounded-xl">
+                  <div className="flex items-center gap-3">
+                    {hasDmarc ? <CheckCircle className="text-green-400" size={18} /> : <AlertCircle className="text-red-400" size={18} />}
+                    <div>
+                      <span className="text-sm font-bold text-zinc-100 block">DMARC Protocol</span>
+                      <span className="text-[10px] text-zinc-400 font-mono">Domain-based Message Authentication</span>
+                    </div>
+                  </div>
+                  <span className={`text-xs font-bold font-mono px-2 py-1 rounded ${hasDmarc ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'}`}>
+                    {hasDmarc ? 'DETECTED' : 'MISSING'}
+                  </span>
+                </div>
+
+              </div>
             </div>
           )}
 
