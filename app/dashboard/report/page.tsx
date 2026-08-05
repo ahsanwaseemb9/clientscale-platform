@@ -72,6 +72,7 @@ export default function AuditReportPage() {
     };
 
     window.addEventListener('scroll', handleScroll, { passive: true });
+    // Run once on mount in case page is already scrolled
     handleScroll();
 
     return () => window.removeEventListener('scroll', handleScroll);
@@ -238,9 +239,12 @@ export default function AuditReportPage() {
     buttons: 'forms and contact buttons'
   };
 
-  // DEFENSIVE CLEANER: Strips any accidental leading "before" from the AI action string
+  // BULLETPROOF CLEANER: Strips any repeating variations of "draining conversions before" or leading "before"
   const rawAction = String(industryTerms.action || `prospects can complete their journey on ${brandName}`);
-  const cleanAction = rawAction.replace(/^before\s+/i, '');
+  const cleanAction = rawAction
+    .replace(/^(draining\s+conversions\s+)?before\s+/i, '')
+    .replace(/^draining\s+conversions\s+/i, '')
+    .trim();
 
   let dynamicSynthesis = '';
   
