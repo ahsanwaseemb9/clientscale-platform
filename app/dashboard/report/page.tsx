@@ -60,16 +60,18 @@ export default function AuditReportPage() {
     setIsLoading(false);
   }, []);
 
-  // Track scroll position to toggle the mobile scroll-to-top button
+  // Track global document scroll position to toggle the mobile scroll-to-top button
   useEffect(() => {
     const handleScroll = () => {
-      if (window.scrollY > 400) {
+      const scrollPosition = window.scrollY || document.documentElement.scrollTop;
+      if (scrollPosition > 300) {
         setShowScrollTop(true);
       } else {
         setShowScrollTop(false);
       }
     };
-    window.addEventListener('scroll', handleScroll);
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
