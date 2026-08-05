@@ -18,12 +18,12 @@ Wappalyzer.setCategories(categories);
 
 // --- AI SCHEMA DEFINITION ---
 const industryContextSchema = z.object({
-  action: z.string().describe("Must grammatically complete the sentence 'draining conversions before [ACTION]'. Example: 'hungry customers can order their favorite pizza'"),
-  shortAction: z.string().describe("e.g., 'request a quote or track a shipment'"),
-  scale: z.string().describe("e.g., 'freight and logistics portal'"),
+  action: z.string().describe("The core business action. Must complete the sentence 'draining conversions before [ACTION]'. Example: 'users can complete their checkout' or 'prospects can book a consultation'. STRICT RULE: Keep it clinical and professional. NO marketing slogans."),
+  shortAction: z.string().describe("e.g., 'request a quote' or 'complete a booking'"),
+  scale: z.string().describe("e.g., 'freight and logistics portal' or 'e-commerce infrastructure'"),
   penalty: z.string().describe("e.g., 'commercial transport search rankings'"),
-  userType: z.string().describe("e.g., 'commercial shippers' or 'hungry customers'"),
-  buttons: z.string().describe("e.g., 'quote request forms and tracking links'")
+  userType: z.string().describe("e.g., 'commercial shippers' or 'retail customers'"),
+  buttons: z.string().describe("e.g., 'quote request forms' or 'checkout buttons'")
 });
 
 function detectNextJs(html: string, headers: Record<string, string[]>) {
@@ -161,8 +161,9 @@ export async function GET(request: Request) {
           const { object } = await generateObject({
             model: openai('gpt-4o-mini'), 
             schema: industryContextSchema,
-            prompt: "You are an expert technical sales analyst for a web performance agency.\n" +
-                    "Analyze the following website text and generate specific, highly converting sales terminology tailored to their exact industry.\n" +
+            prompt: "You are an expert technical forensic analyst for an enterprise web infrastructure agency.\n" +
+                    "Analyze the following website text and generate clinical, professional business terminology tailored to their industry.\n" +
+                    "CRITICAL INSTRUCTION: Do NOT use cheesy marketing slogans, adjectives, or sales pitches. Maintain a serious, diagnostic, and corporate tone.\n" +
                     "The brand name is loosely: " + brandName + "\n\n" +
                     "Website Data:\n" +
                     "Title: " + pageTitle + "\n" +
