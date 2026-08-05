@@ -529,6 +529,39 @@ export default function AuditReportPage() {
           </button>
         </div>
 
+        {/* --- AI EXECUTIVE SYNTHESIS (ELEVATED HERO BLOCK) --- */}
+        <div className="w-full relative group mb-8 sm:mb-12">
+          {/* Subtle AI Glow Background */}
+          <div className="absolute -inset-0.5 bg-gradient-to-r from-cyan-500/30 to-purple-600/30 rounded-2xl blur opacity-30 group-hover:opacity-60 transition duration-1000 group-hover:duration-200 animate-pulse pointer-events-none"></div>
+          
+          <div className="relative bg-[#0a0a0f]/95 border border-zinc-700/80 backdrop-blur-xl rounded-2xl p-6 sm:p-8 shadow-2xl flex flex-col sm:flex-row gap-5 sm:gap-6 items-start">
+            
+            {/* AI Iconography */}
+            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-cyan-500/10 to-purple-500/10 border border-cyan-400/30 flex items-center justify-center shrink-0 shadow-[0_0_15px_rgba(34,211,238,0.15)] relative overflow-hidden">
+              <div className="absolute inset-0 bg-cyan-400/20 blur-xl animate-pulse"></div>
+              <Cpu size={24} className="text-cyan-300 relative z-10" /> 
+            </div>
+
+            {/* Content */}
+            <div className="flex-grow">
+              <div className="flex items-center gap-3 mb-3">
+                <h2 className="text-[11px] sm:text-xs font-mono font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-400 uppercase tracking-[0.25em]">
+                  AI Diagnostic Synthesis
+                </h2>
+                {/* Processing Indicator Dot */}
+                <span className="flex h-2 w-2 relative">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-cyan-500 shadow-[0_0_8px_rgba(6,182,212,0.8)]"></span>
+                </span>
+              </div>
+              
+              <p className="text-sm sm:text-base md:text-lg text-zinc-100 leading-relaxed font-light drop-shadow-sm">
+                {dynamicSynthesis}
+              </p>
+            </div>
+          </div>
+        </div>
+
         {/* --- LIVE TELEMETRY VOLATILITY WARNING --- */}
         <div className="bg-[#12121c]/95 border border-blue-400/40 rounded-2xl p-6 sm:p-8 flex flex-col items-center text-center gap-4 relative overflow-hidden group backdrop-blur-xl shadow-xl mb-16 sm:mb-20">
           <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-transparent pointer-events-none" />
@@ -561,7 +594,7 @@ export default function AuditReportPage() {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             <VercelGraph 
               title="Conversion Disruption"
               yUnit="%"
@@ -608,15 +641,6 @@ export default function AuditReportPage() {
                 }
               ]}
             />
-          </div>
-
-          <div className="bg-[#12121c]/80 border border-cyan-500/20 rounded-xl p-5 sm:p-6 shadow-inner">
-            <h4 className="text-[10px] font-mono font-bold text-cyan-400 uppercase tracking-widest mb-3 flex items-center gap-2">
-              <ShieldCheck size={14} /> The Business Translation
-            </h4>
-            <p className="text-xs sm:text-sm text-zinc-200 leading-relaxed font-light">
-              {dynamicSynthesis}
-            </p>
           </div>
         </div>
 
