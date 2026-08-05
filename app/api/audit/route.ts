@@ -18,7 +18,7 @@ Wappalyzer.setCategories(categories);
 
 // --- AI SCHEMA DEFINITION ---
 const industryContextSchema = z.object({
-  action: z.string().describe("e.g., 'commercial clients can request quotes or book shipments on [Brand]'"),
+  action: z.string().describe("Must grammatically complete the sentence 'draining conversions before [ACTION]'. Example: 'hungry customers can order their favorite pizza'"),
   shortAction: z.string().describe("e.g., 'request a quote or track a shipment'"),
   scale: z.string().describe("e.g., 'freight and logistics portal'"),
   penalty: z.string().describe("e.g., 'commercial transport search rankings'"),
