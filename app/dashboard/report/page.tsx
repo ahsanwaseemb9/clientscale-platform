@@ -529,8 +529,24 @@ export default function AuditReportPage() {
           </button>
         </div>
 
+        {/* --- LIVE TELEMETRY VOLATILITY WARNING --- */}
+        <div className="bg-[#12121c]/95 border border-blue-400/40 rounded-2xl p-6 sm:p-8 flex flex-col items-center text-center gap-4 relative overflow-hidden group backdrop-blur-xl shadow-xl mb-8 sm:mb-12">
+          <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-transparent pointer-events-none" />
+          <div className="w-11 h-11 rounded-xl bg-blue-500/20 border border-blue-400/40 flex items-center justify-center text-blue-300 shrink-0 relative z-10 shadow-[0_0_10px_rgba(59,130,246,0.3)]">
+            <Info size={22} className="opacity-95" />
+          </div>
+          <div className="relative z-10 max-w-3xl">
+            <h4 className="text-[11px] xs:text-xs sm:text-sm md:text-base font-mono font-extrabold text-cyan-400 uppercase tracking-tight sm:tracking-widest mb-3 whitespace-nowrap sm:whitespace-normal overflow-hidden text-ellipsis">
+              Live Telemetry Volatility Warning
+            </h4>
+            <p className="text-sm sm:text-base md:text-lg text-white leading-relaxed font-normal">
+              Because this target domain relies on a traditional origin server, the telemetry below fluctuates based on live traffic and CPU strain. Migrating to the ClientScale Edge Network removes this instability, permanently locking these metrics into an optimized state.
+            </p>
+          </div>
+        </div>
+
         {/* --- AI EXECUTIVE SYNTHESIS (ELEVATED HERO BLOCK) --- */}
-        <div className="w-full relative group mb-8 sm:mb-12">
+        <div className="w-full relative group mb-16 sm:mb-20">
           {/* Subtle AI Glow Background */}
           <div className="absolute -inset-0.5 bg-gradient-to-r from-cyan-500/30 to-purple-600/30 rounded-2xl blur opacity-30 group-hover:opacity-60 transition duration-1000 group-hover:duration-200 animate-pulse pointer-events-none"></div>
           
@@ -559,22 +575,6 @@ export default function AuditReportPage() {
                 {dynamicSynthesis}
               </p>
             </div>
-          </div>
-        </div>
-
-        {/* --- LIVE TELEMETRY VOLATILITY WARNING --- */}
-        <div className="bg-[#12121c]/95 border border-blue-400/40 rounded-2xl p-6 sm:p-8 flex flex-col items-center text-center gap-4 relative overflow-hidden group backdrop-blur-xl shadow-xl mb-16 sm:mb-20">
-          <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-transparent pointer-events-none" />
-          <div className="w-11 h-11 rounded-xl bg-blue-500/20 border border-blue-400/40 flex items-center justify-center text-blue-300 shrink-0 relative z-10 shadow-[0_0_10px_rgba(59,130,246,0.3)]">
-            <Info size={22} className="opacity-95" />
-          </div>
-          <div className="relative z-10 max-w-3xl">
-            <h4 className="text-[11px] xs:text-xs sm:text-sm md:text-base font-mono font-extrabold text-cyan-400 uppercase tracking-tight sm:tracking-widest mb-3 whitespace-nowrap sm:whitespace-normal overflow-hidden text-ellipsis">
-              Live Telemetry Volatility Warning
-            </h4>
-            <p className="text-sm sm:text-base md:text-lg text-white leading-relaxed font-normal">
-              Because this target domain relies on a traditional origin server, the telemetry below fluctuates based on live traffic and CPU strain. Migrating to the ClientScale Edge Network removes this instability, permanently locking these metrics into an optimized state.
-            </p>
           </div>
         </div>
 
