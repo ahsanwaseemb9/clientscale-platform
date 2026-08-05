@@ -255,7 +255,7 @@ export default function AuditReportPage() {
       value: `${revenueLeakagePercent}%`,
       description: parseFloat(revenueLeakagePercent) === 0 
         ? 'Performance is fully optimized. Zero estimated revenue leakage due to latency.'
-        : `Latency is actively deflating your conversion rate. ${industryTerms.userType.charAt(0).toUpperCase() + industryTerms.userType.slice(1)} are abandoning the pipeline before they can ${industryTerms.shortAction}.`,
+        : `Latency is actively deflating conversion rates. Users are experiencing friction and abandoning the checkout flow before they can ${industryTerms.shortAction}.`,
       drawerKey: 'revenue' as const,
       isZero: parseFloat(revenueLeakagePercent) === 0,
       iconComp: DollarSign
