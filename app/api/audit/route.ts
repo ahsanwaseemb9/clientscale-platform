@@ -1,4 +1,8 @@
 import { NextResponse } from 'next/server';
+import { generateObject } from 'ai';
+import { openai } from '@ai-sdk/openai';
+import { z } from 'zod';
+import * as cheerio from 'cheerio';
 
 // 1. OVERRIDE SERVERLESS TIMEOUT LIMITS (Set to 60 seconds)
 export const maxDuration = 60;
@@ -11,6 +15,16 @@ import { auditHtmlMetadata } from '../../lib/audit/html';
 
 Wappalyzer.setTechnologies(technologies);
 Wappalyzer.setCategories(categories);
+
+// --- AI SCHEMA DEFINITION ---
+const industryContextSchema = z.object({
+  action: z.string().describe("e.g., 'commercial clients can request quotes or book shipments on [Brand]'"),
+  shortAction: z.string().describe("e.g., 'request a quote or track a shipment'"),
+  scale: z.string().describe("e.g., 'freight and logistics portal'"),
+  penalty: z.string().describe("e.g., 'commercial transport search rankings'"),
+  userType: z.string().describe("e.g., 'commercial shippers' or 'hungry customers'"),
+  buttons: z.string().describe("e.g., 'quote request forms and tracking links'")
+});
 
 function detectNextJs(html: string, headers: Record<string, string[]>) {
   const hasHeader = headers['x-powered-by']?.some(h => h.includes('Next.js'));
@@ -69,7 +83,7 @@ function calculateLeakageRisk(inpString: string, tbtString: string, altComplianc
 const fetchWithTimeout = async (promise: Promise<any>, ms: number, fallbackValue: any, serviceName: string) => {
   let timeoutId: NodeJS.Timeout;
   const timeoutPromise = new Promise((_, reject) => {
-    timeoutId = setTimeout(() => { reject(new Error(`Timeout after ${ms}ms`)); }, ms);
+    timeoutId = setTimeout(() => { reject(new Error("Timeout after " + ms + "ms")); }, ms);
   });
 
   try {
@@ -78,7 +92,7 @@ const fetchWithTimeout = async (promise: Promise<any>, ms: number, fallbackValue
     return result;
   } catch (error: any) {
     clearTimeout(timeoutId!);
-    console.warn(`[Timeout/Error Caught in ${serviceName}]:`, error.message);
+    console.warn("[Timeout/Error Caught in " + serviceName + "]:", error.message);
     return fallbackValue;
   }
 };
@@ -88,8 +102,9 @@ export async function GET(request: Request) {
   const rawUrl = searchParams.get('url');
 
   if (!rawUrl) return NextResponse.json({ error: 'URL required' }, { status: 400 });
-  const targetUrl = rawUrl.startsWith('http') ? rawUrl : `https://${rawUrl}`;
+  const targetUrl = rawUrl.startsWith('http') ? rawUrl : "https://" + rawUrl;
   const hostname = new URL(targetUrl).hostname;
+  const brandName = hostname.replace(/^www\./, '').split('.')[0];
 
   try {
     let targetResponse;
@@ -105,9 +120,10 @@ export async function GET(request: Request) {
     targetResponse.headers.forEach((value, key) => { serverHeaders[key] = [value]; });
 
     const googleApiKey = process.env.GOOGLE_PAGESPEED_API_KEY || "AIzaSyCUJORk1Q4OyTQZu-MeIEZXescMJYuxa_k";
-    const pageSpeedUrl = `https://www.googleapis.com/pagespeedonline/v5/runPagespeed?url=${encodeURIComponent(targetUrl)}&strategy=mobile&key=${googleApiKey}`;
+    const pageSpeedUrl = "https://www.googleapis.com/pagespeedonline/v5/runPagespeed?url=" + encodeURIComponent(targetUrl) + "&strategy=mobile&key=" + googleApiKey;
     
-    const [techDetections, pageSpeedRes] = await Promise.all([
+    // --- ASYNC CONCURRENT EXECUTION BLOCK ---
+    const [techDetections, pageSpeedRes, aiAnalysis] = await Promise.all([
       fetchWithTimeout(
         Wappalyzer.analyze({ url: targetUrl, headers: serverHeaders, html: htmlText, meta: {}, scriptSrc: [] }),
         25000, 
@@ -118,12 +134,12 @@ export async function GET(request: Request) {
       fetchWithTimeout(
         fetch(pageSpeedUrl).then(async (res) => {
           if (!res.ok) {
-            console.error(`PageSpeed HTTP Error: ${res.status} ${res.statusText}`);
+            console.error("PageSpeed HTTP Error: " + res.status + " " + res.statusText);
             return null;
           }
           const data = await res.json();
           if (data.error) {
-            console.error(`PageSpeed API Internal Error:`, data.error);
+            console.error("PageSpeed API Internal Error:", data.error);
             return null;
           }
           return data;
@@ -131,6 +147,33 @@ export async function GET(request: Request) {
         25000,
         null,
         "Google PageSpeed"
+      ),
+      // 3. OpenAI Context Generator
+      fetchWithTimeout(
+        (async () => {
+          if (!process.env.OPENAI_API_KEY) return null;
+          
+          const $ = cheerio.load(htmlText);
+          const pageTitle = $('title').text();
+          const metaDesc = $('meta[name="description"]').attr('content') || '';
+          const bodyText = $('body').text().replace(/\s+/g, ' ').substring(0, 1500); 
+          
+          const { object } = await generateObject({
+            model: openai('gpt-4o-mini'), 
+            schema: industryContextSchema,
+            prompt: "You are an expert technical sales analyst for a web performance agency.\n" +
+                    "Analyze the following website text and generate specific, highly converting sales terminology tailored to their exact industry.\n" +
+                    "The brand name is loosely: " + brandName + "\n\n" +
+                    "Website Data:\n" +
+                    "Title: " + pageTitle + "\n" +
+                    "Description: " + metaDesc + "\n" +
+                    "Content: " + bodyText
+          });
+          return object;
+        })(),
+        15000, // 15s timeout to ensure AI never hangs the main audit
+        null,
+        "OpenAI Industry Context"
       )
     ]);
 
@@ -150,7 +193,7 @@ export async function GET(request: Request) {
 
     const tbtValue = lighthouse?.audits?.['total-blocking-time']?.displayValue || 'N/A';
     const inpValue = pageSpeedRes?.loadingExperience?.metrics?.INTERACTION_TO_NEXT_PAINT?.percentile 
-      ? `${pageSpeedRes.loadingExperience.metrics.INTERACTION_TO_NEXT_PAINT.percentile} ms` 
+      ? pageSpeedRes.loadingExperience.metrics.INTERACTION_TO_NEXT_PAINT.percentile + " ms" 
       : 'N/A';
 
     const leakageData = calculateLeakageRisk(
@@ -161,6 +204,7 @@ export async function GET(request: Request) {
       target: targetUrl,
       status: 'success',
       timestamp: new Date().toISOString(),
+      industryContext: aiAnalysis, // <-- Injected AI Output
       security: dnsResult,
       metaAndSocial: htmlAudit.socialPreview,
       accessibility: htmlAudit.accessibility,
