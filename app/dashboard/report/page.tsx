@@ -546,7 +546,7 @@ export default function AuditReportPage() {
             <div className="flex-grow">
               <div className="flex items-center gap-3 mb-3">
                 <h2 className="text-[11px] sm:text-xs font-mono font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-400 uppercase tracking-[0.25em]">
-                  AI Diagnostic Synthesis
+                  The Business Translation
                 </h2>
                 {/* Processing Indicator Dot */}
                 <span className="flex h-2 w-2 relative">
