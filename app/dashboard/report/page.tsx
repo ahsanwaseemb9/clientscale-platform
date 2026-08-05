@@ -190,7 +190,7 @@ export default function AuditReportPage() {
     dynamicSeverityTier = 'MODERATE';
   }
 
-  // --- HYPER-DYNAMIC BUSINESS TRANSLATION GENERATOR ---
+  // --- HYPER-DYNAMIC AI BUSINESS TRANSLATION GENERATOR ---
   
   const getBrandName = (targetUrl: string): string => {
     try {
@@ -204,21 +204,10 @@ export default function AuditReportPage() {
   };
 
   const brandName = getBrandName(auditData?.target || '');
-  const pageMetaText = `${meta?.title || ''} ${meta?.description || ''}`.toLowerCase();
-  
-  // Advanced Archetype Detection Engine
-  const isLogistics = /freight|logistics|shipping|cargo|transport|haulage|courier|supply chain|transit/i.test(pageMetaText);
-  const isLegal = /law|legal|solicitor|attorney|lawyer|litigation/i.test(pageMetaText);
-  
-  const hasRetailKeywords = /shop|cart|checkout|catalog|catalogue|ecommerce/i.test(pageMetaText); // Removed vague words
-  const hasEcommerceTech = infrastructure.some((tech: any) => 
-    /eCommerce|Commerce|Shopify|Magento|WooCommerce|BigCommerce/i.test(tech.name || '') ||
-    (Array.isArray(tech.categories) && tech.categories.some((c: string) => /eCommerce|Cart/i.test(c)))
-  );
-  
-  const isRetailEcommerce = hasRetailKeywords || hasEcommerceTech;
 
-  let industryTerms = {
+  // 1. The frontend now cleanly consumes the backend AI payload (auditData.industryContext)
+  // If the payload is missing (e.g., legacy scan), it gracefully falls back to universal defaults.
+  const industryTerms = auditData?.industryContext || {
     action: `prospects can complete their journey on ${brandName}`,
     shortAction: `convert`,
     scale: 'digital presence',
@@ -226,54 +215,6 @@ export default function AuditReportPage() {
     userType: 'visitors',
     buttons: 'forms and contact buttons'
   };
-
-  // Prioritize highly specific niches first
-  if (isLogistics) {
-    industryTerms = {
-      action: `commercial clients can request quotes or book shipments on ${brandName}`,
-      shortAction: `request a quote or track a shipment`,
-      scale: `freight and logistics portal`,
-      penalty: `commercial transport search rankings`,
-      userType: `commercial shippers`,
-      buttons: `quote request forms and tracking links`
-    };
-  } else if (isLegal) {
-    industryTerms = {
-      action: `prospective clients can submit a consultation request to ${brandName}`,
-      shortAction: `book a consultation`,
-      scale: `legal practice portal`,
-      penalty: `local legal and solicitor search rankings`,
-      userType: `prospective clients`,
-      buttons: `consultation forms and contact links`
-    };
-  } else if (isRetailEcommerce || rawDomNodes > 1800) {
-    industryTerms = {
-      action: `mobile shoppers can add items to their cart and complete checkout on ${brandName}`,
-      shortAction: `complete checkout`,
-      scale: `digital retail catalog`,
-      penalty: `high-intent shopping search rankings`,
-      userType: `shoppers`,
-      buttons: `product links and checkout buttons`
-    };
-  } else if (rawDomNodes > 800) {
-    industryTerms = {
-      action: `qualified leads can complete the inquiry flow on ${brandName}`,
-      shortAction: `complete onboarding`,
-      scale: `lead acquisition pipeline`,
-      penalty: `organic B2B search rankings`,
-      userType: `qualified leads`,
-      buttons: `inquiry forms and booking links`
-    };
-  } else {
-    industryTerms = {
-      action: `clients can complete a booking or contact request on ${brandName}`,
-      shortAction: `book a service`,
-      scale: `online storefront`,
-      penalty: `local map packs and mobile search placement`,
-      userType: `potential clients`,
-      buttons: `contact forms and booking buttons`
-    };
-  }
 
   let dynamicSynthesis = '';
   
@@ -304,7 +245,7 @@ export default function AuditReportPage() {
   }
 
 
-  // --- DYNAMIC CARDS CONFIGURATION & SORTING (MOVED BELOW TERMINOLOGY) ---
+  // --- DYNAMIC CARDS INJECTING AI TERMINOLOGY ---
   const frictionCards = [
     {
       id: 'revenue',
