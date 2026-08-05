@@ -72,7 +72,6 @@ export default function AuditReportPage() {
     };
 
     window.addEventListener('scroll', handleScroll, { passive: true });
-    // Run once on mount in case page is already scrolled
     handleScroll();
 
     return () => window.removeEventListener('scroll', handleScroll);
@@ -239,6 +238,10 @@ export default function AuditReportPage() {
     buttons: 'forms and contact buttons'
   };
 
+  // DEFENSIVE CLEANER: Strips any accidental leading "before" from the AI action string
+  const rawAction = String(industryTerms.action || `prospects can complete their journey on ${brandName}`);
+  const cleanAction = rawAction.replace(/^before\s+/i, '');
+
   let dynamicSynthesis = '';
   
   if (parseFloat(revenueLeakagePercent) === 0 && isGhostOptimal && !isMapPenalized && !isFragile && parseFloat(parasiteImpact) === 0) {
@@ -261,7 +264,7 @@ export default function AuditReportPage() {
       : ` An Interaction to Next Paint (INP) of ${rawInp}ms stays within healthy thresholds, protecting ${industryTerms.penalty}.`;
       
     const sentence5 = parseFloat(revenueLeakagePercent) > 0 
-      ? ` This technical friction drives an estimated minimum revenue leakage of ${revenueLeakagePercent}%—draining conversions before ${industryTerms.action}.`
+      ? ` This technical friction drives an estimated minimum revenue leakage of ${revenueLeakagePercent}%—draining conversions before ${cleanAction}.`
       : ` Despite structural warnings, rendering speed is sufficient to estimate zero immediate revenue loss.`;
 
     dynamicSynthesis = `${sentence1}${sentence2}${sentence3}${sentence4}${sentence5}`;
@@ -1115,8 +1118,9 @@ export default function AuditReportPage() {
       {/* --- MOBILE SCROLL-TO-TOP BUTTON --- */}
       {showScrollTop && (
         <button 
+          type="button"
           onClick={scrollToTop}
-          className="sm:hidden fixed bottom-6 right-6 z-50 flex items-center justify-center w-12 h-12 rounded-full bg-[#0a0a0f]/90 border border-cyan-500/40 text-cyan-400 shadow-[0_0_20px_rgba(6,182,212,0.3)] backdrop-blur-md transition-all hover:bg-cyan-500/20 active:scale-95 animate-fade-in"
+          className="sm:hidden fixed bottom-6 right-6 z-50 flex items-center justify-center w-12 h-12 rounded-full bg-[#0a0a0f]/95 border border-cyan-500/50 text-cyan-400 shadow-[0_0_25px_rgba(6,182,212,0.4)] backdrop-blur-xl transition-all hover:bg-cyan-500/20 active:scale-95 cursor-pointer animate-in fade-in duration-300"
           aria-label="Scroll to top"
         >
           <ArrowUp size={20} />
