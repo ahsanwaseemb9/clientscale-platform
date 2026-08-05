@@ -5,7 +5,7 @@ import {
   AlertTriangle, DollarSign, Ghost, ShieldAlert, Activity, 
   Database, ServerCrash, X, ChevronRight, MapPin, MailWarning,
   ListOrdered, Layers, Globe, Image as ImageIcon, Accessibility, 
-  CheckCircle, AlertCircle, Cpu, Lock, Unlock, ShieldCheck, Search, Info
+  CheckCircle, AlertCircle, Cpu, Lock, Unlock, ShieldCheck, Search, Info, ArrowUp
 } from 'lucide-react';
 
 // --- UPGRADE MAPPING DICTIONARY ---
@@ -43,6 +43,7 @@ export default function AuditReportPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [activeDrawer, setActiveDrawer] = useState<'revenue' | 'ghost' | 'parasite' | 'dom' | 'inp' | 'dns' | 'accessibility' | null>(null);
   const [isUpgradeUnlocked, setIsUpgradeUnlocked] = useState(false);
+  const [showScrollTop, setShowScrollTop] = useState(false);
 
   useEffect(() => {
     const storedData = sessionStorage.getItem('clientScale_auditData');
@@ -58,6 +59,23 @@ export default function AuditReportPage() {
     }
     setIsLoading(false);
   }, []);
+
+  // Track scroll position to toggle the mobile scroll-to-top button
+  useEffect(() => {
+    const handleScroll = () => {
+      if (window.scrollY > 400) {
+        setShowScrollTop(true);
+      } else {
+        setShowScrollTop(false);
+      }
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
   if (isLoading) {
     return (
@@ -1088,6 +1106,17 @@ export default function AuditReportPage() {
         )}
 
       </div>
+
+      {/* --- MOBILE SCROLL-TO-TOP BUTTON --- */}
+      {showScrollTop && (
+        <button 
+          onClick={scrollToTop}
+          className="sm:hidden fixed bottom-6 right-6 z-50 flex items-center justify-center w-12 h-12 rounded-full bg-[#0a0a0f]/90 border border-cyan-500/40 text-cyan-400 shadow-[0_0_20px_rgba(6,182,212,0.3)] backdrop-blur-md transition-all hover:bg-cyan-500/20 active:scale-95 animate-fade-in"
+          aria-label="Scroll to top"
+        >
+          <ArrowUp size={20} />
+        </button>
+      )}
     </main>
   );
 }
