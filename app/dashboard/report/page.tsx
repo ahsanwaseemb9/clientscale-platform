@@ -662,7 +662,7 @@ export default function AuditReportPage() {
             </div>
           </div>
 
-          <div className="grid grid-cols-2 lg:grid-cols-1 gap-3 sm:gap-8">
+          <div className="grid grid-cols-1 gap-6 sm:gap-8">
             <VercelGraph 
               title="Conversion Disruption"
               yUnit="%"
