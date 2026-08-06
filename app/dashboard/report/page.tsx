@@ -563,12 +563,6 @@ export default function AuditReportPage() {
         <div className="flex flex-col items-center text-center gap-6 border-b border-zinc-700/80 pb-10 mb-12 w-full overflow-hidden">
           <div className="w-full max-w-3xl px-2">
             
-            {/* Telemetry Snapshot Badge */}
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 font-mono text-xs mb-4 shadow-[0_0_10px_rgba(6,182,212,0.15)]">
-              <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span>
-              Telemetry Snapshot Captured: {auditTimestamp}
-            </div>
-
             <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-white tracking-tight">
               Diagnostic Forensics
             </h1>
@@ -579,6 +573,13 @@ export default function AuditReportPage() {
                 {auditData?.target?.replace('https://', '').replace('http://', '') || 'Target Domain'}
               </span>
             </p>
+
+            {/* Telemetry Snapshot Badge */}
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 font-mono text-xs mt-6 shadow-[0_0_10px_rgba(6,182,212,0.15)]">
+              <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span>
+              Telemetry Snapshot Captured: {auditTimestamp}
+            </div>
+            
           </div>
 
           <button className="w-full sm:w-auto bg-gradient-to-b from-cyan-600 to-cyan-700 hover:from-cyan-500 hover:to-cyan-600 text-white px-8 py-3.5 rounded-xl font-bold text-xs sm:text-sm transition-all shadow-[0_0_20px_rgba(6,182,212,0.4)] flex items-center justify-center gap-2 border border-cyan-400/50 mt-2">
