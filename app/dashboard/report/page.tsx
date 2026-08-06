@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { 
   AlertTriangle, DollarSign, Ghost, ShieldAlert, Activity, 
   Database, ServerCrash, X, ChevronRight, MapPin, MailWarning,
@@ -44,6 +44,9 @@ export default function AuditReportPage() {
   const [activeDrawer, setActiveDrawer] = useState<'revenue' | 'ghost' | 'parasite' | 'dom' | 'inp' | 'dns' | 'accessibility' | null>(null);
   const [isUpgradeUnlocked, setIsUpgradeUnlocked] = useState(false);
   const [showScrollTop, setShowScrollTop] = useState(false);
+  
+  // Anchor reference to target the absolute top of the page
+  const topAnchorRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const storedData = sessionStorage.getItem('clientScale_auditData');
@@ -60,26 +63,26 @@ export default function AuditReportPage() {
     setIsLoading(false);
   }, []);
 
-  // Track global window scroll position to show/hide the scroll-to-top button
+  // --- ROBUST SCROLL DETECTION (Intersection Observer bypasses CSS layout scroll issues) ---
   useEffect(() => {
-    const handleScroll = () => {
-      const scrollPos = window.scrollY || document.documentElement.scrollTop;
-      if (scrollPos > 150) {
-        setShowScrollTop(true);
-      } else {
-        setShowScrollTop(false);
-      }
-    };
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        // Show the return-to-top arrow if the top of the page is out of the viewport
+        setShowScrollTop(!entry.isIntersecting);
+      },
+      { root: null, threshold: 0 }
+    );
 
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    // Run once on mount in case page is already scrolled
-    handleScroll();
+    if (topAnchorRef.current) {
+      observer.observe(topAnchorRef.current);
+    }
 
-    return () => window.removeEventListener('scroll', handleScroll);
+    return () => observer.disconnect();
   }, []);
 
+  // --- BULLETPROOF SCROLL-TO-TOP FUNCTION ---
   const scrollToTop = () => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    topAnchorRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
   if (isLoading) {
@@ -549,6 +552,9 @@ export default function AuditReportPage() {
 
   return (
     <main className="flex min-h-[100dvh] w-full flex-col items-center bg-[#020205] text-white antialiased selection:bg-cyan-500/30 selection:text-cyan-200 overflow-x-hidden pb-24 relative">
+      
+      {/* Anchor Element used to pull the view perfectly to the top */}
+      <div ref={topAnchorRef} className="absolute top-0 left-0 w-full h-px opacity-0 pointer-events-none" />
 
       {/* --- SPACE AGENCY TELEMETRY BACKGROUND LAYERS --- */}
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_-20%,rgba(16,24,48,0.85),rgba(2,2,5,1)_65%)] pointer-events-none z-0" />
@@ -967,6 +973,16 @@ export default function AuditReportPage() {
            </div>
         </div>
 
+        {/* --- BOTTOM STATIC SCROLL-TO-TOP BUTTON --- */}
+        <div className="flex justify-center mt-12 pb-8 w-full border-t border-zinc-800/80 pt-8 relative z-20">
+          <button 
+            onClick={scrollToTop}
+            className="flex items-center gap-2 text-zinc-400 hover:text-cyan-400 transition-colors font-mono text-xs uppercase tracking-widest"
+          >
+            <ArrowUp size={16} /> Return to Top
+          </button>
+        </div>
+
         {/* --- SLIDE-OUT DRAWER --- */}
         <div 
           className={`fixed inset-y-0 right-0 w-full sm:w-[450px] bg-[#0c0c14]/95 backdrop-blur-2xl border-l border-zinc-600 p-6 sm:p-8 transform transition-transform duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] z-50 overflow-y-auto ${
@@ -1151,7 +1167,7 @@ export default function AuditReportPage() {
 
       </div>
 
-      {/* --- GLOBAL SCROLL-TO-TOP BUTTON --- */}
+      {/* --- GLOBAL SCROLL-TO-TOP BUTTON (FLOATING) --- */}
       {showScrollTop && (
         <button 
           type="button"
