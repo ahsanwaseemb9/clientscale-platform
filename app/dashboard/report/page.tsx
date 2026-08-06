@@ -528,6 +528,25 @@ export default function AuditReportPage() {
     );
   };
 
+  // Format the audit timestamp nicely (e.g., "August 6, 2026 at 4:07 PM")
+  const formatAuditDate = (isoString?: string) => {
+    try {
+      const date = isoString ? new Date(isoString) : new Date();
+      return new Intl.DateTimeFormat('en-GB', {
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: true
+      }).format(date);
+    } catch {
+      return 'Live Telemetry Snapshot';
+    }
+  };
+
+  const auditTimestamp = formatAuditDate(auditData?.timestamp);
+
   return (
     <main className="flex min-h-[100dvh] w-full flex-col items-center bg-[#020205] text-white antialiased selection:bg-cyan-500/30 selection:text-cyan-200 overflow-x-hidden pb-24 relative">
 
@@ -543,9 +562,17 @@ export default function AuditReportPage() {
         {/* --- PAGE HEADER --- */}
         <div className="flex flex-col items-center text-center gap-6 border-b border-zinc-700/80 pb-10 mb-12 w-full overflow-hidden">
           <div className="w-full max-w-3xl px-2">
+            
+            {/* Telemetry Snapshot Badge */}
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 font-mono text-xs mb-4 shadow-[0_0_10px_rgba(6,182,212,0.15)]">
+              <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span>
+              Telemetry Snapshot Captured: {auditTimestamp}
+            </div>
+
             <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-white tracking-tight">
               Diagnostic Forensics
             </h1>
+            
             <p className="text-zinc-200 mt-5 sm:mt-6 text-sm sm:text-base font-mono font-medium">
               Live pipeline intelligence for{' '}
               <span className="text-cyan-300 font-bold inline-block whitespace-nowrap">
@@ -553,6 +580,7 @@ export default function AuditReportPage() {
               </span>
             </p>
           </div>
+
           <button className="w-full sm:w-auto bg-gradient-to-b from-cyan-600 to-cyan-700 hover:from-cyan-500 hover:to-cyan-600 text-white px-8 py-3.5 rounded-xl font-bold text-xs sm:text-sm transition-all shadow-[0_0_20px_rgba(6,182,212,0.4)] flex items-center justify-center gap-2 border border-cyan-400/50 mt-2">
             <Activity size={16} />
             Initialize AI Remediation
