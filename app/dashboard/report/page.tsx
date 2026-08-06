@@ -447,7 +447,7 @@ export default function AuditReportPage() {
     }, [series]);
 
     const width = 500;
-    const height = 120;
+    const height = 200; // Increased internal resolution height
     const dx = width / 39;
 
     const generatePath = (data: number[]) => {
@@ -466,37 +466,37 @@ export default function AuditReportPage() {
     };
 
     return (
-      <div className="bg-[#050508] border border-zinc-800 rounded-xl p-4 sm:p-5 w-full flex flex-col h-full min-h-[260px] shadow-lg relative overflow-hidden">
-        <div className="flex justify-between items-center mb-3">
-          <h3 className="text-[13px] font-semibold text-zinc-200 tracking-wide flex items-center gap-2">
+      <div className="bg-[#050508] border border-zinc-800 rounded-xl p-5 sm:p-7 w-full flex flex-col h-full min-h-[340px] sm:min-h-[450px] shadow-lg relative overflow-hidden">
+        <div className="flex justify-between items-center mb-4 sm:mb-5">
+          <h3 className="text-[13px] sm:text-[14px] font-semibold text-zinc-200 tracking-wide flex items-center gap-2">
             {title}
             <ChevronRight size={14} className="text-zinc-600" />
           </h3>
         </div>
         
-        <div className="flex gap-4 mb-6 relative z-10">
+        <div className="flex gap-5 mb-6 sm:mb-8 relative z-10">
           {series.map((s: any, idx: number) => (
-            <div key={idx} className="flex flex-col gap-1">
-              <span className="text-[10px] text-zinc-500 font-medium">{s.label}</span>
-              <div className="flex items-center gap-1.5 text-xs font-mono font-bold text-zinc-200">
-                <span className="w-2 h-2 rounded-full" style={{ backgroundColor: s.color }} />
+            <div key={idx} className="flex flex-col gap-1.5">
+              <span className="text-[10px] sm:text-[11px] text-zinc-500 font-medium">{s.label}</span>
+              <div className="flex items-center gap-1.5 text-xs sm:text-sm font-mono font-bold text-zinc-200">
+                <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: s.color }} />
                 {s.currentDisplay}
               </div>
             </div>
           ))}
         </div>
 
-        <div className="relative flex-grow flex items-end">
+        <div className="relative flex-grow flex items-end mt-2 min-h-[200px] sm:min-h-[300px]">
           <div className="absolute inset-0 flex flex-col justify-between pb-6">
             {[maxVal, maxVal * 0.75, maxVal * 0.5, maxVal * 0.25, 0].map((val, i) => (
               <div key={i} className="flex items-center w-full gap-3 relative z-0">
-                <span className="text-[9px] font-mono text-zinc-600 w-6 text-right shrink-0">{val}{yUnit}</span>
+                <span className="text-[9px] sm:text-[10px] font-mono text-zinc-600 w-8 sm:w-10 text-right shrink-0">{val}{yUnit}</span>
                 <div className="flex-grow border-t border-zinc-800/60" />
               </div>
             ))}
           </div>
 
-          <div className="absolute inset-0 pl-9 pb-6 pt-1">
+          <div className="absolute inset-0 pl-11 sm:pl-14 pb-6 pt-1">
             <svg className="w-full h-full" viewBox={`0 0 ${width} ${height}`} preserveAspectRatio="none">
               {series.map((s: any, idx: number) => (
                 <g key={idx}>
@@ -521,9 +521,9 @@ export default function AuditReportPage() {
             </svg>
           </div>
           
-          <div className="absolute bottom-0 left-9 right-0 flex justify-between pt-2 border-t border-zinc-800/60">
+          <div className="absolute bottom-0 left-11 sm:left-14 right-0 flex justify-between pt-3 border-t border-zinc-800/60">
             {xLabels.map((l: string, i: number) => (
-              <span key={i} className="text-[9px] font-mono text-zinc-500">{l}</span>
+              <span key={i} className="text-[9px] sm:text-[10px] font-mono text-zinc-500">{l}</span>
             ))}
           </div>
         </div>
@@ -662,7 +662,7 @@ export default function AuditReportPage() {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8">
             <VercelGraph 
               title="Conversion Disruption"
               yUnit="%"
