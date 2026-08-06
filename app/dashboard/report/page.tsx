@@ -575,9 +575,12 @@ export default function AuditReportPage() {
             </p>
 
             {/* Telemetry Snapshot Badge */}
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 font-mono text-xs mt-6 shadow-[0_0_10px_rgba(6,182,212,0.15)]">
-              <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span>
-              Telemetry Snapshot Captured: {auditTimestamp}
+            <div className="inline-flex flex-col sm:flex-row items-center gap-1.5 sm:gap-2 px-4 py-2 sm:px-3 sm:py-1 rounded-xl sm:rounded-full bg-cyan-500/10 border border-cyan-500/30 text-white font-mono text-xs mt-6 shadow-[0_0_10px_rgba(6,182,212,0.15)]">
+              <div className="flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span>
+                <span>Telemetry Snapshot Captured:</span>
+              </div>
+              <span className="font-semibold sm:font-normal">{auditTimestamp}</span>
             </div>
             
           </div>
@@ -1148,12 +1151,12 @@ export default function AuditReportPage() {
 
       </div>
 
-      {/* --- MOBILE SCROLL-TO-TOP BUTTON --- */}
+      {/* --- GLOBAL SCROLL-TO-TOP BUTTON --- */}
       {showScrollTop && (
         <button 
           type="button"
           onClick={scrollToTop}
-          className="sm:hidden fixed bottom-6 right-6 z-50 flex items-center justify-center w-12 h-12 rounded-full bg-[#0a0a0f]/95 border border-cyan-500/50 text-cyan-400 shadow-[0_0_25px_rgba(6,182,212,0.4)] backdrop-blur-xl transition-all hover:bg-cyan-500/20 active:scale-95 cursor-pointer animate-in fade-in duration-300"
+          className="fixed bottom-6 right-6 z-50 flex items-center justify-center w-12 h-12 rounded-full bg-[#0a0a0f]/95 border border-cyan-500/50 text-cyan-400 shadow-[0_0_25px_rgba(6,182,212,0.4)] backdrop-blur-xl transition-all hover:bg-cyan-500/20 active:scale-95 cursor-pointer animate-in fade-in duration-300"
           aria-label="Scroll to top"
         >
           <ArrowUp size={20} />
