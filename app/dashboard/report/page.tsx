@@ -447,7 +447,7 @@ export default function AuditReportPage() {
     }, [series]);
 
     const width = 500;
-    const height = 120; // Restored to original height for proportional display
+    const height = 120; // Internal coordinate height
     const dx = width / 39;
 
     const generatePath = (data: number[]) => {
@@ -465,21 +465,45 @@ export default function AuditReportPage() {
       return `${line} L ${width},${height} L 0,${height} Z`;
     };
 
+    // Formatter to force line breaks on specific labels for mobile
+    const formatLabel = (label: string) => {
+      if (label === 'TBT (Thread Lock)') {
+        return (
+          <>
+            <span className="block sm:inline">TBT</span>
+            <span className="block sm:inline sm:ml-1">(Thread Lock)</span>
+          </>
+        );
+      }
+      const parts = label.split(' ');
+      if (parts.length > 1) {
+        return (
+          <>
+            <span className="block sm:inline">{parts[0]}</span>
+            <span className="block sm:inline sm:ml-1">{parts.slice(1).join(' ')}</span>
+          </>
+        );
+      }
+      return label;
+    };
+
     return (
       <div className="bg-[#050508] border border-zinc-800 rounded-xl p-3 sm:p-5 w-full flex flex-col h-full min-h-[260px] shadow-lg relative overflow-hidden">
-        <div className="flex justify-between items-center mb-3">
-          <h3 className="text-[11px] sm:text-[13px] font-semibold text-zinc-200 tracking-wide flex items-center gap-1.5 sm:gap-2">
+        <div className="flex justify-between items-start mb-3 sm:mb-4">
+          <h3 className="text-sm sm:text-lg font-bold text-zinc-100 tracking-wide leading-tight flex items-start gap-1.5 sm:gap-2">
             {title}
-            <ChevronRight size={14} className="text-zinc-600" />
+            <ChevronRight size={16} className="text-zinc-600 mt-0.5" />
           </h3>
         </div>
         
-        <div className="flex flex-col sm:flex-row gap-2 sm:gap-4 mb-4 sm:mb-6 relative z-10">
+        <div className="flex flex-row gap-3 sm:gap-6 mb-5 sm:mb-8 relative z-10 w-full">
           {series.map((s: any, idx: number) => (
-            <div key={idx} className="flex flex-col gap-0.5 sm:gap-1">
-              <span className="text-[9px] sm:text-[10px] text-zinc-500 font-medium">{s.label}</span>
-              <div className="flex items-center gap-1.5 text-[10px] sm:text-xs font-mono font-bold text-zinc-200">
-                <span className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full" style={{ backgroundColor: s.color }} />
+            <div key={idx} className="flex flex-col gap-1 sm:gap-1.5 flex-1">
+              <span className="text-xs sm:text-sm text-zinc-400 font-semibold leading-snug break-words">
+                {formatLabel(s.label)}
+              </span>
+              <div className="flex items-center gap-1.5 text-sm sm:text-base font-mono font-bold text-zinc-100">
+                <span className="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full shrink-0" style={{ backgroundColor: s.color }} />
                 {s.currentDisplay}
               </div>
             </div>
@@ -490,13 +514,13 @@ export default function AuditReportPage() {
           <div className="absolute inset-0 flex flex-col justify-between pb-6">
             {[maxVal, maxVal * 0.75, maxVal * 0.5, maxVal * 0.25, 0].map((val, i) => (
               <div key={i} className="flex items-center w-full gap-2 sm:gap-3 relative z-0">
-                <span className="text-[8px] sm:text-[9px] font-mono text-zinc-600 w-6 text-right shrink-0">{val}{yUnit}</span>
+                <span className="text-[10px] sm:text-xs font-mono text-zinc-500 w-6 sm:w-8 text-right shrink-0">{val}{yUnit}</span>
                 <div className="flex-grow border-t border-zinc-800/60" />
               </div>
             ))}
           </div>
 
-          <div className="absolute inset-0 pl-9 pb-6 pt-1">
+          <div className="absolute inset-0 pl-9 sm:pl-12 pb-6 pt-1">
             <svg className="w-full h-full" viewBox={`0 0 ${width} ${height}`} preserveAspectRatio="none">
               {series.map((s: any, idx: number) => (
                 <g key={idx}>
@@ -521,9 +545,9 @@ export default function AuditReportPage() {
             </svg>
           </div>
           
-          <div className="absolute bottom-0 left-9 right-0 flex justify-between pt-2 border-t border-zinc-800/60">
+          <div className="absolute bottom-0 left-9 sm:left-12 right-0 flex justify-between pt-2 border-t border-zinc-800/60">
             {xLabels.map((l: string, i: number) => (
-              <span key={i} className="text-[8px] sm:text-[9px] font-mono text-zinc-500">{l}</span>
+              <span className="text-[10px] sm:text-xs font-mono text-zinc-500" key={i}>{l}</span>
             ))}
           </div>
         </div>
@@ -662,7 +686,7 @@ export default function AuditReportPage() {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 gap-6 sm:gap-8">
+          <div className="grid grid-cols-2 lg:grid-cols-1 gap-3 sm:gap-8">
             <VercelGraph 
               title="Conversion Disruption"
               yUnit="%"
