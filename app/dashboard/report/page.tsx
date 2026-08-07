@@ -330,75 +330,8 @@ export default function AuditReportPage() {
   frictionCards.sort((a, b) => (a.isGreen === b.isGreen ? 0 : a.isGreen ? 1 : -1));
 
 
-  // High-End APM Streaming Telemetry Component
-  const LiveTelemetryWave = ({ isFlat, isAlert }: { isFlat: boolean; isAlert: boolean }) => {
-    const [points, setPoints] = useState<number[]>([]);
-
-    useEffect(() => {
-      if (isFlat) {
-        setPoints(Array(35).fill(18));
-        return;
-      }
-
-      const initial = Array.from({ length: 35 }, () => 18 + (Math.random() * 10 - 5));
-      setPoints(initial);
-
-      const interval = setInterval(() => {
-        setPoints((prev) => {
-          const nextVal = 18 + (Math.random() * (isAlert ? 24 : 8) - (isAlert ? 12 : 4));
-          const clamped = Math.max(4, Math.min(32, nextVal));
-          return [...prev.slice(1), clamped];
-        });
-      }, 400);
-
-      return () => clearInterval(interval);
-    }, [isFlat, isAlert]);
-
-    const width = 500;
-    const height = 36;
-    const dx = width / (points.length - 1 || 1);
-
-    let pathString = '';
-    if (points.length > 0) {
-      pathString = `M 0,${points[0]}`;
-      for (let i = 0; i < points.length - 1; i++) {
-        const xCurrent = i * dx;
-        const yCurrent = points[i];
-        const xNext = (i + 1) * dx;
-        const yNext = points[i + 1];
-        const xMid = (xCurrent + xNext) / 2;
-        pathString += ` Q ${xMid},${yCurrent} ${xNext},${yNext}`;
-      }
-    }
-
-    const strokeColor = '#ffffff';
-
-    return (
-      <div className="w-full h-10 overflow-hidden relative mt-4 flex items-center bg-[#12121c]/90 border border-zinc-600/50 rounded-xl px-2 shadow-inner">
-        <svg className="w-full h-full" viewBox={`0 0 ${width} ${height}`} preserveAspectRatio="none">
-          <defs>
-            <linearGradient id={`grad-white`} x1="0%" y1="0%" x2="100%" y2="0%">
-              <stop offset="0%" stopColor={strokeColor} stopOpacity={isFlat ? "0.7" : "0.3"} />
-              <stop offset="50%" stopColor={strokeColor} stopOpacity="1" />
-              <stop offset="100%" stopColor={strokeColor} stopOpacity={isFlat ? "0.7" : "0.3"} />
-            </linearGradient>
-          </defs>
-          <path 
-            d={pathString} 
-            fill="none" 
-            stroke="url(#grad-white)"
-            strokeWidth="2.5" 
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            className="drop-shadow-[0_0_8px_rgba(255,255,255,0.7)]"
-          />
-        </svg>
-      </div>
-    );
-  };
-
   // --- CLIENTSCALE CUSTOM TELEMETRY GRAPH ---
-  const TelemetryGraph = ({ title, series, yUnit = '', xLabels = ['6h ago', 'Live Sync'], maxVal = 100 }: any) => {
+  const TelemetryGraph = ({ title, series, yUnit = '', xLabels = ['- 60s', 'Live Sync'], maxVal = 100 }: any) => {
     const [dataLines, setDataLines] = useState<number[][]>(() => 
       series.map((s: any) => Array.from({length: 40}, () => Math.max(0, s.base + (Math.random() * s.variance - s.variance/2))))
     );
@@ -442,9 +375,9 @@ export default function AuditReportPage() {
         <div className="absolute inset-0 bg-[linear-gradient(to_right,#06b6d408_1px,transparent_1px),linear-gradient(to_bottom,#06b6d408_1px,transparent_1px)] bg-[size:24px_24px] pointer-events-none" />
 
         <div className="relative z-10 flex flex-row justify-between items-center mb-6 gap-2">
-          <h3 className="text-[9.5px] xs:text-[10.5px] sm:text-[11px] font-mono font-bold text-cyan-500/90 uppercase tracking-widest sm:tracking-[0.2em] flex items-center gap-1.5 sm:gap-2 whitespace-nowrap overflow-hidden">
+          <h3 className="text-[8.5px] xs:text-[9.5px] sm:text-[11px] font-mono font-bold text-cyan-500/90 uppercase tracking-widest sm:tracking-[0.2em] flex items-center gap-1.5 sm:gap-2 whitespace-nowrap">
             <Activity size={14} className="text-cyan-400 shrink-0" />
-            <span className="truncate">[ {title} ]</span>
+            <span>[ {title} ]</span>
           </h3>
           <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
             <span className="relative flex h-1.5 w-1.5 sm:h-2 sm:w-2">
@@ -471,14 +404,14 @@ export default function AuditReportPage() {
         <div className="relative flex-grow flex items-end mt-4">
           <div className="absolute inset-0 flex flex-col justify-between pb-6">
             {[maxVal, maxVal * 0.75, maxVal * 0.5, maxVal * 0.25, 0].map((val, i) => (
-              <div key={i} className="flex items-center w-full gap-2 sm:gap-3 relative z-0">
-                <span className="text-[10px] sm:text-xs font-mono text-zinc-400 w-10 sm:w-12 text-right shrink-0">{val}{yUnit}</span>
+              <div key={i} className="flex items-center w-full gap-3 relative z-0">
+                <span className="text-[10px] sm:text-[11px] font-mono text-zinc-500 w-10 sm:w-12 text-right shrink-0">{val}{yUnit}</span>
                 <div className="flex-grow border-t border-zinc-800/50 border-dashed" />
               </div>
             ))}
           </div>
 
-          <div className="absolute inset-0 pl-[48px] sm:pl-[60px] pb-6 pt-1">
+          <div className="absolute inset-0 pl-[52px] sm:pl-[64px] pb-6 pt-1">
             <svg className="w-full h-full overflow-visible" viewBox={`0 0 ${width} ${height}`} preserveAspectRatio="none">
               <defs>
                 {/* SVG Glow Filters for Telemetry Oscilloscope effect */}
@@ -519,7 +452,7 @@ export default function AuditReportPage() {
             </svg>
           </div>
           
-          <div className="absolute bottom-0 left-[48px] sm:left-[60px] right-0 flex justify-between pt-2 border-t border-zinc-800/80">
+          <div className="absolute bottom-0 left-[52px] sm:left-[64px] right-0 flex justify-between pt-2 border-t border-zinc-800/80">
             {xLabels.map((l: string, i: number) => (
               <span className="text-[9px] sm:text-[10px] font-mono text-zinc-500 uppercase tracking-widest" key={i}>{l}</span>
             ))}
