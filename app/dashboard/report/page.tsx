@@ -24,7 +24,7 @@ const TECH_UPGRADES: Record<string, { upgrade: string; reason: string }> = {
   // Widgets & Chat
   "Intercom": { upgrade: "Automated AI Lead Nurture", reason: "Replaces expensive human latency with instant AI triage for mid-sized operations." },
   "Mindbody": { upgrade: "Headless Booking API", reason: "Removes third-party iframe lag to keep users inside your optimized conversion funnel." },
-  "Calendly": { Native: "API Scheduling", reason: "Prevents external CSS/JS injection and keeps the user on your domain." },
+  "Calendly": { upgrade: "Native API Scheduling", reason: "Prevents external CSS/JS injection and keeps the user on your domain." },
   
   // Servers / Misc
   "Apache": { upgrade: "Vercel Edge Network", reason: "Shifts compute to the edge for instant Time-to-First-Byte globally." },
@@ -471,7 +471,7 @@ export default function AuditReportPage() {
         <div className="relative flex-grow flex items-end mt-4">
           <div className="absolute inset-0 flex flex-col justify-between pb-6">
             {[maxVal, maxVal * 0.75, maxVal * 0.5, maxVal * 0.25, 0].map((val, i) => (
-              <div key={i} className="flex items-center w-full gap-3 relative z-0">
+              <div key={i} className="flex items-center w-full gap-2 sm:gap-3 relative z-0">
                 <span className="text-[10px] sm:text-[11px] font-mono text-zinc-500 w-10 sm:w-12 text-right shrink-0">{val}{yUnit}</span>
                 <div className="flex-grow border-t border-zinc-800/50 border-dashed" />
               </div>
