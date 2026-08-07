@@ -441,12 +441,12 @@ export default function AuditReportPage() {
         {/* Subtle Radar/Telemetry Background Grid */}
         <div className="absolute inset-0 bg-[linear-gradient(to_right,#06b6d408_1px,transparent_1px),linear-gradient(to_bottom,#06b6d408_1px,transparent_1px)] bg-[size:24px_24px] pointer-events-none" />
 
-        <div className="relative z-10 flex justify-between items-center mb-6">
-          <h3 className="text-[10px] sm:text-[11px] font-mono font-bold text-cyan-500/90 uppercase tracking-[0.2em] flex items-center gap-2">
-            <Activity size={14} className="text-cyan-400" />
-            [ {title} ]
+        <div className="relative z-10 flex flex-row justify-between items-center mb-6 gap-2">
+          <h3 className="text-[9.5px] xs:text-[10.5px] sm:text-[11px] font-mono font-bold text-cyan-500/90 uppercase tracking-widest sm:tracking-[0.2em] flex items-center gap-1.5 sm:gap-2 whitespace-nowrap overflow-hidden">
+            <Activity size={14} className="text-cyan-400 shrink-0" />
+            <span className="truncate">[ {title} ]</span>
           </h3>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
             <span className="relative flex h-1.5 w-1.5 sm:h-2 sm:w-2">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>
               <span className="relative inline-flex rounded-full h-1.5 w-1.5 sm:h-2 sm:w-2 bg-cyan-500"></span>
@@ -471,14 +471,14 @@ export default function AuditReportPage() {
         <div className="relative flex-grow flex items-end mt-4">
           <div className="absolute inset-0 flex flex-col justify-between pb-6">
             {[maxVal, maxVal * 0.75, maxVal * 0.5, maxVal * 0.25, 0].map((val, i) => (
-              <div key={i} className="flex items-center w-full gap-3 relative z-0">
-                <span className="text-[8px] sm:text-[9px] font-mono text-zinc-600 w-8 text-right shrink-0">{val}{yUnit}</span>
+              <div key={i} className="flex items-center w-full gap-2 sm:gap-3 relative z-0">
+                <span className="text-[10px] sm:text-xs font-mono text-zinc-400 w-10 sm:w-12 text-right shrink-0">{val}{yUnit}</span>
                 <div className="flex-grow border-t border-zinc-800/50 border-dashed" />
               </div>
             ))}
           </div>
 
-          <div className="absolute inset-0 pl-11 pb-6 pt-1">
+          <div className="absolute inset-0 pl-[48px] sm:pl-[60px] pb-6 pt-1">
             <svg className="w-full h-full overflow-visible" viewBox={`0 0 ${width} ${height}`} preserveAspectRatio="none">
               <defs>
                 {/* SVG Glow Filters for Telemetry Oscilloscope effect */}
@@ -519,9 +519,9 @@ export default function AuditReportPage() {
             </svg>
           </div>
           
-          <div className="absolute bottom-0 left-11 right-0 flex justify-between pt-2 border-t border-zinc-800/80">
+          <div className="absolute bottom-0 left-[48px] sm:left-[60px] right-0 flex justify-between pt-2 border-t border-zinc-800/80">
             {xLabels.map((l: string, i: number) => (
-              <span className="text-[8px] sm:text-[9px] font-mono text-zinc-500 uppercase tracking-widest" key={i}>{l}</span>
+              <span className="text-[9px] sm:text-[10px] font-mono text-zinc-500 uppercase tracking-widest" key={i}>{l}</span>
             ))}
           </div>
         </div>
