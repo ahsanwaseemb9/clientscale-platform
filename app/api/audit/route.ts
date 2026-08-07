@@ -16,7 +16,7 @@ import { auditHtmlMetadata } from '../../lib/audit/html';
 Wappalyzer.setTechnologies(technologies);
 Wappalyzer.setCategories(categories);
 
-// --- AI SCHEMA DEFINITION (EXPANDED FOR EXECUTIVE SYNTHESIS) ---
+// --- AI SCHEMA DEFINITION ---
 const industryContextSchema = z.object({
   action: z.string().describe("The core business action. E.g., 'users can complete their checkout' or 'prospects can book a consultation'. STRICT RULE: Do NOT include 'draining conversions before' or 'before'. Provide only the standalone action."),
   shortAction: z.string().describe("e.g., 'request a quote' or 'complete a booking'"),
@@ -149,7 +149,7 @@ export async function GET(request: Request) {
         null,
         "Google PageSpeed"
       ),
-      // --- PHASE 1 & 2: BRAND SOUL & HUMAN FRICTION MAPPER ---
+      // --- PHASE 1, 2 & 3: BRAND SOUL & SELF-CORRECTING AGENT PIPELINE ---
       fetchWithTimeout(
         (async () => {
           if (!process.env.OPENAI_API_KEY) return null;
@@ -162,29 +162,36 @@ export async function GET(request: Request) {
           const primaryH1 = $('h1').first().text().replace(/\s+/g, ' ').trim();
           const heroText = $('header, main, section').first().text().replace(/\s+/g, ' ').substring(0, 1000);
 
-          const { object } = await generateObject({
+          // Agent A: The Writer (Generates Initial Draft)
+          const draftResponse = await generateObject({
             model: openai('gpt-4o-mini'), 
-            temperature: 0.1, // Grounded, consultative
-            schema: industryContextSchema,
+            temperature: 0.2,
+            schema: z.object({
+              draftSynthesis: z.string()
+            }),
             prompt: `You are a Senior Infrastructure Advisory Partner evaluating ${brandName} (${targetUrl}).
+BRAND SOUL CONTEXT: Title: ${pageTitle}, H1: ${primaryH1}, Context: ${heroText}.
+TASK: Write a 3-sentence executive synthesis to the founder explaining how rendering delays on mobile devices impact their SPECIFIC end-users.`
+          });
 
-BRAND SOUL CONTEXT:
-- Title: ${pageTitle || 'N/A'}
-- Meta Description: ${metaDesc || 'N/A'}
-- Primary Heading (H1): ${primaryH1 || 'N/A'}
-- Hero Context: ${heroText || 'N/A'}
+          // Agent B: The Critic (Enforces Guardrails & Finalizes Object)
+          const finalResponse = await generateObject({
+            model: openai('gpt-4o-mini'), 
+            temperature: 0.1, 
+            schema: industryContextSchema,
+            prompt: `You are a ruthless editor for an elite consulting firm. 
+Review this draft executive synthesis: "${draftResponse.object.draftSynthesis}"
 
 TASK:
-1. Identify their exact business model, vibe, and audience.
-2. Formulate clinical, high-level B2B business terms.
-3. Write a 3-sentence 'executiveSynthesis' directly to the founder. Explain how rendering delays on mobile devices impact their SPECIFIC end-users (e.g., commuters trying to check bus routes, legal clients booking urgent consultations, shippers requesting freight quotes).
-
-CRITICAL CONSTRAINTS:
-- Do NOT use cheesy marketing adjectives, sales pitches, or slogans.
-- NEVER use technical developer terms like "DOM", "JavaScript", "CPU main-thread", or "Core Web Vitals" in the executive synthesis.
-- Maintain a serious, authoritative, consultative partner tone.`
+1. Extract the required business terminology fields based on the brand context (${brandName}).
+2. Rewrite the 'executiveSynthesis' using the draft as a base. 
+CRITICAL CONSTRAINTS FOR REWRITE:
+- Eradicate ANY developer jargon (e.g., remove "DOM", "JavaScript", "CPU", "Core Web Vitals").
+- Eradicate ANY cheesy marketing SaaS slogans. 
+- Ensure it sounds grounded, authoritative, and speaks directly to human friction (e.g., commuters in the rain, lawyers missing deadlines).`
           });
-          return object;
+
+          return finalResponse.object;
         })(),
         18000, // 18s timeout for deep agent generation
         null,
@@ -219,7 +226,7 @@ CRITICAL CONSTRAINTS:
       target: targetUrl,
       status: 'success',
       timestamp: new Date().toISOString(),
-      industryContext: aiAnalysis, // <-- Injected AI Output (Includes executiveSynthesis)
+      industryContext: aiAnalysis, // <-- Injected AI Output (Now scrubbed by the Critic Agent)
       security: dnsResult,
       metaAndSocial: htmlAudit.socialPreview,
       accessibility: htmlAudit.accessibility,
