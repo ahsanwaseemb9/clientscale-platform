@@ -461,7 +461,7 @@ export default function AuditReportPage() {
               <span className="text-[9px] sm:text-[10px] text-zinc-500 font-mono font-bold uppercase tracking-widest">
                 {s.label}
               </span>
-              <div className="flex items-center gap-2 text-base sm:text-xl font-mono font-bold text-white drop-shadow-md">
+              <div className="flex items-center gap-2 text-sm sm:text-lg font-mono font-bold text-white drop-shadow-md">
                 {s.currentDisplay}
               </div>
             </div>
