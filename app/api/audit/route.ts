@@ -16,14 +16,16 @@ import { auditHtmlMetadata } from '../../lib/audit/html';
 Wappalyzer.setTechnologies(technologies);
 Wappalyzer.setCategories(categories);
 
-// --- AI SCHEMA DEFINITION ---
+// --- AI SCHEMA DEFINITION (EXPANDED FOR EXECUTIVE SYNTHESIS) ---
 const industryContextSchema = z.object({
   action: z.string().describe("The core business action. E.g., 'users can complete their checkout' or 'prospects can book a consultation'. STRICT RULE: Do NOT include 'draining conversions before' or 'before'. Provide only the standalone action."),
   shortAction: z.string().describe("e.g., 'request a quote' or 'complete a booking'"),
   scale: z.string().describe("e.g., 'freight and logistics portal' or 'e-commerce infrastructure'"),
   penalty: z.string().describe("e.g., 'commercial transport search rankings'"),
   userType: z.string().describe("e.g., 'commercial shippers' or 'retail customers'"),
-  buttons: z.string().describe("e.g., 'quote request forms' or 'checkout buttons'")
+  buttons: z.string().describe("e.g., 'quote request forms' or 'checkout buttons'"),
+  brandVibe: z.string().describe("e.g., 'Boutique Law Firm', 'Public Transit Network', 'High-End E-Commerce', 'B2B Logistics Portal'"),
+  executiveSynthesis: z.string().describe("A 3-sentence consultative executive briefing written directly to the business owner/founder. Connects technical latency directly to the human, real-world friction experienced by their specific customers. STRICT RULES: Zero developer jargon (never say 'DOM', 'JavaScript', or 'main thread'). Zero robotic SaaS slogans. Write like a senior partner at a top management consulting firm.")
 });
 
 function detectNextJs(html: string, headers: Record<string, string[]>) {
@@ -130,7 +132,6 @@ export async function GET(request: Request) {
         [],
         "Wappalyzer"
       ),
-      // 2. EXPLICIT ERROR LOGGING FOR GOOGLE API
       fetchWithTimeout(
         fetch(pageSpeedUrl).then(async (res) => {
           if (!res.ok) {
@@ -148,34 +149,46 @@ export async function GET(request: Request) {
         null,
         "Google PageSpeed"
       ),
-      // 3. OpenAI Context Generator
+      // --- PHASE 1 & 2: BRAND SOUL & HUMAN FRICTION MAPPER ---
       fetchWithTimeout(
         (async () => {
           if (!process.env.OPENAI_API_KEY) return null;
           
           const $ = cheerio.load(htmlText);
-          const pageTitle = $('title').text();
-          const metaDesc = $('meta[name="description"]').attr('content') || '';
-          const bodyText = $('body').text().replace(/\s+/g, ' ').substring(0, 1500); 
           
+          // Phase 1: Brand Soul Extraction
+          const pageTitle = $('title').text().trim();
+          const metaDesc = $('meta[name="description"]').attr('content')?.trim() || '';
+          const primaryH1 = $('h1').first().text().replace(/\s+/g, ' ').trim();
+          const heroText = $('header, main, section').first().text().replace(/\s+/g, ' ').substring(0, 1000);
+
           const { object } = await generateObject({
             model: openai('gpt-4o-mini'), 
-            temperature: 0, // <-- Forces deterministic, consistent outputs
+            temperature: 0.1, // Grounded, consultative
             schema: industryContextSchema,
-            prompt: "You are an expert technical forensic analyst for an enterprise web infrastructure agency.\n" +
-                    "Analyze the following website text and generate clinical, professional business terminology tailored to their industry.\n" +
-                    "CRITICAL INSTRUCTION: Do NOT use cheesy marketing slogans, adjectives, or sales pitches. Maintain a serious, diagnostic, and corporate tone.\n" +
-                    "The brand name is loosely: " + brandName + "\n\n" +
-                    "Website Data:\n" +
-                    "Title: " + pageTitle + "\n" +
-                    "Description: " + metaDesc + "\n" +
-                    "Content: " + bodyText
+            prompt: `You are a Senior Infrastructure Advisory Partner evaluating ${brandName} (${targetUrl}).
+
+BRAND SOUL CONTEXT:
+- Title: ${pageTitle || 'N/A'}
+- Meta Description: ${metaDesc || 'N/A'}
+- Primary Heading (H1): ${primaryH1 || 'N/A'}
+- Hero Context: ${heroText || 'N/A'}
+
+TASK:
+1. Identify their exact business model, vibe, and audience.
+2. Formulate clinical, high-level B2B business terms.
+3. Write a 3-sentence 'executiveSynthesis' directly to the founder. Explain how rendering delays on mobile devices impact their SPECIFIC end-users (e.g., commuters trying to check bus routes, legal clients booking urgent consultations, shippers requesting freight quotes).
+
+CRITICAL CONSTRAINTS:
+- Do NOT use cheesy marketing adjectives, sales pitches, or slogans.
+- NEVER use technical developer terms like "DOM", "JavaScript", "CPU main-thread", or "Core Web Vitals" in the executive synthesis.
+- Maintain a serious, authoritative, consultative partner tone.`
           });
           return object;
         })(),
-        15000, // 15s timeout to ensure AI never hangs the main audit
+        18000, // 18s timeout for deep agent generation
         null,
-        "OpenAI Industry Context"
+        "OpenAI Agentic Synthesis"
       )
     ]);
 
@@ -206,7 +219,7 @@ export async function GET(request: Request) {
       target: targetUrl,
       status: 'success',
       timestamp: new Date().toISOString(),
-      industryContext: aiAnalysis, // <-- Injected AI Output
+      industryContext: aiAnalysis, // <-- Injected AI Output (Includes executiveSynthesis)
       security: dnsResult,
       metaAndSocial: htmlAudit.socialPreview,
       accessibility: htmlAudit.accessibility,
