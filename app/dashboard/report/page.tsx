@@ -24,7 +24,7 @@ const TECH_UPGRADES: Record<string, { upgrade: string; reason: string }> = {
   // Widgets & Chat
   "Intercom": { upgrade: "Automated AI Lead Nurture", reason: "Replaces expensive human latency with instant AI triage for mid-sized operations." },
   "Mindbody": { upgrade: "Headless Booking API", reason: "Removes third-party iframe lag to keep users inside your optimized conversion funnel." },
-  "Calendly": { upgrade: "Native API Scheduling", reason: "Prevents external CSS/JS injection and keeps the user on your domain." },
+  "Calendly": { Native: "API Scheduling", reason: "Prevents external CSS/JS injection and keeps the user on your domain." },
   
   // Servers / Misc
   "Apache": { upgrade: "Vercel Edge Network", reason: "Shifts compute to the edge for instant Time-to-First-Byte globally." },
@@ -330,6 +330,73 @@ export default function AuditReportPage() {
   frictionCards.sort((a, b) => (a.isGreen === b.isGreen ? 0 : a.isGreen ? 1 : -1));
 
 
+  // High-End APM Streaming Telemetry Component
+  const LiveTelemetryWave = ({ isFlat, isAlert }: { isFlat: boolean; isAlert: boolean }) => {
+    const [points, setPoints] = useState<number[]>([]);
+
+    useEffect(() => {
+      if (isFlat) {
+        setPoints(Array(35).fill(18));
+        return;
+      }
+
+      const initial = Array.from({ length: 35 }, () => 18 + (Math.random() * 10 - 5));
+      setPoints(initial);
+
+      const interval = setInterval(() => {
+        setPoints((prev) => {
+          const nextVal = 18 + (Math.random() * (isAlert ? 24 : 8) - (isAlert ? 12 : 4));
+          const clamped = Math.max(4, Math.min(32, nextVal));
+          return [...prev.slice(1), clamped];
+        });
+      }, 400);
+
+      return () => clearInterval(interval);
+    }, [isFlat, isAlert]);
+
+    const width = 500;
+    const height = 36;
+    const dx = width / (points.length - 1 || 1);
+
+    let pathString = '';
+    if (points.length > 0) {
+      pathString = `M 0,${points[0]}`;
+      for (let i = 0; i < points.length - 1; i++) {
+        const xCurrent = i * dx;
+        const yCurrent = points[i];
+        const xNext = (i + 1) * dx;
+        const yNext = points[i + 1];
+        const xMid = (xCurrent + xNext) / 2;
+        pathString += ` Q ${xMid},${yCurrent} ${xNext},${yNext}`;
+      }
+    }
+
+    const strokeColor = '#ffffff';
+
+    return (
+      <div className="w-full h-10 overflow-hidden relative mt-4 flex items-center bg-[#12121c]/90 border border-zinc-600/50 rounded-xl px-2 shadow-inner">
+        <svg className="w-full h-full" viewBox={`0 0 ${width} ${height}`} preserveAspectRatio="none">
+          <defs>
+            <linearGradient id={`grad-white`} x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stopColor={strokeColor} stopOpacity={isFlat ? "0.7" : "0.3"} />
+              <stop offset="50%" stopColor={strokeColor} stopOpacity="1" />
+              <stop offset="100%" stopColor={strokeColor} stopOpacity={isFlat ? "0.7" : "0.3"} />
+            </linearGradient>
+          </defs>
+          <path 
+            d={pathString} 
+            fill="none" 
+            stroke="url(#grad-white)"
+            strokeWidth="2.5" 
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            className="drop-shadow-[0_0_8px_rgba(255,255,255,0.7)]"
+          />
+        </svg>
+      </div>
+    );
+  };
+
   // --- CLIENTSCALE CUSTOM TELEMETRY GRAPH ---
   const TelemetryGraph = ({ title, series, yUnit = '', xLabels = ['- 60s', 'Live Sync'], maxVal = 100 }: any) => {
     const [dataLines, setDataLines] = useState<number[][]>(() => 
@@ -394,7 +461,7 @@ export default function AuditReportPage() {
               <span className="text-[9px] sm:text-[10px] text-zinc-500 font-mono font-bold uppercase tracking-widest">
                 {s.label}
               </span>
-              <div className="flex items-center gap-2 text-lg sm:text-2xl font-mono font-bold text-white drop-shadow-md">
+              <div className="flex items-center gap-2 text-base sm:text-xl font-mono font-bold text-white drop-shadow-md">
                 {s.currentDisplay}
               </div>
             </div>
