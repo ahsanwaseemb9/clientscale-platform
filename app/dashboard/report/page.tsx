@@ -455,21 +455,21 @@ export default function AuditReportPage() {
     };
 
     return (
-      <div className="bg-white border border-gray-200 rounded-xl p-4 sm:p-6 w-full flex flex-col h-full min-h-[260px] shadow-sm relative overflow-hidden">
+      <div className="bg-[#050508] border border-zinc-800 rounded-xl p-4 sm:p-6 w-full flex flex-col h-full min-h-[260px] shadow-lg relative overflow-hidden">
         <div className="flex justify-between items-start mb-4 sm:mb-6">
-          <h3 className="text-lg sm:text-xl font-bold text-gray-900 tracking-tight leading-tight flex items-start gap-1.5 sm:gap-2">
+          <h3 className="text-lg sm:text-xl font-bold text-zinc-100 tracking-tight leading-tight flex items-start gap-1.5 sm:gap-2">
             {title}
-            <ChevronRight size={20} className="text-gray-400 mt-0.5" />
+            <ChevronRight size={20} className="text-zinc-600 mt-0.5" />
           </h3>
         </div>
         
         <div className="flex flex-row gap-4 sm:gap-8 mb-6 sm:mb-8 relative z-10 w-full">
           {series.map((s: any, idx: number) => (
             <div key={idx} className="flex flex-col gap-1 sm:gap-1.5 flex-1">
-              <span className="text-sm sm:text-base text-gray-500 font-semibold leading-snug">
+              <span className="text-sm sm:text-base text-zinc-400 font-semibold leading-snug">
                 {formatLabel(s.label)}
               </span>
-              <div className="flex items-center gap-2 text-lg sm:text-2xl font-mono font-bold text-gray-900">
+              <div className="flex items-center gap-2 text-lg sm:text-2xl font-mono font-bold text-zinc-100">
                 <span className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full shrink-0" style={{ backgroundColor: s.color }} />
                 {s.currentDisplay}
               </div>
@@ -481,8 +481,8 @@ export default function AuditReportPage() {
           <div className="absolute inset-0 flex flex-col justify-between pb-6">
             {[maxVal, maxVal * 0.75, maxVal * 0.5, maxVal * 0.25, 0].map((val, i) => (
               <div key={i} className="flex items-center w-full gap-2 sm:gap-3 relative z-0">
-                <span className="text-xs sm:text-sm font-mono text-gray-400 w-10 sm:w-12 text-right shrink-0">{val}{yUnit}</span>
-                <div className="flex-grow border-t border-gray-100" />
+                <span className="text-xs sm:text-sm font-mono text-zinc-500 w-10 sm:w-12 text-right shrink-0">{val}{yUnit}</span>
+                <div className="flex-grow border-t border-zinc-800/60" />
               </div>
             ))}
           </div>
@@ -511,9 +511,9 @@ export default function AuditReportPage() {
             </svg>
           </div>
           
-          <div className="absolute bottom-0 left-12 sm:left-[3.75rem] right-0 flex justify-between pt-2 border-t border-gray-200">
+          <div className="absolute bottom-0 left-12 sm:left-[3.75rem] right-0 flex justify-between pt-2 border-t border-zinc-800/60">
             {xLabels.map((l: string, i: number) => (
-              <span className="text-xs sm:text-sm font-mono text-gray-400" key={i}>{l}</span>
+              <span className="text-xs sm:text-sm font-mono text-zinc-500" key={i}>{l}</span>
             ))}
           </div>
         </div>
