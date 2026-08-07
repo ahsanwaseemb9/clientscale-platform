@@ -397,8 +397,8 @@ export default function AuditReportPage() {
     );
   };
 
-  // --- VERCEL STYLE OBSERVABILITY GRAPH ---
-  const VercelGraph = ({ title, series, yUnit = '', xLabels = ['6h ago', '2m ago'], maxVal = 100 }: any) => {
+  // --- CLIENTSCALE CUSTOM TELEMETRY GRAPH ---
+  const TelemetryGraph = ({ title, series, yUnit = '', xLabels = ['6h ago', 'Live Sync'], maxVal = 100 }: any) => {
     const [dataLines, setDataLines] = useState<number[][]>(() => 
       series.map((s: any) => Array.from({length: 40}, () => Math.max(0, s.base + (Math.random() * s.variance - s.variance/2))))
     );
@@ -433,65 +433,95 @@ export default function AuditReportPage() {
     };
 
     return (
-      <div className="bg-[#0a0a0f] border border-zinc-800/80 rounded-xl p-5 sm:p-6 w-full flex flex-col h-full min-h-[250px] relative overflow-hidden">
-        <div className="flex justify-between items-center mb-5">
-          <h3 className="text-[13px] sm:text-[14px] font-semibold text-zinc-200 tracking-wide flex items-center gap-1.5">
-            {title}
-            <ChevronRight size={14} className="text-zinc-600" />
+      <div className="bg-[#09090e] border border-cyan-900/40 hover:border-cyan-700/60 transition-colors duration-700 rounded-xl p-5 sm:p-6 w-full flex flex-col h-full min-h-[300px] shadow-[inset_0_0_30px_rgba(6,182,212,0.03)] relative overflow-hidden group">
+        
+        {/* Top Cyber Accent Line */}
+        <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-cyan-500/50 to-transparent opacity-80" />
+        
+        {/* Subtle Radar/Telemetry Background Grid */}
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,#06b6d408_1px,transparent_1px),linear-gradient(to_bottom,#06b6d408_1px,transparent_1px)] bg-[size:24px_24px] pointer-events-none" />
+
+        <div className="relative z-10 flex justify-between items-center mb-6">
+          <h3 className="text-[10px] sm:text-[11px] font-mono font-bold text-cyan-500/90 uppercase tracking-[0.2em] flex items-center gap-2">
+            <Activity size={14} className="text-cyan-400" />
+            [ {title} ]
           </h3>
+          <div className="flex items-center gap-2">
+            <span className="relative flex h-1.5 w-1.5 sm:h-2 sm:w-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-1.5 w-1.5 sm:h-2 sm:w-2 bg-cyan-500"></span>
+            </span>
+            <span className="text-[8px] sm:text-[9px] font-mono text-cyan-500/60 uppercase tracking-widest hidden xs:block">Live Sync</span>
+          </div>
         </div>
         
-        <div className="flex flex-row gap-8 sm:gap-12 mb-8 relative z-10 w-full">
+        <div className="flex flex-row gap-4 sm:gap-6 mb-8 relative z-10 w-full">
           {series.map((s: any, idx: number) => (
-            <div key={idx} className="flex flex-col gap-1">
-              <span className="text-[11px] sm:text-xs text-zinc-500 font-medium tracking-wide">
+            <div key={idx} className="flex flex-col gap-1 sm:gap-1.5 flex-1 pl-3 sm:pl-4 border-l-2 bg-gradient-to-r from-white/[0.02] to-transparent py-1.5" style={{ borderColor: s.color }}>
+              <span className="text-[9px] sm:text-[10px] text-zinc-500 font-mono font-bold uppercase tracking-widest">
                 {s.label}
               </span>
-              <div className="flex items-center gap-2 text-[14px] sm:text-base font-mono font-bold text-zinc-100 mt-0.5">
-                <span className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: s.color }} />
+              <div className="flex items-center gap-2 text-lg sm:text-2xl font-mono font-bold text-white drop-shadow-md">
                 {s.currentDisplay}
               </div>
             </div>
           ))}
         </div>
 
-        <div className="relative flex-grow flex items-end">
+        <div className="relative flex-grow flex items-end mt-4">
           <div className="absolute inset-0 flex flex-col justify-between pb-6">
             {[maxVal, maxVal * 0.75, maxVal * 0.5, maxVal * 0.25, 0].map((val, i) => (
               <div key={i} className="flex items-center w-full gap-3 relative z-0">
-                <span className="text-[9px] sm:text-[10px] font-mono text-zinc-600 w-8 text-right shrink-0">{val}{yUnit}</span>
-                <div className="flex-grow border-t border-zinc-800/60" />
+                <span className="text-[8px] sm:text-[9px] font-mono text-zinc-600 w-8 text-right shrink-0">{val}{yUnit}</span>
+                <div className="flex-grow border-t border-zinc-800/50 border-dashed" />
               </div>
             ))}
           </div>
 
           <div className="absolute inset-0 pl-11 pb-6 pt-1">
-            <svg className="w-full h-full" viewBox={`0 0 ${width} ${height}`} preserveAspectRatio="none">
+            <svg className="w-full h-full overflow-visible" viewBox={`0 0 ${width} ${height}`} preserveAspectRatio="none">
+              <defs>
+                {/* SVG Glow Filters for Telemetry Oscilloscope effect */}
+                {series.map((s: any, i: number) => (
+                  <filter key={`glow-${i}`} id={`glow-${i}`} x="-20%" y="-20%" width="140%" height="140%">
+                    <feGaussianBlur stdDeviation="3" result="blur" />
+                    <feComposite in="SourceGraphic" in2="blur" operator="over" />
+                  </filter>
+                ))}
+                {/* Area Gradients */}
+                {series.map((s: any, i: number) => (
+                  <linearGradient key={`grad-${i}`} id={`grad-${i}`} x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor={s.color} stopOpacity="0.2" />
+                    <stop offset="100%" stopColor={s.color} stopOpacity="0" />
+                  </linearGradient>
+                ))}
+              </defs>
+              
               {series.map((s: any, idx: number) => (
                 <g key={idx}>
                   {s.fill && (
                     <path 
                       d={generateArea(dataLines[idx])} 
-                      fill={s.color} 
-                      opacity="0.1" 
+                      fill={`url(#grad-${idx})`} 
                     />
                   )}
                   <path 
                     d={generatePath(dataLines[idx])} 
                     fill="none" 
                     stroke={s.color}
-                    strokeWidth="1.5" 
+                    strokeWidth="2" 
                     strokeLinecap="round"
                     strokeLinejoin="round"
+                    filter={`url(#glow-${idx})`}
                   />
                 </g>
               ))}
             </svg>
           </div>
           
-          <div className="absolute bottom-0 left-11 right-0 flex justify-between pt-2 border-t border-zinc-800/60">
+          <div className="absolute bottom-0 left-11 right-0 flex justify-between pt-2 border-t border-zinc-800/80">
             {xLabels.map((l: string, i: number) => (
-              <span className="text-[9px] sm:text-[10px] font-mono text-zinc-500" key={i}>{l}</span>
+              <span className="text-[8px] sm:text-[9px] font-mono text-zinc-500 uppercase tracking-widest" key={i}>{l}</span>
             ))}
           </div>
         </div>
@@ -631,14 +661,14 @@ export default function AuditReportPage() {
           </div>
 
           <div className="grid grid-cols-1 gap-6 sm:gap-8">
-            <VercelGraph 
+            <TelemetryGraph 
               title="Conversion Disruption"
               yUnit="%"
               maxVal={100}
               series={[
                 { 
                   label: 'Parasite Load', 
-                  color: '#f5a623', 
+                  color: '#eab308', // Amber/Yellow
                   currentDisplay: `${parasiteImpact}%`, 
                   base: isNaN(parseFloat(parasiteImpact)) ? 0 : parseFloat(parasiteImpact), 
                   variance: parseFloat(parasiteImpact) === 0 ? 0 : 8, 
@@ -646,7 +676,7 @@ export default function AuditReportPage() {
                 },
                 { 
                   label: 'Revenue Leakage', 
-                  color: '#0070f3', 
+                  color: '#06b6d4', // Cyan
                   currentDisplay: `${revenueLeakagePercent}%`, 
                   base: isNaN(parseFloat(revenueLeakagePercent)) ? 0 : parseFloat(revenueLeakagePercent), 
                   variance: parseFloat(revenueLeakagePercent) === 0 ? 0 : 3, 
@@ -654,14 +684,14 @@ export default function AuditReportPage() {
                 }
               ]}
             />
-            <VercelGraph 
+            <TelemetryGraph 
               title="Interaction & Render Latency"
               yUnit="ms"
               maxVal={dynamicLatencyYAxis} // Dynamic Scaling Applied
               series={[
                 { 
                   label: 'INP Latency', 
-                  color: '#0070f3', 
+                  color: '#a855f7', // Purple
                   currentDisplay: `${rawInp}ms`, 
                   base: isNaN(rawInp) ? 0 : rawInp, 
                   variance: rawInp === 0 ? 0 : 150, 
@@ -669,7 +699,7 @@ export default function AuditReportPage() {
                 },
                 { 
                   label: 'TBT (Thread Lock)', 
-                  color: '#e00000', 
+                  color: '#ef4444', // Red
                   currentDisplay: `${rawTbt}ms`, 
                   base: isNaN(rawTbt) ? 0 : rawTbt, 
                   variance: rawTbt === 0 ? 0 : 200, 
