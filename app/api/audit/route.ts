@@ -171,7 +171,7 @@ export async function GET(request: Request) {
             }),
             prompt: `You are a Senior Infrastructure Advisory Partner evaluating ${brandName} (${targetUrl}).
 BRAND SOUL CONTEXT: Title: ${pageTitle}, H1: ${primaryH1}, Context: ${heroText}.
-TASK: Write a 3-sentence executive synthesis to the founder explaining how rendering delays on mobile devices impact their SPECIFIC end-users.`
+TASK: Write a 3-sentence executive synthesis to the founder explaining how rendering delays and digital friction impact their SPECIFIC end-users across all devices.`
           });
 
           // Agent B: The Critic (Enforces Guardrails & Finalizes Object)
