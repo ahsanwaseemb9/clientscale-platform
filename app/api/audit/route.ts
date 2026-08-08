@@ -25,7 +25,7 @@ const industryContextSchema = z.object({
   userType: z.string().describe("e.g., 'commercial shippers' or 'retail customers'"),
   buttons: z.string().describe("e.g., 'quote request forms' or 'checkout buttons'"),
   brandVibe: z.string().describe("e.g., 'Boutique Law Firm', 'Public Transit Network', 'High-End E-Commerce', 'B2B Logistics Portal'"),
-  executiveSynthesis: z.string().describe("A 3-sentence consultative executive briefing written directly to the business owner/founder. Connects technical latency directly to the human, real-world friction experienced by their specific customers. STRICT RULES: Zero developer jargon (never say 'DOM', 'JavaScript', or 'main thread'). Zero robotic SaaS slogans. Write like a senior partner at a top management consulting firm.")
+  executiveSynthesis: z.string().describe("A 3-sentence consultative executive briefing. MUST reference specific metrics provided.")
 });
 
 function detectNextJs(html: string, headers: Record<string, string[]>) {
@@ -124,11 +124,11 @@ export async function GET(request: Request) {
     const googleApiKey = process.env.GOOGLE_PAGESPEED_API_KEY || "AIzaSyCUJORk1Q4OyTQZu-MeIEZXescMJYuxa_k";
     const pageSpeedUrl = "https://www.googleapis.com/pagespeedonline/v5/runPagespeed?url=" + encodeURIComponent(targetUrl) + "&strategy=mobile&key=" + googleApiKey;
     
-    // --- ASYNC CONCURRENT EXECUTION BLOCK ---
-    const [techDetections, pageSpeedRes, aiAnalysis] = await Promise.all([
+    // --- STAGE 1: PARALLEL DATA EXTRACTION ---
+    const [techDetections, pageSpeedRes] = await Promise.all([
       fetchWithTimeout(
         Wappalyzer.analyze({ url: targetUrl, headers: serverHeaders, html: htmlText, meta: {}, scriptSrc: [] }),
-        25000, 
+        20000, 
         [],
         "Wappalyzer"
       ),
@@ -148,59 +148,90 @@ export async function GET(request: Request) {
         25000,
         null,
         "Google PageSpeed"
-      ),
-      // --- PHASE 1, 2 & 3: BRAND SOUL & SELF-CORRECTING AGENT PIPELINE ---
-      fetchWithTimeout(
-        (async () => {
-          if (!process.env.OPENAI_API_KEY) return null;
-          
-          const $ = cheerio.load(htmlText);
-          
-          // Phase 1: Brand Soul Extraction
-          const pageTitle = $('title').text().trim();
-          const metaDesc = $('meta[name="description"]').attr('content')?.trim() || '';
-          const primaryH1 = $('h1').first().text().replace(/\s+/g, ' ').trim();
-          const heroText = $('header, main, section').first().text().replace(/\s+/g, ' ').substring(0, 1000);
+      )
+    ]);
 
-          // Agent A: The Writer (Generates Initial Draft)
-          const draftResponse = await generateObject({
-            model: openai('gpt-4o-mini'), 
-            temperature: 0.2,
-            schema: z.object({
-              draftSynthesis: z.string()
-            }),
-            prompt: `You are a Senior Infrastructure Advisory Partner evaluating ${brandName} (${targetUrl}).
-BRAND SOUL CONTEXT: Title: ${pageTitle}, H1: ${primaryH1}, Context: ${heroText}.
-TASK: Write a 3-sentence executive synthesis to the founder explaining how rendering delays and digital friction impact their SPECIFIC end-users across all devices.`
-          });
+    // --- STAGE 2: PARSE THE METRICS (So we can feed them to the AI) ---
+    const htmlAudit = auditHtmlMetadata(htmlText);
+    const lighthouse = pageSpeedRes?.lighthouseResult || null;
 
-          // Agent B: The Critic (Enforces Guardrails & Finalizes Object)
-          const finalResponse = await generateObject({
-            model: openai('gpt-4o-mini'), 
-            temperature: 0.1, 
-            schema: industryContextSchema,
-            prompt: `You are a ruthless editor for an elite consulting firm. 
+    const tbtValue = lighthouse?.audits?.['total-blocking-time']?.displayValue || 'N/A';
+    const inpValue = pageSpeedRes?.loadingExperience?.metrics?.INTERACTION_TO_NEXT_PAINT?.percentile 
+      ? pageSpeedRes.loadingExperience.metrics.INTERACTION_TO_NEXT_PAINT.percentile + " ms" 
+      : 'N/A';
+    
+    const perfScore = lighthouse?.categories?.performance?.score ? Math.round(lighthouse.categories.performance.score * 100) : 50;
+    const revenueLeakagePercent = Math.max(0, (100 - perfScore) * 0.15).toFixed(1);
+    const thirdPartyCount = htmlAudit.thirdPartyScriptCount || 0;
+
+    const leakageData = calculateLeakageRisk(
+      inpValue, tbtValue, htmlAudit.accessibility.altComplianceScore, dnsResult.riskLevel, htmlAudit.thirdPartyScriptCount
+    );
+
+    // --- STAGE 3: SEQUENTIAL AI AGENT (Now armed with actual data) ---
+    const aiAnalysis = await fetchWithTimeout(
+      (async () => {
+        if (!process.env.OPENAI_API_KEY) return null;
+        
+        const $ = cheerio.load(htmlText);
+        
+        // Phase 1: Brand Soul Extraction
+        const pageTitle = $('title').text().trim();
+        const primaryH1 = $('h1').first().text().replace(/\s+/g, ' ').trim();
+        const heroText = $('header, main, section').first().text().replace(/\s+/g, ' ').substring(0, 800);
+
+        // Agent A: The Writer (Generates Initial Draft)
+        const draftResponse = await generateObject({
+          model: openai('gpt-4o-mini'), 
+          temperature: 0.2,
+          schema: z.object({
+            draftSynthesis: z.string()
+          }),
+          prompt: `You are an elite Enterprise Infrastructure Consultant advising the CEO of ${brandName} (${targetUrl}).
+          
+BRAND CONTEXT:
+Title: ${pageTitle || 'N/A'}
+H1: ${primaryH1 || 'N/A'}
+About: ${heroText || 'N/A'}
+
+PERFORMANCE METRICS WE JUST EXTRACTED:
+- Mobile Render Latency (INP): ${inpValue}
+- Main Thread Lock (TBT): ${tbtValue}
+- Estimated Revenue Leakage: ${revenueLeakagePercent}%
+- Parasite Load: ${thirdPartyCount} external trackers
+
+TASK: Write a 3-sentence executive synthesis.
+Sentence 1: State exactly what their specific business does and who their specific users are (e.g., "For a boutique law firm like Smith & Co, high-net-worth clients expect instant digital discretion on mobile devices.").
+Sentence 2: Tie the SPECIFIC performance metrics above directly to their specific user's physical friction across all devices (e.g., "However, an agonizing ${tbtValue} thread lock caused by ${thirdPartyCount} tracking scripts completely freezes the screen when a client attempts to submit a consultation request.").
+Sentence 3: State the financial reality using the extracted metrics (e.g., "This structural fragility is actively driving an estimated ${revenueLeakagePercent}% revenue leakage, sending impatient prospects to faster competitors.").`
+        });
+
+        // Agent B: The Critic (Enforces Guardrails & Finalizes Object)
+        const finalResponse = await generateObject({
+          model: openai('gpt-4o-mini'), 
+          temperature: 0.1, 
+          schema: industryContextSchema,
+          prompt: `You are a ruthless editor for an elite consulting firm. 
 Review this draft executive synthesis: "${draftResponse.object.draftSynthesis}"
 
 TASK:
 1. Extract the required business terminology fields based on the brand context (${brandName}).
-2. Rewrite the 'executiveSynthesis' using the draft as a base. 
+2. Finalize the 'executiveSynthesis' using the draft as a base. 
+
 CRITICAL CONSTRAINTS FOR REWRITE:
+- You MUST reference their specific industry and specific user type in the first sentence.
+- You MUST include the actual performance numbers (e.g., ${tbtValue}, ${revenueLeakagePercent}%).
 - Eradicate ANY developer jargon (e.g., remove "DOM", "JavaScript", "CPU", "Core Web Vitals").
-- Eradicate ANY cheesy marketing SaaS slogans. 
-- Ensure it sounds grounded, authoritative, and speaks directly to human friction (e.g., commuters in the rain, lawyers missing deadlines).`
-          });
+- Eradicate ANY cheesy SaaS slogans. 
+- Ensure the tone is clinical, authoritative, and terrifyingly accurate.`
+        });
 
-          return finalResponse.object;
-        })(),
-        18000, // 18s timeout for deep agent generation
-        null,
-        "OpenAI Agentic Synthesis"
-      )
-    ]);
-
-    const htmlAudit = auditHtmlMetadata(htmlText);
-    const lighthouse = pageSpeedRes?.lighthouseResult || null;
+        return finalResponse.object;
+      })(),
+      18000, // 18s timeout for deep agent generation
+      null,
+      "OpenAI Agentic Synthesis"
+    );
 
     let cleanInfrastructure = Array.isArray(techDetections)
       ? techDetections.map((item: any) => ({
@@ -213,15 +244,6 @@ CRITICAL CONSTRAINTS FOR REWRITE:
     const nextJsMatch = detectNextJs(htmlText, serverHeaders);
     if (nextJsMatch && !cleanInfrastructure.find((t: any) => t.name === "Next.js")) cleanInfrastructure.push(nextJsMatch);
 
-    const tbtValue = lighthouse?.audits?.['total-blocking-time']?.displayValue || 'N/A';
-    const inpValue = pageSpeedRes?.loadingExperience?.metrics?.INTERACTION_TO_NEXT_PAINT?.percentile 
-      ? pageSpeedRes.loadingExperience.metrics.INTERACTION_TO_NEXT_PAINT.percentile + " ms" 
-      : 'N/A';
-
-    const leakageData = calculateLeakageRisk(
-      inpValue, tbtValue, htmlAudit.accessibility.altComplianceScore, dnsResult.riskLevel, htmlAudit.thirdPartyScriptCount
-    );
-
     const unifiedPayload = {
       target: targetUrl,
       status: 'success',
@@ -231,9 +253,9 @@ CRITICAL CONSTRAINTS FOR REWRITE:
       metaAndSocial: htmlAudit.socialPreview,
       accessibility: htmlAudit.accessibility,
       diagnostics: {
-        performanceScore: lighthouse?.categories?.performance?.score ? Math.round(lighthouse.categories.performance.score * 100) : null, 
+        performanceScore: perfScore, 
         latency: { tbt: tbtValue, inp: inpValue },
-        thirdPartyScriptCount: htmlAudit.thirdPartyScriptCount,
+        thirdPartyScriptCount: thirdPartyCount,
       },
       infrastructure: cleanInfrastructure,
       conversionFunnel: {
