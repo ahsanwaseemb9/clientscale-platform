@@ -172,10 +172,9 @@ export async function GET(request: Request) {
       inpValue, tbtValue, htmlAudit.accessibility.altComplianceScore, dnsResult.riskLevel, htmlAudit.thirdPartyScriptCount
     );
 
-    // Parse TBT to number for severity logic
+    // Parse TBT strictly to a number for hard numerical routing
     const parsedTbt = parseInt(tbtValue.replace(/[^0-9]/g, ''));
     const tbtNum = isNaN(parsedTbt) ? 0 : parsedTbt;
-    const isOptimized = parseFloat(revenueLeakagePercent) <= 0 || tbtNum < 50;
 
     // --- STAGE 3: INDUSTRY-ADAPTIVE SEQUENTIAL AI AGENT ---
     const aiAnalysis = await fetchWithTimeout(
@@ -213,17 +212,17 @@ export async function GET(request: Request) {
           analogyInstructions = "Focus on user frustration, broken digital trust, and abandoned engagement moments to faster alternatives.";
         }
 
-        // DYNAMIC ROUTER: Build Strict Tone Based on Exact Metrics (No mixed signals)
+        // DYNAMIC ROUTER: Strict Numerical Tone Mapping (Zero Loophole Overrides)
         let severityInstructions = "";
-        if (isOptimized) {
+        if (tbtNum <= 50 && parseFloat(revenueLeakagePercent) <= 0.5) {
           severityInstructions = `TONE: High praise. Commend their pristine ${tbtValue} architecture, noting that the processor remains undistracted and responds instantly to user taps, creating seamless trust.`;
-        } else if (tbtNum > 0 && tbtNum <= 300) {
+        } else if (tbtNum > 50 && tbtNum <= 300) {
           severityInstructions = `TONE: Firm warning. They have a growing vulnerability. The ${tbtValue} micro-delay is beginning to paralyze the screen and quietly bleed revenue.`;
         } else {
-          severityInstructions = `TONE: Emergency intervention. Sound the alarm. This is a severe, unacceptable level of digital paralysis (${tbtValue}) causing severe operational and financial damage.`;
+          severityInstructions = `TONE: Emergency intervention. Sound the alarm. This is a severe, unacceptable level of digital paralysis (${tbtValue} thread lock) caused by ${thirdPartyCount} background scripts freezing user interaction and driving severe revenue loss.`;
         }
 
-        // AGENT A: The Writer (Generates Initial Draft strictly anchored to data)
+        // AGENT A: The Writer (Generates Initial Draft strictly anchored to numerical reality)
         const draftResponse = await generateObject({
           model: openai('gpt-4o-mini'), 
           temperature: 0.2,
@@ -249,7 +248,7 @@ DYNAMIC INSTRUCTIONS FOR THIS SPECIFIC CLIENT:
 
 TASK: Write a 4-sentence executive synthesis using the following strict structure:
 Sentence 1 (Identity): State exactly what their specific business does and who their specific users are.
-Sentence 2 (Operational): Address the exact performance reality. If metrics show high latency, explain how the ${tbtValue} thread lock is choked by ${thirdPartyCount} background scripts. If optimized, praise their speed.
+Sentence 2 (Operational): Address the exact performance reality. If TBT is above 50ms, you MUST explain how the ${tbtValue} thread lock is choked by ${thirdPartyCount} background scripts. If truly optimized (TBT <= 50ms), praise their speed.
 Sentence 3 (Psychological): Explain the user's physical reality based on the metrics (either instant frictionless response OR screen paralysis ignoring user taps).
 Sentence 4 (Financial): State the financial reality using the exact ${revenueLeakagePercent}% revenue leakage metric.`
         });
@@ -273,7 +272,7 @@ DYNAMIC CONTEXT REMINDER:
 CRITICAL CONSTRAINTS FOR REWRITE:
 - You MUST reference their specific industry and specific user type in the first sentence.
 - You MUST include the actual performance numbers (${tbtValue}, ${revenueLeakagePercent}%).
-- If metrics show high latency (like an 800ms thread lock), the tone MUST reflect critical friction and revenue leakage—praising a slow site is strictly forbidden.
+- ABSOLUTE RULE: If TBT is greater than 50ms (such as an 800ms thread lock), you are strictly forbidden from praising the site. The tone MUST reflect critical friction, frozen screens, and revenue leakage.
 - Eradicate ANY developer jargon (e.g., remove "DOM", "JavaScript", "CPU", "Core Web Vitals", "main thread"). 
 - Eradicate ANY cheesy SaaS slogans.`
         });
