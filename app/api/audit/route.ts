@@ -25,7 +25,7 @@ const industryContextSchema = z.object({
   userType: z.string().describe("e.g., 'commercial shippers' or 'retail customers'"),
   buttons: z.string().describe("e.g., 'quote request forms' or 'checkout buttons'"),
   brandVibe: z.string().describe("e.g., 'Boutique Law Firm', 'Public Transit Network', 'High-End E-Commerce', 'B2B Logistics Portal'"),
-  executiveSynthesis: z.string().describe("A 3-sentence consultative executive briefing. MUST reference specific metrics provided.")
+  executiveSynthesis: z.string().describe("A 4-sentence consultative executive briefing. MUST reference specific metrics provided and explain the physical user friction.")
 });
 
 function detectNextJs(html: string, headers: Record<string, string[]>) {
@@ -151,7 +151,7 @@ export async function GET(request: Request) {
       )
     ]);
 
-// --- STAGE 2: PARSE THE METRICS (So we can feed them to the AI) ---
+    // --- STAGE 2: PARSE THE METRICS (So we can feed them to the AI) ---
     const htmlAudit = auditHtmlMetadata(htmlText);
     const lighthouse = pageSpeedRes?.lighthouseResult || null;
 
@@ -204,10 +204,11 @@ PERFORMANCE METRICS WE JUST EXTRACTED:
 - Estimated Revenue Leakage: ${revenueLeakagePercent}%
 - Parasite Load: ${thirdPartyCount} external trackers
 
-TASK: Write a 3-sentence executive synthesis.
-Sentence 1: State exactly what their specific business does and who their specific users are (e.g., "For a boutique law firm like Smith & Co, high-net-worth clients expect instant digital discretion on mobile devices.").
-Sentence 2: Tie the SPECIFIC performance metrics above directly to their specific user's physical friction across all devices (e.g., "However, an agonizing ${tbtValue} thread lock caused by ${thirdPartyCount} tracking scripts completely freezes the screen when a client attempts to submit a consultation request.").
-Sentence 3: State the financial reality using the extracted metrics (e.g., "This structural fragility is actively driving an estimated ${revenueLeakagePercent}% revenue leakage, sending impatient prospects to faster competitors.").`
+TASK: Write a 4-sentence executive synthesis using the following structure:
+Sentence 1 (Identity): State exactly what their specific business does and who their specific users are.
+Sentence 2 (Operational): Explain the ${tbtValue} 'thread lock' as a hijacked system—the website's processor is too distracted by ${thirdPartyCount} background tracking scripts exactly when the user tries to take action.
+Sentence 3 (Psychological): Explain the user's physical reality—the screen appears loaded but suffers from digital paralysis, completely ignoring the user's taps and making the experience feel broken.
+Sentence 4 (Financial): State the financial reality—this invisible micro-delay breaks the customer's buying momentum, quietly driving an estimated ${revenueLeakagePercent}% revenue leakage to faster competitors.`
         });
 
         // Agent B: The Critic (Enforces Guardrails & Finalizes Object)
@@ -225,9 +226,10 @@ TASK:
 CRITICAL CONSTRAINTS FOR REWRITE:
 - You MUST reference their specific industry and specific user type in the first sentence.
 - You MUST include the actual performance numbers (e.g., ${tbtValue}, ${revenueLeakagePercent}%).
-- Eradicate ANY developer jargon (e.g., remove "DOM", "JavaScript", "CPU", "Core Web Vitals").
+- You MUST explicitly explain what the latency physically does to the user using business terms like "digital paralysis", "ignored taps", or "distracted background scripts".
+- Eradicate ANY developer jargon (e.g., remove "DOM", "JavaScript", "CPU", "Core Web Vitals", "main thread"). 
 - Eradicate ANY cheesy SaaS slogans. 
-- Ensure the tone is clinical, authoritative, and terrifyingly accurate.`
+- Ensure the tone is clinical, authoritative, and accurately terrifying regarding the lost revenue.`
         });
 
         return finalResponse.object;
