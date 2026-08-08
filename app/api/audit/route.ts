@@ -25,7 +25,7 @@ const industryContextSchema = z.object({
   userType: z.string().describe("e.g., 'commercial shippers' or 'retail customers'"),
   buttons: z.string().describe("e.g., 'quote request forms' or 'checkout buttons'"),
   brandVibe: z.string().describe("e.g., 'Boutique Law Firm', 'Public Transit Network', 'High-End E-Commerce', 'B2B Logistics Portal'"),
-  executiveSynthesis: z.string().describe("A 4-sentence consultative executive briefing. MUST reference specific metrics provided and explain the physical user friction.")
+  executiveSynthesis: z.string().describe("A 4-sentence consultative executive briefing. MUST reference specific metrics provided and explain the physical user experience (friction or seamlessness).")
 });
 
 function detectNextJs(html: string, headers: Record<string, string[]>) {
@@ -172,7 +172,10 @@ export async function GET(request: Request) {
       inpValue, tbtValue, htmlAudit.accessibility.altComplianceScore, dnsResult.riskLevel, htmlAudit.thirdPartyScriptCount
     );
 
-    // --- STAGE 3: SEQUENTIAL AI AGENT (Now armed with actual data) ---
+    // --- LOGIC GATE: IS THIS A PERFECT WEBSITE? ---
+    const isOptimized = parseFloat(revenueLeakagePercent) <= 0;
+
+    // --- STAGE 3: SEQUENTIAL AI AGENT (Now armed with actual data & conditional tone) ---
     const aiAnalysis = await fetchWithTimeout(
       (async () => {
         if (!process.env.OPENAI_API_KEY) return null;
@@ -184,14 +187,28 @@ export async function GET(request: Request) {
         const primaryH1 = $('h1').first().text().replace(/\s+/g, ' ').trim();
         const heroText = $('header, main, section').first().text().replace(/\s+/g, ' ').substring(0, 800);
 
-        // Agent A: The Writer (Generates Initial Draft)
-        const draftResponse = await generateObject({
-          model: openai('gpt-4o-mini'), 
-          temperature: 0.2,
-          schema: z.object({
-            draftSynthesis: z.string()
-          }),
-          prompt: `You are an elite Enterprise Infrastructure Consultant advising the CEO of ${brandName} (${targetUrl}).
+        // CONDITIONAL AGENT A: The Writer (Generates Initial Draft based on score)
+        const draftPrompt = isOptimized 
+          ? `You are an elite Enterprise Infrastructure Consultant validating the pristine architecture of ${brandName} (${targetUrl}).
+          
+BRAND CONTEXT:
+Title: ${pageTitle || 'N/A'}
+H1: ${primaryH1 || 'N/A'}
+About: ${heroText || 'N/A'}
+
+PERFORMANCE METRICS WE JUST EXTRACTED:
+- Mobile Render Latency (INP): ${inpValue}
+- Main Thread Lock (TBT): ${tbtValue}
+- Estimated Revenue Leakage: ${revenueLeakagePercent}%
+- Parasite Load: ${thirdPartyCount} external trackers
+
+TASK: Write a 4-sentence executive synthesis using the following structure:
+Sentence 1 (Identity): State exactly what their specific business does and who their specific users are.
+Sentence 2 (Operational): Praise the exceptionally clean ${tbtValue} 'thread lock', noting that their website's processor remains undistracted by background scripts exactly when the user tries to take action.
+Sentence 3 (Psychological): Explain the user's physical reality—the screen reacts instantly to taps, creating a seamless, frictionless digital experience that builds immediate trust.
+Sentence 4 (Financial): State the financial reality—this highly optimized infrastructure results in an estimated ${revenueLeakagePercent}% revenue leakage from latency, ensuring maximum conversion retention and a distinct edge over slower competitors.`
+
+          : `You are an elite Enterprise Infrastructure Consultant advising the CEO of ${brandName} (${targetUrl}).
           
 BRAND CONTEXT:
 Title: ${pageTitle || 'N/A'}
@@ -208,15 +225,35 @@ TASK: Write a 4-sentence executive synthesis using the following structure:
 Sentence 1 (Identity): State exactly what their specific business does and who their specific users are.
 Sentence 2 (Operational): Explain the ${tbtValue} 'thread lock' as a hijacked system—the website's processor is too distracted by ${thirdPartyCount} background tracking scripts exactly when the user tries to take action.
 Sentence 3 (Psychological): Explain the user's physical reality—the screen appears loaded but suffers from digital paralysis, completely ignoring the user's taps and making the experience feel broken.
-Sentence 4 (Financial): State the financial reality—this invisible micro-delay breaks the customer's buying momentum, quietly driving an estimated ${revenueLeakagePercent}% revenue leakage to faster competitors.`
+Sentence 4 (Financial): State the financial reality—this invisible micro-delay breaks the customer's buying momentum, quietly driving an estimated ${revenueLeakagePercent}% revenue leakage to faster competitors.`;
+
+        const draftResponse = await generateObject({
+          model: openai('gpt-4o-mini'), 
+          temperature: 0.2,
+          schema: z.object({
+            draftSynthesis: z.string()
+          }),
+          prompt: draftPrompt
         });
 
-        // Agent B: The Critic (Enforces Guardrails & Finalizes Object)
-        const finalResponse = await generateObject({
-          model: openai('gpt-4o-mini'), 
-          temperature: 0.1, 
-          schema: industryContextSchema,
-          prompt: `You are a ruthless editor for an elite consulting firm. 
+        // CONDITIONAL AGENT B: The Critic (Enforces Guardrails & Finalizes Object)
+        const criticPrompt = isOptimized
+          ? `You are a ruthless editor for an elite consulting firm. 
+Review this draft executive synthesis: "${draftResponse.object.draftSynthesis}"
+
+TASK:
+1. Extract the required business terminology fields based on the brand context (${brandName}).
+2. Finalize the 'executiveSynthesis' using the draft as a base. 
+
+CRITICAL CONSTRAINTS FOR REWRITE:
+- You MUST reference their specific industry and specific user type in the first sentence.
+- You MUST include the actual performance numbers (e.g., ${tbtValue}, ${revenueLeakagePercent}%).
+- You MUST explicitly explain how the lack of latency benefits the physical user experience using terms like "instant response", "frictionless", or "seamless trust".
+- Eradicate ANY developer jargon (e.g., remove "DOM", "JavaScript", "CPU", "Core Web Vitals", "main thread"). 
+- Eradicate ANY cheesy SaaS slogans. 
+- Ensure the tone is clinical, authoritative, and highly complimentary of their pristine digital architecture.`
+
+          : `You are a ruthless editor for an elite consulting firm. 
 Review this draft executive synthesis: "${draftResponse.object.draftSynthesis}"
 
 TASK:
@@ -229,7 +266,13 @@ CRITICAL CONSTRAINTS FOR REWRITE:
 - You MUST explicitly explain what the latency physically does to the user using business terms like "digital paralysis", "ignored taps", or "distracted background scripts".
 - Eradicate ANY developer jargon (e.g., remove "DOM", "JavaScript", "CPU", "Core Web Vitals", "main thread"). 
 - Eradicate ANY cheesy SaaS slogans. 
-- Ensure the tone is clinical, authoritative, and accurately terrifying regarding the lost revenue.`
+- Ensure the tone is clinical, authoritative, and accurately terrifying regarding the lost revenue.`;
+
+        const finalResponse = await generateObject({
+          model: openai('gpt-4o-mini'), 
+          temperature: 0.1, 
+          schema: industryContextSchema,
+          prompt: criticPrompt
         });
 
         return finalResponse.object;
