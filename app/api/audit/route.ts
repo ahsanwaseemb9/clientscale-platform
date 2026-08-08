@@ -25,7 +25,7 @@ const industryContextSchema = z.object({
   userType: z.string().describe("e.g., 'commercial shippers' or 'retail customers'"),
   buttons: z.string().describe("e.g., 'quote request forms' or 'checkout buttons'"),
   brandVibe: z.string().describe("e.g., 'Boutique Law Firm', 'Public Transit Network', 'High-End E-Commerce', 'B2B Logistics Portal'"),
-  executiveSynthesis: z.string().describe("A 4-sentence consultative executive briefing. MUST reference specific metrics provided and explain the physical user experience (friction or seamlessness).")
+  executiveSynthesis: z.string().describe("A 4-sentence consultative executive briefing. MUST reference specific metrics provided and accurately reflect the performance reality (friction or seamlessness).")
 });
 
 function detectNextJs(html: string, headers: Record<string, string[]>) {
@@ -201,19 +201,19 @@ export async function GET(request: Request) {
 
         const category = profilerResponse.object.industryCategory;
 
-        // DYNAMIC ROUTER: Build Custom Analogies Based on Profiler
+        // DYNAMIC ROUTER: Build Clean, Brand-Agnostic Analogies Based on Profiler
         let analogyInstructions = "";
         if (category === 'ecommerce') {
-          analogyInstructions = "Focus on cart abandonment, lost impulsive buying momentum, and impatient shoppers bouncing to faster checkout flows like Deliveroo or Amazon.";
+          analogyInstructions = "Focus strictly on cart abandonment, lost impulsive buying momentum, and impatient shoppers bouncing to faster digital-native competitors in the retail and e-commerce space.";
         } else if (category === 'b2b_service') {
           analogyInstructions = "Focus on brand prestige, loss of high-net-worth client trust, and missed consultation bookings due to a platform that feels unprofessional and broken.";
         } else if (category === 'transport_logistics') {
           analogyInstructions = "Focus on operational reliability, commuter/shipper frustration in the field on mobile devices, and the inability to access time-sensitive data.";
         } else {
-          analogyInstructions = "Focus on user frustration, broken digital trust, and abandoned engagement moments.";
+          analogyInstructions = "Focus on user frustration, broken digital trust, and abandoned engagement moments to faster alternatives.";
         }
 
-        // DYNAMIC ROUTER: Build Emotional Tone Based on Exact TBT Score
+        // DYNAMIC ROUTER: Build Strict Tone Based on Exact Metrics (No mixed signals)
         let severityInstructions = "";
         if (isOptimized) {
           severityInstructions = `TONE: High praise. Commend their pristine ${tbtValue} architecture, noting that the processor remains undistracted and responds instantly to user taps, creating seamless trust.`;
@@ -223,7 +223,7 @@ export async function GET(request: Request) {
           severityInstructions = `TONE: Emergency intervention. Sound the alarm. This is a severe, unacceptable level of digital paralysis (${tbtValue}) causing severe operational and financial damage.`;
         }
 
-        // AGENT A: The Writer (Generates Initial Draft using Dynamic Rules)
+        // AGENT A: The Writer (Generates Initial Draft strictly anchored to data)
         const draftResponse = await generateObject({
           model: openai('gpt-4o-mini'), 
           temperature: 0.2,
@@ -247,11 +247,11 @@ DYNAMIC INSTRUCTIONS FOR THIS SPECIFIC CLIENT:
 1. ${analogyInstructions}
 2. ${severityInstructions}
 
-TASK: Write a 4-sentence executive synthesis using the following structure:
+TASK: Write a 4-sentence executive synthesis using the following strict structure:
 Sentence 1 (Identity): State exactly what their specific business does and who their specific users are.
-Sentence 2 (Operational): Explain the ${tbtValue} 'thread lock' reality based on the severity instructions (either praising efficiency or criticizing the ${thirdPartyCount} background scripts distracting the processor).
-Sentence 3 (Psychological): Explain the user's physical reality (either instant frictionless response OR screen freezing/ignoring taps).
-Sentence 4 (Financial): State the financial reality using the ${revenueLeakagePercent}% revenue leakage metric.`
+Sentence 2 (Operational): Address the exact performance reality. If metrics show high latency, explain how the ${tbtValue} thread lock is choked by ${thirdPartyCount} background scripts. If optimized, praise their speed.
+Sentence 3 (Psychological): Explain the user's physical reality based on the metrics (either instant frictionless response OR screen paralysis ignoring user taps).
+Sentence 4 (Financial): State the financial reality using the exact ${revenueLeakagePercent}% revenue leakage metric.`
         });
 
         // AGENT B: The Critic (Enforces Guardrails & Finalizes Object)
@@ -272,10 +272,10 @@ DYNAMIC CONTEXT REMINDER:
 
 CRITICAL CONSTRAINTS FOR REWRITE:
 - You MUST reference their specific industry and specific user type in the first sentence.
-- You MUST include the actual performance numbers (e.g., ${tbtValue}, ${revenueLeakagePercent}%).
+- You MUST include the actual performance numbers (${tbtValue}, ${revenueLeakagePercent}%).
+- If metrics show high latency (like an 800ms thread lock), the tone MUST reflect critical friction and revenue leakage—praising a slow site is strictly forbidden.
 - Eradicate ANY developer jargon (e.g., remove "DOM", "JavaScript", "CPU", "Core Web Vitals", "main thread"). 
-- Eradicate ANY cheesy SaaS slogans. 
-- Ensure the tone matches the exact severity level requested.`
+- Eradicate ANY cheesy SaaS slogans.`
         });
 
         return finalResponse.object;
@@ -300,7 +300,7 @@ CRITICAL CONSTRAINTS FOR REWRITE:
       target: targetUrl,
       status: 'success',
       timestamp: new Date().toISOString(),
-      industryContext: aiAnalysis, // <-- Injected AI Output (Now dynamically routed and scrubbed)
+      industryContext: aiAnalysis, // <-- Injected AI Output
       security: dnsResult,
       metaAndSocial: htmlAudit.socialPreview,
       accessibility: htmlAudit.accessibility,
