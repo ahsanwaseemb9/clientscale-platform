@@ -151,13 +151,17 @@ export async function GET(request: Request) {
       )
     ]);
 
-    // --- STAGE 2: PARSE THE METRICS (So we can feed them to the AI) ---
+// --- STAGE 2: PARSE THE METRICS (So we can feed them to the AI) ---
     const htmlAudit = auditHtmlMetadata(htmlText);
     const lighthouse = pageSpeedRes?.lighthouseResult || null;
 
-    const tbtValue = lighthouse?.audits?.['total-blocking-time']?.displayValue || 'N/A';
+    // Strip all empty spaces out of Google's pre-formatted string (e.g., "250 ms" -> "250ms")
+    const rawTbtValue = lighthouse?.audits?.['total-blocking-time']?.displayValue || 'N/A';
+    const tbtValue = rawTbtValue.replace(/\s+/g, '');
+
+    // Remove the hardcoded space in the manual concatenation
     const inpValue = pageSpeedRes?.loadingExperience?.metrics?.INTERACTION_TO_NEXT_PAINT?.percentile 
-      ? pageSpeedRes.loadingExperience.metrics.INTERACTION_TO_NEXT_PAINT.percentile + " ms" 
+      ? pageSpeedRes.loadingExperience.metrics.INTERACTION_TO_NEXT_PAINT.percentile + "ms" 
       : 'N/A';
     
     const perfScore = lighthouse?.categories?.performance?.score ? Math.round(lighthouse.categories.performance.score * 100) : 50;
