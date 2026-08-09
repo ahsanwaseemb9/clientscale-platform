@@ -113,7 +113,11 @@ export async function GET(request: Request) {
     try {
       targetResponse = await fetch(targetUrl, { headers: { 'User-Agent': 'ClientScale-Forensic-Engine/1.0' } });
     } catch (e) {
-      return NextResponse.json({ error: 'Target domain firewalls blocked diagnostic sweep.' }, { status: 502 });
+      // FIX 3: Graceful Firewall Degradation. If WAF completely blocks the connection, return clean status.
+      return NextResponse.json({ 
+        error: 'Diagnostic restricted by target domain perimeter security.', 
+        status: 'blocked' 
+      }, { status: 502 });
     }
 
     const dnsResult = await auditDomainSecurity(hostname);
@@ -146,35 +150,41 @@ export async function GET(request: Request) {
           return data;
         }),
         25000,
-        null,
+        null, // Yields null if blocked by regional API firewall
         "Google PageSpeed"
       )
     ]);
 
-    // --- STAGE 2: PARSE THE METRICS (So we can feed them to the AI) ---
+    // --- STAGE 2: PARSE THE METRICS & BUILD SMART FALLBACKS ---
     const htmlAudit = auditHtmlMetadata(htmlText);
     const lighthouse = pageSpeedRes?.lighthouseResult || null;
+    const thirdPartyCount = htmlAudit.thirdPartyScriptCount || 0;
 
-    // Strip all empty spaces out of Google's pre-formatted string (e.g., "250 ms" -> "250ms")
     const rawTbtValue = lighthouse?.audits?.['total-blocking-time']?.displayValue || 'N/A';
-    const tbtValue = rawTbtValue.replace(/\s+/g, '');
+    const tbtValue = rawTbtValue !== 'N/A' ? rawTbtValue.replace(/\s+/g, '') : 'N/A';
 
-    // Remove the hardcoded space in the manual concatenation
     const inpValue = pageSpeedRes?.loadingExperience?.metrics?.INTERACTION_TO_NEXT_PAINT?.percentile 
       ? pageSpeedRes.loadingExperience.metrics.INTERACTION_TO_NEXT_PAINT.percentile + "ms" 
       : 'N/A';
     
-    const perfScore = lighthouse?.categories?.performance?.score ? Math.round(lighthouse.categories.performance.score * 100) : 50;
+    // FIX 1: Smart Heuristic Fallback (Removes the 7.5% hallucination)
+    let perfScore;
+    if (lighthouse?.categories?.performance?.score) {
+      perfScore = Math.round(lighthouse.categories.performance.score * 100);
+    } else {
+      // If Google is blocked, deduct 3 points for every 3rd party script found locally
+      perfScore = Math.max(10, 85 - (thirdPartyCount * 3));
+    }
     const revenueLeakagePercent = Math.max(0, (100 - perfScore) * 0.15).toFixed(1);
-    const thirdPartyCount = htmlAudit.thirdPartyScriptCount || 0;
 
     const leakageData = calculateLeakageRisk(
-      inpValue, tbtValue, htmlAudit.accessibility.altComplianceScore, dnsResult.riskLevel, htmlAudit.thirdPartyScriptCount
+      inpValue, tbtValue, htmlAudit.accessibility.altComplianceScore, dnsResult.riskLevel, thirdPartyCount
     );
 
-    // Parse TBT strictly to a number for hard numerical routing
+    // FIX 2: AI Guardrail Setup (Flag missing numerical data)
     const parsedTbt = parseInt(tbtValue.replace(/[^0-9]/g, ''));
-    const tbtNum = isNaN(parsedTbt) ? 0 : parsedTbt;
+    const tbtNum = isNaN(parsedTbt) ? -1 : parsedTbt; 
+    const isDataMissing = tbtNum === -1; 
 
     // --- STAGE 3: INDUSTRY-ADAPTIVE SEQUENTIAL AI AGENT ---
     const aiAnalysis = await fetchWithTimeout(
@@ -212,9 +222,11 @@ export async function GET(request: Request) {
           analogyInstructions = "Focus on user frustration, broken digital trust, and abandoned engagement moments to faster alternatives.";
         }
 
-        // DYNAMIC ROUTER: Strict Numerical Tone Mapping (Zero Loophole Overrides)
+        // DYNAMIC ROUTER: Strict Numerical Tone Mapping (Includes Missing Data Fallback)
         let severityInstructions = "";
-        if (tbtNum <= 50 && parseFloat(revenueLeakagePercent) <= 0.5) {
+        if (isDataMissing) {
+          severityInstructions = `TONE: Clinical and structural. Perimeter security blocked exact lab latency metrics. You MUST NOT mention any specific 'ms' latency or thread lock times. Instead, focus entirely on the risk of having ${thirdPartyCount} external trackers (parasite load) inherently causing digital paralysis and the estimated ${revenueLeakagePercent}% revenue leakage.`;
+        } else if (tbtNum <= 50 && parseFloat(revenueLeakagePercent) <= 0.5) {
           severityInstructions = `TONE: High praise. Commend their pristine ${tbtValue} architecture, noting that the processor remains undistracted and responds instantly to user taps, creating seamless trust.`;
         } else if (tbtNum > 50 && tbtNum <= 300) {
           severityInstructions = `TONE: Firm warning. They have a growing vulnerability. The ${tbtValue} micro-delay is beginning to paralyze the screen and quietly bleed revenue.`;
@@ -237,10 +249,9 @@ H1: ${primaryH1 || 'N/A'}
 About: ${heroText || 'N/A'}
 
 PERFORMANCE METRICS WE JUST EXTRACTED:
-- Mobile Render Latency (INP): ${inpValue}
-- Main Thread Lock (TBT): ${tbtValue}
 - Estimated Revenue Leakage: ${revenueLeakagePercent}%
 - Parasite Load: ${thirdPartyCount} external trackers
+${!isDataMissing ? `- Mobile Render Latency (INP): ${inpValue}\n- Main Thread Lock (TBT): ${tbtValue}` : ''}
 
 DYNAMIC INSTRUCTIONS FOR THIS SPECIFIC CLIENT:
 1. ${analogyInstructions}
@@ -248,9 +259,9 @@ DYNAMIC INSTRUCTIONS FOR THIS SPECIFIC CLIENT:
 
 TASK: Write a 4-sentence executive synthesis using the following strict structure:
 Sentence 1 (Identity): State exactly what their specific business does and who their specific users are.
-Sentence 2 (Operational): Address the exact performance reality. If TBT is above 50ms, you MUST explain how the ${tbtValue} thread lock is choked by ${thirdPartyCount} background scripts. If truly optimized (TBT <= 50ms), praise their speed.
+Sentence 2 (Operational): ${isDataMissing ? `Address the structural bloat. Explain that while exact processor lock times are shielded by perimeter security, their heavy payload of ${thirdPartyCount} background tracking scripts is a known catalyst for processor distraction and digital paralysis.` : `Address the exact performance reality. If TBT is above 50ms, you MUST explain how the ${tbtValue} thread lock is choked by ${thirdPartyCount} background scripts. If truly optimized (TBT <= 50ms), praise their speed.`}
 Sentence 3 (Psychological): Explain the user's physical reality based on the metrics (either instant frictionless response OR screen paralysis ignoring user taps).
-Sentence 4 (Financial): State the financial reality using the exact ${revenueLeakagePercent}% revenue leakage metric.`
+Sentence 4 (Financial): State the financial reality using the exact estimated ${revenueLeakagePercent}% revenue leakage metric.`
         });
 
         // AGENT B: The Critic (Enforces Guardrails & Finalizes Object)
@@ -271,8 +282,8 @@ DYNAMIC CONTEXT REMINDER:
 
 CRITICAL CONSTRAINTS FOR REWRITE:
 - You MUST reference their specific industry and specific user type in the first sentence.
-- You MUST include the actual performance numbers (${tbtValue}, ${revenueLeakagePercent}%).
-- ABSOLUTE RULE: If TBT is greater than 50ms (such as an 800ms thread lock), you are strictly forbidden from praising the site. The tone MUST reflect critical friction, frozen screens, and revenue leakage.
+- You MUST include the actual metrics provided (e.g., ${revenueLeakagePercent}%, ${thirdPartyCount} scripts).
+- ${isDataMissing ? `ABSOLUTE RULE: You are strictly forbidden from referencing specific 'ms' metrics or exact thread lock times because the data is 'N/A'. Focus entirely on the risk of the ${thirdPartyCount} scripts and the ${revenueLeakagePercent}% leakage.` : `ABSOLUTE RULE: If TBT is greater than 50ms (such as an 800ms thread lock), you are strictly forbidden from praising the site. The tone MUST reflect critical friction, frozen screens, and revenue leakage.`}
 - Eradicate ANY developer jargon (e.g., remove "DOM", "JavaScript", "CPU", "Core Web Vitals", "main thread"). 
 - Eradicate ANY cheesy SaaS slogans.`
         });
