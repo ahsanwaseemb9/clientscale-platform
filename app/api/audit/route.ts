@@ -25,7 +25,7 @@ const industryContextSchema = z.object({
   userType: z.string().describe("e.g., 'commercial shippers' or 'retail customers'"),
   buttons: z.string().describe("e.g., 'quote request forms' or 'checkout buttons'"),
   brandVibe: z.string().describe("e.g., 'Boutique Law Firm', 'Public Transit Network', 'High-End E-Commerce', 'B2B Logistics Portal'"),
-  executiveSynthesis: z.string().describe("A 4-sentence consultative executive briefing. MUST reference specific metrics provided and accurately reflect the performance reality (friction or seamlessness).")
+  executiveSynthesis: z.string().describe("A 4-sentence consultative executive briefing wrapped exactly in a <p style='text-align: justify;'> tag. MUST reference specific metrics provided and accurately reflect the performance reality.")
 });
 
 function detectNextJs(html: string, headers: Record<string, string[]>) {
@@ -265,7 +265,7 @@ Sentence 3 (Psychological): Explain the user's physical reality based on the met
 Sentence 4 (Financial): State the financial reality using the exact estimated ${revenueLeakagePercent}% revenue leakage metric.`
         });
 
-        // AGENT B: The Critic (Forcing the exact latency numbers)
+        // AGENT B: The Critic (Forcing the exact latency numbers & Layout Formatting)
         const finalResponse = await generateObject({
           model: openai('gpt-4o-mini'), 
           temperature: 0.1, 
@@ -286,6 +286,7 @@ CRITICAL CONSTRAINTS FOR REWRITE:
     ? `ABSOLUTE RULE: You MUST include the ${revenueLeakagePercent}% leakage metric. You are strictly forbidden from referencing specific 'ms' metrics because the data is 'N/A'.` 
     : `ABSOLUTE RULE: You MUST explicitly include the exact numerical metrics in your sentences: ${tbtValue} thread lock, ${inpValue} latency, and ${revenueLeakagePercent}% revenue leakage.`}
 - If TBT is greater than 50ms, you are strictly forbidden from praising the site. The tone MUST reflect critical friction, frozen screens, and revenue leakage.
+- FORMATTING RULE: The final output for 'executiveSynthesis' MUST be wrapped exactly in a <p style='text-align: justify;'> tag (e.g., <p style='text-align: justify;'>[Your 4 sentences here]</p>). Do NOT use markdown code blocks like \`\`\`html. Return only the raw string.
 - Eradicate ANY developer jargon (e.g., remove "DOM", "JavaScript", "CPU", "Core Web Vitals", "main thread"). 
 - Eradicate ANY cheesy SaaS slogans.`
         });
