@@ -222,7 +222,7 @@ export async function GET(request: Request) {
           analogyInstructions = "Focus on user frustration, broken digital trust, and abandoned engagement moments to faster alternatives.";
         }
 
-        // DYNAMIC ROUTER: Strict Numerical Tone Mapping (Includes Missing Data Fallback)
+        // DYNAMIC ROUTER: Strict Numerical Tone Mapping (Includes Missing Data & 0 Script Fallbacks)
         let severityInstructions = "";
         if (isDataMissing) {
           severityInstructions = `TONE: Clinical and structural. Perimeter security blocked exact lab latency metrics. You MUST NOT mention any specific 'ms' latency or thread lock times. Instead, focus entirely on the risk of having ${thirdPartyCount} external trackers (parasite load) inherently causing digital paralysis and the estimated ${revenueLeakagePercent}% revenue leakage.`;
@@ -231,7 +231,31 @@ export async function GET(request: Request) {
         } else if (tbtNum > 50 && tbtNum <= 300) {
           severityInstructions = `TONE: Firm warning. They have a growing vulnerability. The ${tbtValue} micro-delay is beginning to paralyze the screen and quietly bleed revenue.`;
         } else {
-          severityInstructions = `TONE: Emergency intervention. Sound the alarm. This is a severe, unacceptable level of digital paralysis (${tbtValue} thread lock) caused by ${thirdPartyCount} background scripts freezing user interaction and driving severe revenue loss.`;
+          if (thirdPartyCount > 0) {
+            severityInstructions = `TONE: Emergency intervention. Sound the alarm. This is a severe, unacceptable level of digital paralysis (${tbtValue} thread lock) caused by ${thirdPartyCount} external background scripts freezing user interaction and driving severe revenue loss.`;
+          } else {
+            severityInstructions = `TONE: Emergency intervention. Sound the alarm. This is a severe, unacceptable level of digital paralysis (${tbtValue} thread lock) caused by their own heavy internal code architecture and first-party structural bloat freezing user interaction.`;
+          }
+        }
+
+        // DYNAMIC ROUTER: Agent A Sentence 2 Logic Fork
+        let sentence2Logic = "";
+        if (isDataMissing) {
+          sentence2Logic = `Address the structural bloat. Explain that while exact processor lock times are shielded by perimeter security, their heavy payload of ${thirdPartyCount} background tracking scripts is a known catalyst for processor distraction and digital paralysis.`;
+        } else if (tbtNum > 50 && thirdPartyCount > 0) {
+          sentence2Logic = `Address the exact performance reality. You MUST explain how the ${tbtValue} thread lock is choked by ${thirdPartyCount} external background scripts.`;
+        } else if (tbtNum > 50 && thirdPartyCount === 0) {
+          sentence2Logic = `Address the exact performance reality. You MUST explain that the ${tbtValue} thread lock is caused entirely by their own internal code architecture and heavy first-party structural bloat (since they have zero external trackers).`;
+        } else {
+          sentence2Logic = `Address the exact performance reality. Because their TBT is pristine (${tbtValue}), praise their highly optimized speed and efficient architecture.`;
+        }
+
+        // DYNAMIC ROUTER: Agent B Absolute Rule
+        let absoluteRule = "";
+        if (isDataMissing) {
+          absoluteRule = `ABSOLUTE RULE: You are strictly forbidden from referencing specific 'ms' metrics or exact thread lock times because the data is 'N/A'. Focus entirely on the risk of the ${thirdPartyCount} scripts and the ${revenueLeakagePercent}% leakage.`;
+        } else {
+          absoluteRule = `ABSOLUTE RULE: If TBT is greater than 50ms, you are strictly forbidden from praising the site. Furthermore, if they have 0 external trackers, do not say the "absence of scripts" causes the issue—blame their internal code architecture. The tone MUST reflect critical friction, frozen screens, and revenue leakage.`;
         }
 
         // AGENT A: The Writer (Generates Initial Draft strictly anchored to numerical reality)
@@ -259,7 +283,7 @@ DYNAMIC INSTRUCTIONS FOR THIS SPECIFIC CLIENT:
 
 TASK: Write a 4-sentence executive synthesis using the following strict structure:
 Sentence 1 (Identity): State exactly what their specific business does and who their specific users are.
-Sentence 2 (Operational): ${isDataMissing ? `Address the structural bloat. Explain that while exact processor lock times are shielded by perimeter security, their heavy payload of ${thirdPartyCount} background tracking scripts is a known catalyst for processor distraction and digital paralysis.` : `Address the exact performance reality. If TBT is above 50ms, you MUST explain how the ${tbtValue} thread lock is choked by ${thirdPartyCount} background scripts. If truly optimized (TBT <= 50ms), praise their speed.`}
+Sentence 2 (Operational): ${sentence2Logic}
 Sentence 3 (Psychological): Explain the user's physical reality based on the metrics (either instant frictionless response OR screen paralysis ignoring user taps).
 Sentence 4 (Financial): State the financial reality using the exact estimated ${revenueLeakagePercent}% revenue leakage metric.`
         });
@@ -283,7 +307,7 @@ DYNAMIC CONTEXT REMINDER:
 CRITICAL CONSTRAINTS FOR REWRITE:
 - You MUST reference their specific industry and specific user type in the first sentence.
 - You MUST include the actual metrics provided (e.g., ${revenueLeakagePercent}%, ${thirdPartyCount} scripts).
-- ${isDataMissing ? `ABSOLUTE RULE: You are strictly forbidden from referencing specific 'ms' metrics or exact thread lock times because the data is 'N/A'. Focus entirely on the risk of the ${thirdPartyCount} scripts and the ${revenueLeakagePercent}% leakage.` : `ABSOLUTE RULE: If TBT is greater than 50ms (such as an 800ms thread lock), you are strictly forbidden from praising the site. The tone MUST reflect critical friction, frozen screens, and revenue leakage.`}
+- ${absoluteRule}
 - Eradicate ANY developer jargon (e.g., remove "DOM", "JavaScript", "CPU", "Core Web Vitals", "main thread"). 
 - Eradicate ANY cheesy SaaS slogans.`
         });
