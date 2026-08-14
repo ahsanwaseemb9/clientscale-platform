@@ -11,11 +11,12 @@ export async function POST(request: Request) {
     
     console.log("[ClientScale Telemetry Caught]:", body);
 
-    // Insert directly into your existing 'session_telemetry' table
+    // Insert into 'session_telemetry' including the required tenant_id
     const { error } = await supabase
       .from('session_telemetry')
       .insert([
         {
+          tenant_id: '00000000-0000-0000-0000-000000000000', // Default system tenant UUID
           session_id: body.session_id,
           friction_type: body.event || 'rage_click',
           recovered: false,

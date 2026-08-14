@@ -1,5 +1,7 @@
 'use client';
 
+import SyncFinancesButton from './../../components/SyncFinancesButton';
+
 import { useEffect, useState, useRef } from 'react';
 import { 
   AlertTriangle, DollarSign, Ghost, ShieldAlert, Activity, 
@@ -593,6 +595,7 @@ export default function AuditReportPage() {
             <Activity size={16} />
             Initialize AI Remediation
           </button>
+          <SyncFinancesButton/>
         </div>
 
         {/* --- LIVE TELEMETRY VOLATILITY WARNING --- */}
