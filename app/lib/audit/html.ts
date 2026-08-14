@@ -1,6 +1,5 @@
 export function auditHtmlMetadata(htmlText: string) {
   // --- DEFENSIVE BOUNCER ---
-  // Ensure we always have a string to prevent fatal regex crashes on dirty payloads
   const safeHtml = typeof htmlText === 'string' ? htmlText : '';
 
   // 1. Social Preview & Meta Description via Regex
@@ -15,13 +14,11 @@ export function auditHtmlMetadata(htmlText: string) {
   const ogDescMatch = safeHtml.match(/<meta[^>]+property=["']og:description["'][^>]+content=["']([^"']+)["']/i) ||
                       safeHtml.match(/<meta[^>]+content=["']([^"']+)["'][^>]+property=["']og:description["']/i);
 
-  // Fallback to standard SEO description if og:description is missing
   const standardDescMatch = safeHtml.match(/<meta[^>]+name=["']description["'][^>]+content=["']([^"']+)["']/i) ||
                             safeHtml.match(/<meta[^>]+content=["']([^"']+)["'][^>]+name=["']description["']/i);
 
   const rawTitle = ogTitleMatch?.[1] || titleMatch?.[1] || null;
   
-  // Basic cleanup for standard HTML entity apostrophes/quotes
   const ogTitle = rawTitle 
     ? rawTitle.replace(/&#039;/g, "'").replace(/&amp;/g, "&").replace(/&quot;/g, '"')
     : null;
@@ -29,14 +26,13 @@ export function auditHtmlMetadata(htmlText: string) {
   const ogImage = ogImageMatch?.[1] || null;
   const description = ogDescMatch?.[1] || standardDescMatch?.[1] || null;
 
-  // 2. Accessibility & Missing Alt Extraction
-  const imgTags = safeHtml.match(/<img[^>]+>/gi) || [];
+  // 2. Accessibility & Missing Alt Extraction (Explicitly typed as string[])
+  const imgTags: string[] = safeHtml.match(/<img[^>]+>/gi) || [];
   const totalImages = imgTags.length;
 
   const missingAltImages: string[] = [];
-  imgTags.forEach(img => {
-    // Check if the img tag does not contain an alt attribute
-    if (!/\balt\s*=/i.test(img)) {
+  imgTags.forEach((img: string) => {
+    if (!/\balt\s*=/.test(img)) {
       const srcMatch = img.match(/src=["']([^"']+)["']/i);
       missingAltImages.push(srcMatch?.[1] || 'Unnamed Asset / Inline SVG Element');
     }
@@ -47,8 +43,8 @@ export function auditHtmlMetadata(htmlText: string) {
   // 3. Schema Structured Data Check
   const hasSchema = /application\/ld\+json/i.test(safeHtml);
 
-  // 4. Third-Party Script Bloat Tracker
-  const allScripts = safeHtml.match(/<script[^>]+src=["']([^"']+)["']/gi) || [];
+  // 4. Third-Party Script Bloat Tracker (Explicitly typed as string[])
+  const allScripts: string[] = safeHtml.match(/<script[^>]+src=["']([^"']+)["']/gi) || [];
   const thirdPartyScripts = allScripts.filter(script => script.includes('http'));
 
   return {
