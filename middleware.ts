@@ -3,8 +3,14 @@ import { NextResponse, NextRequest } from 'next/server';
 export function middleware(request: NextRequest) {
   const response = NextResponse.next();
 
-  // Only inject into HTML pages (skip API routes, static assets, etc.)
+  // Skip API routes and Next.js internal assets
   if (request.nextUrl.pathname.startsWith('/api') || request.nextUrl.pathname.startsWith('/_next')) {
+    return response;
+  }
+
+  // Only apply HTMLRewriter if the response is HTML and has a body stream
+  const contentType = response.headers.get('content-type') || '';
+  if (!contentType.includes('text/html') || !response.body) {
     return response;
   }
 
