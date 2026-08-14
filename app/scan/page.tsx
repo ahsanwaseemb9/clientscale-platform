@@ -1,5 +1,5 @@
 import { Suspense } from 'react';
-import AuditContent from '@/app/components/AuditContent'; // Make sure this path matches your folder structure!
+import AuditContent from '../components/AuditContent'; // Make sure this path matches your folder structure!
 
 export default function ScanPage() {
   return (
