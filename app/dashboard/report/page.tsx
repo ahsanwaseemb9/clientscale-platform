@@ -1,14 +1,12 @@
 // app/dashboard/report/page.tsx
 'use client';
 
-import SyncFinancesButton from './../../components/SyncFinancesButton';
-
 import { useEffect, useState, useRef } from 'react';
 import { 
   AlertTriangle, DollarSign, Ghost, ShieldAlert, Activity, 
   Database, ServerCrash, X, ChevronRight, MapPin, MailWarning,
   ListOrdered, Layers, Globe, Image as ImageIcon, Accessibility, 
-  CheckCircle, AlertCircle, Cpu, Lock, Unlock, ShieldCheck, Search, Info, ArrowUp
+  CheckCircle, AlertCircle, Cpu, Lock, Unlock, Search, Info, ArrowUp
 } from 'lucide-react';
 
 // --- UPGRADE MAPPING DICTIONARY ---
@@ -88,15 +86,20 @@ export default function AuditReportPage() {
     topAnchorRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
-  // --- DYNAMIC FINANCIAL SYNC HANDLER (Domain-Based Resolution) ---
+  // --- DYNAMIC FINANCIAL SYNC HANDLER (Target Domain Resolution) ---
   const handleSyncFinances = async () => {
     try {
-      const currentDomain = window.location.hostname; 
+      // Extracts the prospect's domain from auditData.target (e.g., 'themarlowclub.co.uk' or 'kfc.com')
+      const rawTarget = auditData?.target || '';
+      const targetDomain = rawTarget
+        .replace(/^https?:\/\//, '')
+        .replace(/^www\./, '')
+        .split('/')[0];
 
       const response = await fetch('/api/sync-finances', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ domain: currentDomain }),
+        body: JSON.stringify({ domain: targetDomain }),
       });
 
       const data = await response.json();
@@ -539,8 +542,6 @@ export default function AuditReportPage() {
               Sync Financial Baseline
             </button>
           </div>
-          
-          <SyncFinancesButton />
         </div>
 
         {/* --- LIVE TELEMETRY VOLATILITY WARNING --- */}
@@ -990,5 +991,3 @@ export default function AuditReportPage() {
     </main>
   );
 }
-
-
