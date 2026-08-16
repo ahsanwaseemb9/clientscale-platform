@@ -1,17 +1,13 @@
+// app/api/sync-finances/route.ts
 import { NextResponse } from 'next/server';
-import Stripe from 'stripe';
 import { createClient } from '@supabase/supabase-js';
+import { fetchStripeFinancials } from '../../lib/audit/adapters/stripe';
+// import { fetchShopifyFinancials } from '@/lib/adapters/shopify';
 
 export async function POST(request: Request) {
   try {
-    const stripeKey = process.env.STRIPE_SECRET_KEY;
-    if (!stripeKey) {
-      return NextResponse.json({ success: false, error: 'STRIPE_SECRET_KEY is missing' }, { status: 500 });
-    }
-
-    const stripe = new Stripe(stripeKey);
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
-    const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
+    const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || '';
 
     if (!supabaseUrl || !supabaseKey) {
       return NextResponse.json({ success: false, error: 'Supabase environment variables are missing' }, { status: 500 });
@@ -19,37 +15,54 @@ export async function POST(request: Request) {
 
     const supabase = createClient(supabaseUrl, supabaseKey);
 
+    // 1. Get the actual tenant context from the request
     const { tenantId } = await request.json().catch(() => ({}));
-    const activeTenantId = tenantId || '00000000-0000-0000-0000-000000000000';
-
-    // 1. Fetch charges from Stripe
-    let charges;
-    try {
-      charges = await stripe.charges.list({ limit: 100 });
-    } catch (stripeErr: any) {
-      console.error('[Stripe API Fetch Error]:', stripeErr);
-      return NextResponse.json({ success: false, error: `Stripe Network Error: ${stripeErr.message}` }, { status: 500 });
+    
+    if (!tenantId) {
+       return NextResponse.json({ success: false, error: 'tenantId is required to sync finances' }, { status: 400 });
     }
 
-    const successfulCharges = charges.data.filter(charge => charge.paid && !charge.refunded);
+    // 2. Fetch Tenant Configuration (The Switchboard)
+    const { data: tenant, error: tenantError } = await supabase
+      .from('tenants')
+      .select('active_provider, integration_config')
+      .eq('id', tenantId)
+      .single();
 
-    if (successfulCharges.length === 0) {
-      return NextResponse.json({ success: true, message: 'No successful charges found to calculate baseline.' });
+    if (tenantError || !tenant) {
+      return NextResponse.json({ success: false, error: 'Tenant not found or missing configuration' }, { status: 404 });
     }
 
-    const totalRevenueCents = successfulCharges.reduce((acc, charge) => acc + charge.amount, 0);
-    const totalOrders = successfulCharges.length;
-    const aov = (totalRevenueCents / totalOrders) / 100;
+    let financialMetrics;
 
-    // 2. Persist to Supabase
+    // 3. Route to the correct platform adapter dynamically
+    switch (tenant.active_provider) {
+      case 'stripe':
+        // Passes the tenant's specific JSON configuration to the adapter
+        financialMetrics = await fetchStripeFinancials(tenant.integration_config);
+        break;
+      case 'shopify':
+        // financialMetrics = await fetchShopifyFinancials(tenant.integration_config);
+        break;
+      default:
+        return NextResponse.json({ success: false, error: `Unsupported active provider: ${tenant.active_provider}` }, { status: 400 });
+    }
+
+    if (!financialMetrics) {
+      return NextResponse.json({ success: false, error: 'Failed to compute financial metrics' }, { status: 500 });
+    }
+
+    // 4. Upsert the normalized data to the unified database schema
     const { error: dbError } = await supabase
       .from('tenant_financials')
       .upsert({
-        tenant_id: activeTenantId,
-        average_order_value: aov,
-        total_orders_analyzed: totalOrders,
-        total_revenue_analyzed: totalRevenueCents / 100,
-        currency: successfulCharges[0]?.currency?.toUpperCase() || 'USD',
+        tenant_id: tenantId,
+        provider: financialMetrics.provider,
+        average_order_value: financialMetrics.average_order_value,
+        total_revenue: financialMetrics.total_revenue,
+        // Optional tracking columns you included in your original file:
+        total_orders_analyzed: financialMetrics.total_orders_analyzed,
+        currency: financialMetrics.currency,
         updated_at: new Date().toISOString()
       }, { onConflict: 'tenant_id' });
 
@@ -61,9 +74,10 @@ export async function POST(request: Request) {
     return NextResponse.json({
       success: true,
       metrics: {
-        averageOrderValue: aov,
-        totalOrdersAnalyzed: totalOrders,
-        currency: successfulCharges[0]?.currency?.toUpperCase() || 'USD'
+        provider: financialMetrics.provider,
+        averageOrderValue: financialMetrics.average_order_value,
+        totalOrdersAnalyzed: financialMetrics.total_orders_analyzed,
+        currency: financialMetrics.currency
       }
     });
 
