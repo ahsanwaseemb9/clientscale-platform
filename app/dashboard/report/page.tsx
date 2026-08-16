@@ -1,3 +1,4 @@
+// app/dashboard/report/page.tsx
 'use client';
 
 import SyncFinancesButton from './../../components/SyncFinancesButton';
@@ -85,6 +86,28 @@ export default function AuditReportPage() {
   // --- BULLETPROOF SCROLL-TO-TOP FUNCTION ---
   const scrollToTop = () => {
     topAnchorRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  // --- DYNAMIC FINANCIAL SYNC HANDLER (Domain-Based Resolution) ---
+  const handleSyncFinances = async () => {
+    try {
+      const currentDomain = window.location.hostname; 
+
+      const response = await fetch('/api/sync-finances', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ domain: currentDomain }),
+      });
+
+      const data = await response.json();
+      if (data.success) {
+        alert(`Success! AOV is $${data.metrics.averageOrderValue}`);
+      } else {
+        alert(`Error: ${data.error}`);
+      }
+    } catch (err: any) {
+      alert(`Sync Failed: ${err.message || 'Unknown error'}`);
+    }
   };
 
   if (isLoading) {
@@ -193,7 +216,7 @@ export default function AuditReportPage() {
   // Real accessibility targets passed from backend
   const missingAltList = Array.isArray(a11y.missingAltImages) && a11y.missingAltImages.length > 0 
     ? a11y.missingAltImages 
-    : []; // Default to empty array if fully compliant
+    : [];
 
   const displayTitle = meta.title 
     ? String(meta.title).replace(/&#039;/g, "'").replace(/&amp;/g, "&").replace(/&quot;/g, '"')
@@ -219,7 +242,6 @@ export default function AuditReportPage() {
   }
 
   // --- HYPER-DYNAMIC AI BUSINESS TRANSLATION GENERATOR ---
-  
   const getBrandName = (targetUrl: string): string => {
     try {
       const hostname = new URL(targetUrl).hostname.replace(/^www\./, '');
@@ -233,8 +255,6 @@ export default function AuditReportPage() {
 
   const brandName = getBrandName(auditData?.target || '');
 
-  // 1. The frontend now cleanly consumes the backend AI payload (auditData.industryContext)
-  // If the payload is missing (e.g., legacy scan), it gracefully falls back to universal defaults.
   const industryTerms = auditData?.industryContext || {
     action: `prospects can complete their journey on ${brandName}`,
     shortAction: `convert`,
@@ -246,8 +266,6 @@ export default function AuditReportPage() {
 
   const dynamicSynthesis = auditData?.industryContext?.executiveSynthesis || "Analyzing structural pipeline friction against conversion health...";
 
-
-  // --- DYNAMIC CARDS INJECTING AI TERMINOLOGY ---
   const frictionCards = [
     {
       id: 'revenue',
@@ -331,74 +349,6 @@ export default function AuditReportPage() {
 
   frictionCards.sort((a, b) => (a.isGreen === b.isGreen ? 0 : a.isGreen ? 1 : -1));
 
-
-  // High-End APM Streaming Telemetry Component
-  const LiveTelemetryWave = ({ isFlat, isAlert }: { isFlat: boolean; isAlert: boolean }) => {
-    const [points, setPoints] = useState<number[]>([]);
-
-    useEffect(() => {
-      if (isFlat) {
-        setPoints(Array(35).fill(18));
-        return;
-      }
-
-      const initial = Array.from({ length: 35 }, () => 18 + (Math.random() * 10 - 5));
-      setPoints(initial);
-
-      const interval = setInterval(() => {
-        setPoints((prev) => {
-          const nextVal = 18 + (Math.random() * (isAlert ? 24 : 8) - (isAlert ? 12 : 4));
-          const clamped = Math.max(4, Math.min(32, nextVal));
-          return [...prev.slice(1), clamped];
-        });
-      }, 400);
-
-      return () => clearInterval(interval);
-    }, [isFlat, isAlert]);
-
-    const width = 500;
-    const height = 36;
-    const dx = width / (points.length - 1 || 1);
-
-    let pathString = '';
-    if (points.length > 0) {
-      pathString = `M 0,${points[0]}`;
-      for (let i = 0; i < points.length - 1; i++) {
-        const xCurrent = i * dx;
-        const yCurrent = points[i];
-        const xNext = (i + 1) * dx;
-        const yNext = points[i + 1];
-        const xMid = (xCurrent + xNext) / 2;
-        pathString += ` Q ${xMid},${yCurrent} ${xNext},${yNext}`;
-      }
-    }
-
-    const strokeColor = '#ffffff';
-
-    return (
-      <div className="w-full h-10 overflow-hidden relative mt-4 flex items-center bg-[#12121c]/90 border border-zinc-600/50 rounded-xl px-2 shadow-inner">
-        <svg className="w-full h-full" viewBox={`0 0 ${width} ${height}`} preserveAspectRatio="none">
-          <defs>
-            <linearGradient id={`grad-white`} x1="0%" y1="0%" x2="100%" y2="0%">
-              <stop offset="0%" stopColor={strokeColor} stopOpacity={isFlat ? "0.7" : "0.3"} />
-              <stop offset="50%" stopColor={strokeColor} stopOpacity="1" />
-              <stop offset="100%" stopColor={strokeColor} stopOpacity={isFlat ? "0.7" : "0.3"} />
-            </linearGradient>
-          </defs>
-          <path 
-            d={pathString} 
-            fill="none" 
-            stroke="url(#grad-white)"
-            strokeWidth="2.5" 
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            className="drop-shadow-[0_0_8px_rgba(255,255,255,0.7)]"
-          />
-        </svg>
-      </div>
-    );
-  };
-
   // --- CLIENTSCALE CUSTOM TELEMETRY GRAPH ---
   const TelemetryGraph = ({ title, series, yUnit = '', xLabels = ['- 60s', 'Live Sync'], maxVal = 100 }: any) => {
     const [dataLines, setDataLines] = useState<number[][]>(() => 
@@ -416,7 +366,7 @@ export default function AuditReportPage() {
     }, [series]);
 
     const width = 500;
-    const height = 120; // Internal coordinate height
+    const height = 120;
     const dx = width / 39;
 
     const generatePath = (data: number[]) => {
@@ -436,11 +386,7 @@ export default function AuditReportPage() {
 
     return (
       <div className="bg-[#09090e] border border-cyan-900/40 hover:border-cyan-700/60 transition-colors duration-700 rounded-xl p-5 sm:p-6 w-full flex flex-col h-full min-h-[300px] shadow-[inset_0_0_30px_rgba(6,182,212,0.03)] relative overflow-hidden group">
-        
-        {/* Top Cyber Accent Line */}
         <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-cyan-500/50 to-transparent opacity-80" />
-        
-        {/* Subtle Radar/Telemetry Background Grid */}
         <div className="absolute inset-0 bg-[linear-gradient(to_right,#06b6d408_1px,transparent_1px),linear-gradient(to_bottom,#06b6d408_1px,transparent_1px)] bg-[size:24px_24px] pointer-events-none" />
 
         <div className="relative z-10 flex flex-row justify-between items-center mb-6 gap-2">
@@ -483,14 +429,12 @@ export default function AuditReportPage() {
           <div className="absolute inset-0 pl-[52px] sm:pl-[64px] pb-6 pt-1">
             <svg className="w-full h-full overflow-visible" viewBox={`0 0 ${width} ${height}`} preserveAspectRatio="none">
               <defs>
-                {/* SVG Glow Filters for Telemetry Oscilloscope effect */}
                 {series.map((s: any, i: number) => (
                   <filter key={`glow-${i}`} id={`glow-${i}`} x="-20%" y="-20%" width="140%" height="140%">
                     <feGaussianBlur stdDeviation="3" result="blur" />
                     <feComposite in="SourceGraphic" in2="blur" operator="over" />
                   </filter>
                 ))}
-                {/* Area Gradients */}
                 {series.map((s: any, i: number) => (
                   <linearGradient key={`grad-${i}`} id={`grad-${i}`} x1="0" y1="0" x2="0" y2="1">
                     <stop offset="0%" stopColor={s.color} stopOpacity="0.2" />
@@ -502,10 +446,7 @@ export default function AuditReportPage() {
               {series.map((s: any, idx: number) => (
                 <g key={idx}>
                   {s.fill && (
-                    <path 
-                      d={generateArea(dataLines[idx])} 
-                      fill={`url(#grad-${idx})`} 
-                    />
+                    <path d={generateArea(dataLines[idx])} fill={`url(#grad-${idx})`} />
                   )}
                   <path 
                     d={generatePath(dataLines[idx])} 
@@ -531,7 +472,6 @@ export default function AuditReportPage() {
     );
   };
 
-  // Format the audit timestamp nicely (e.g., "August 6, 2026 at 4:07 PM")
   const formatAuditDate = (isoString?: string) => {
     try {
       const date = isoString ? new Date(isoString) : new Date();
@@ -552,23 +492,18 @@ export default function AuditReportPage() {
 
   return (
     <main className="flex min-h-[100dvh] w-full flex-col items-center bg-[#020205] text-white antialiased selection:bg-cyan-500/30 selection:text-cyan-200 overflow-x-hidden pb-24 relative">
-      
-      {/* Anchor Element used to pull the view perfectly to the top */}
       <div ref={topAnchorRef} className="absolute top-0 left-0 w-full h-px opacity-0 pointer-events-none" />
 
-      {/* --- SPACE AGENCY TELEMETRY BACKGROUND LAYERS --- */}
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_-20%,rgba(16,24,48,0.85),rgba(2,2,5,1)_65%)] pointer-events-none z-0" />
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(6,182,212,0.12),transparent_45%)] pointer-events-none z-0 mix-blend-screen" />
       <div className="absolute top-[30%] left-[10%] right-[10%] h-[500px] bg-[radial-gradient(circle_at_center,rgba(59,130,246,0.04),transparent_50%)] pointer-events-none z-0 mix-blend-screen" />
       <div className="absolute inset-0 bg-[linear-gradient(to_right,#262d3d_1px,transparent_1px),linear-gradient(to_bottom,#262d3d_1px,transparent_1px)] bg-[size:3.5rem_3.5rem] opacity-100 blur-[1px] pointer-events-none z-0" />
-      <div className="absolute inset-0 bg-[radial-gradient(1px_1px_at_20px_30px,#fff,transparent_100%),radial-gradient(1px_1px_at_75px_140px,rgba(255,255,255,0.7),transparent_100%),radial-gradient(1.5px_1.5px_at_120px_50px,#fff,transparent_100%),radial-gradient(1px_1px_at_240px_320px,rgba(255,255,255,0.5),transparent_100%)] bg-[size:300px_300px] opacity-40 pointer-events-none z-0 animate-pulse [animation-duration:8s]" />
 
       <div className="space-y-6 relative overflow-x-hidden min-h-screen pb-12 px-3 sm:px-6 lg:px-8 max-w-7xl mx-auto z-10 w-full pt-12">
         
         {/* --- PAGE HEADER --- */}
         <div className="flex flex-col items-center text-center gap-6 border-b border-zinc-700/80 pb-10 mb-12 w-full overflow-hidden">
           <div className="w-full max-w-3xl px-2">
-            
             <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-white tracking-tight">
               Diagnostic Forensics
             </h1>
@@ -580,7 +515,6 @@ export default function AuditReportPage() {
               </span>
             </p>
 
-            {/* Telemetry Snapshot Badge */}
             <div className="inline-flex flex-col sm:flex-row items-center gap-1.5 sm:gap-2 px-4 py-2 sm:px-3 sm:py-1 rounded-xl sm:rounded-full bg-cyan-500/10 border border-cyan-500/30 text-white font-mono text-xs mt-6 shadow-[0_0_10px_rgba(6,182,212,0.15)]">
               <div className="flex items-center gap-2">
                 <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span>
@@ -588,14 +522,25 @@ export default function AuditReportPage() {
               </div>
               <span className="font-semibold sm:font-normal">{auditTimestamp}</span>
             </div>
-            
           </div>
 
-          <button className="w-full sm:w-auto bg-gradient-to-b from-cyan-600 to-cyan-700 hover:from-cyan-500 hover:to-cyan-600 text-white px-8 py-3.5 rounded-xl font-bold text-xs sm:text-sm transition-all shadow-[0_0_20px_rgba(6,182,212,0.4)] flex items-center justify-center gap-2 border border-cyan-400/50 mt-2">
-            <Activity size={16} />
-            Initialize AI Remediation
-          </button>
-          <SyncFinancesButton/>
+          <div className="flex flex-col sm:flex-row items-center gap-4 mt-2 w-full sm:w-auto">
+            <button className="w-full sm:w-auto bg-gradient-to-b from-cyan-600 to-cyan-700 hover:from-cyan-500 hover:to-cyan-600 text-white px-8 py-3.5 rounded-xl font-bold text-xs sm:text-sm transition-all shadow-[0_0_20px_rgba(6,182,212,0.4)] flex items-center justify-center gap-2 border border-cyan-400/50">
+              <Activity size={16} />
+              Initialize AI Remediation
+            </button>
+
+            {/* Dynamic Sync Financial Baseline Button */}
+            <button 
+              onClick={handleSyncFinances}
+              className="w-full sm:w-auto bg-gradient-to-b from-blue-600 to-indigo-700 hover:from-blue-500 hover:to-indigo-600 text-white px-8 py-3.5 rounded-xl font-bold text-xs sm:text-sm transition-all shadow-[0_0_20px_rgba(59,130,246,0.4)] flex items-center justify-center gap-2 border border-blue-400/50"
+            >
+              <DollarSign size={16} />
+              Sync Financial Baseline
+            </button>
+          </div>
+          
+          <SyncFinancesButton />
         </div>
 
         {/* --- LIVE TELEMETRY VOLATILITY WARNING --- */}
@@ -614,26 +559,21 @@ export default function AuditReportPage() {
           </div>
         </div>
 
-        {/* --- AI EXECUTIVE SYNTHESIS (ELEVATED HERO BLOCK) --- */}
+        {/* --- AI EXECUTIVE SYNTHESIS --- */}
         <div className="w-full relative group mb-16 sm:mb-20">
-          {/* Subtle AI Glow Background */}
           <div className="absolute -inset-0.5 bg-gradient-to-r from-cyan-500/30 to-purple-600/30 rounded-2xl blur opacity-30 group-hover:opacity-60 transition duration-1000 group-hover:duration-200 animate-pulse pointer-events-none"></div>
           
           <div className="relative bg-[#0a0a0f]/95 border border-zinc-700/80 backdrop-blur-xl rounded-2xl p-6 sm:p-8 shadow-2xl flex flex-col sm:flex-row gap-5 sm:gap-6 items-start">
-            
-            {/* AI Iconography */}
             <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-cyan-500/10 to-purple-500/10 border border-cyan-400/30 flex items-center justify-center shrink-0 shadow-[0_0_15px_rgba(34,211,238,0.15)] relative overflow-hidden">
               <div className="absolute inset-0 bg-cyan-400/20 blur-xl animate-pulse"></div>
               <Cpu size={24} className="text-cyan-300 relative z-10" /> 
             </div>
 
-            {/* Content */}
             <div className="flex-grow">
               <div className="flex items-center gap-3 mb-3">
                 <h2 className="text-[11px] sm:text-xs font-mono font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-400 uppercase tracking-[0.25em]">
                   The Business Translation
                 </h2>
-                {/* Processing Indicator Dot */}
                 <span className="flex h-2 w-2 relative">
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>
                   <span className="relative inline-flex rounded-full h-2 w-2 bg-cyan-500 shadow-[0_0_8px_rgba(6,182,212,0.8)]"></span>
@@ -647,7 +587,7 @@ export default function AuditReportPage() {
           </div>
         </div>
 
-        {/* --- EXECUTIVE SYNTHESIS / OBSERVABILITY GRAPHS --- */}
+        {/* --- OBSERVABILITY GRAPHS --- */}
         <div className="mb-6 sm:mb-8 bg-gradient-to-b from-[#151522] to-[#0e0e14] border border-zinc-500/60 rounded-2xl p-6 sm:p-8 backdrop-blur-xl shadow-2xl">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4 border-b border-zinc-700/80 pb-6 overflow-hidden">
             <div className="w-full min-w-0">
@@ -669,45 +609,17 @@ export default function AuditReportPage() {
               yUnit="%"
               maxVal={100}
               series={[
-                { 
-                  label: 'Parasite Load', 
-                  color: '#eab308', // Amber/Yellow
-                  currentDisplay: `${parasiteImpact}%`, 
-                  base: isNaN(parseFloat(parasiteImpact)) ? 0 : parseFloat(parasiteImpact), 
-                  variance: parseFloat(parasiteImpact) === 0 ? 0 : 8, 
-                  fill: true 
-                },
-                { 
-                  label: 'Revenue Leakage', 
-                  color: '#06b6d4', // Cyan
-                  currentDisplay: `${revenueLeakagePercent}%`, 
-                  base: isNaN(parseFloat(revenueLeakagePercent)) ? 0 : parseFloat(revenueLeakagePercent), 
-                  variance: parseFloat(revenueLeakagePercent) === 0 ? 0 : 3, 
-                  fill: false 
-                }
+                { label: 'Parasite Load', color: '#eab308', currentDisplay: `${parasiteImpact}%`, base: isNaN(parseFloat(parasiteImpact)) ? 0 : parseFloat(parasiteImpact), variance: parseFloat(parasiteImpact) === 0 ? 0 : 8, fill: true },
+                { label: 'Revenue Leakage', color: '#06b6d4', currentDisplay: `${revenueLeakagePercent}%`, base: isNaN(parseFloat(revenueLeakagePercent)) ? 0 : parseFloat(revenueLeakagePercent), variance: parseFloat(revenueLeakagePercent) === 0 ? 0 : 3, fill: false }
               ]}
             />
             <TelemetryGraph 
               title="Interaction & Render Latency"
               yUnit="ms"
-              maxVal={dynamicLatencyYAxis} // Dynamic Scaling Applied
+              maxVal={dynamicLatencyYAxis}
               series={[
-                { 
-                  label: 'INP Latency', 
-                  color: '#a855f7', // Purple
-                  currentDisplay: `${rawInp}ms`, 
-                  base: isNaN(rawInp) ? 0 : rawInp, 
-                  variance: rawInp === 0 ? 0 : 150, 
-                  fill: true 
-                },
-                { 
-                  label: 'TBT (Thread Lock)', 
-                  color: '#ef4444', // Red
-                  currentDisplay: `${rawTbt}ms`, 
-                  base: isNaN(rawTbt) ? 0 : rawTbt, 
-                  variance: rawTbt === 0 ? 0 : 200, 
-                  fill: false 
-                }
+                { label: 'INP Latency', color: '#a855f7', currentDisplay: `${rawInp}ms`, base: isNaN(rawInp) ? 0 : rawInp, variance: rawInp === 0 ? 0 : 150, fill: true },
+                { label: 'TBT (Thread Lock)', color: '#ef4444', currentDisplay: `${rawTbt}ms`, base: isNaN(rawTbt) ? 0 : rawTbt, variance: rawTbt === 0 ? 0 : 200, fill: false }
               ]}
             />
           </div>
@@ -808,8 +720,6 @@ export default function AuditReportPage() {
 
         {/* --- BRAND COMPLIANCE & TECH STACK SIDE-BY-SIDE --- */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6 sm:mb-8 items-start">
-          
-          {/* Brand Impression & Accessibility */}
           <div className="bg-gradient-to-b from-[#151522] to-[#0e0e14] border border-zinc-500/60 rounded-2xl p-6 sm:p-8 backdrop-blur-xl shadow-2xl flex flex-col h-full">
             <div>
               <div className="flex items-center gap-3 mb-6">
@@ -817,7 +727,6 @@ export default function AuditReportPage() {
                 <h2 className="text-xs font-mono font-bold text-zinc-100 uppercase tracking-widest">Brand & Compliance Index</h2>
               </div>
               <div className="space-y-5">
-                {/* Meta Data */}
                 <div>
                   <span className="text-[10px] font-mono font-bold text-zinc-400 uppercase tracking-widest mb-2 block">Social Link Preview (OpenGraph)</span>
                   <div className="p-4 bg-[#12121c] border border-zinc-600/60 rounded-xl space-y-2">
@@ -839,7 +748,6 @@ export default function AuditReportPage() {
                   </div>
                 </div>
 
-                {/* Accessibility */}
                 <div 
                   onClick={() => setActiveDrawer('accessibility')}
                   className="group cursor-pointer transition-all"
@@ -865,7 +773,6 @@ export default function AuditReportPage() {
             </div>
           </div>
 
-          {/* --- TECH STACK FINGERPRINT & UPGRADE PATH --- */}
           <div className="bg-gradient-to-b from-[#151522] to-[#0e0e14] border border-zinc-500/60 rounded-2xl p-6 sm:p-8 backdrop-blur-xl shadow-2xl flex flex-col lg:max-h-[600px] relative overflow-hidden">
             <div className="flex flex-row justify-between items-center mb-6 border-b border-zinc-700/80 pb-4 gap-2 flex-wrap sm:flex-nowrap overflow-hidden">
               <div className="flex items-center gap-2 min-w-0 shrink">
@@ -886,7 +793,6 @@ export default function AuditReportPage() {
 
                 return (
                   <div key={idx} className="flex flex-col sm:flex-row gap-4 p-4 bg-[#12121c] border border-zinc-600/60 rounded-xl relative overflow-hidden group hover:border-cyan-400/50 transition-colors">
-                    {/* LEFT: Detected Infrastructure */}
                     <div className="flex-1 border-b sm:border-b-0 sm:border-r border-zinc-700/80 pb-4 sm:pb-0 sm:pr-4 min-w-0">
                       <div className="text-[9px] font-mono font-bold text-zinc-400 uppercase tracking-wider mb-2 flex items-center gap-1.5">
                         <span className="w-1.5 h-1.5 rounded-full bg-red-400 shrink-0"></span>
@@ -902,7 +808,6 @@ export default function AuditReportPage() {
                       </div>
                     </div>
 
-                    {/* RIGHT: Recommended Upgrade */}
                     <div className="flex-1 pt-2 sm:pt-0 sm:pl-2 min-w-0 relative">
                       <div className="text-[9px] font-mono font-bold text-cyan-400 uppercase tracking-wider mb-2 flex items-center gap-1.5">
                         <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse shrink-0"></span>
@@ -937,7 +842,6 @@ export default function AuditReportPage() {
               )}
             </div>
 
-            {/* --- MONETIZATION GATE OVERLAY --- */}
             {!isUpgradeUnlocked && (
               <div className="absolute inset-x-4 bottom-4 bg-[#151522]/95 backdrop-blur-md border border-cyan-400/50 rounded-xl p-5 text-center shadow-[0_0_25px_rgba(8,145,178,0.3)] flex flex-col items-center gap-3 z-20">
                 <div className="w-10 h-10 rounded-full bg-cyan-500/15 border border-cyan-400/40 flex items-center justify-center text-cyan-300">
@@ -958,7 +862,6 @@ export default function AuditReportPage() {
               </div>
             )}
           </div>
-
         </div>
 
         {/* --- STANDARD TECHNICAL DATA --- */}
@@ -1008,11 +911,6 @@ export default function AuditReportPage() {
               <p className="text-xs sm:text-sm leading-relaxed font-light">
                 This calculation is strictly derived from the <strong>Deloitte & Google "Milliseconds Make Millions" baseline study</strong>.
               </p>
-              <ul className="space-y-3 list-disc pl-5 text-xs sm:text-sm font-light text-zinc-200">
-                <li>Retail and lead-generation conversion rates are mathematically bound to rendering latency.</li>
-                <li>The study proved conclusively that a mere <strong>0.1-second delay</strong> in mobile load times directly causes up to an <strong>8.4% drop in conversions</strong>.</li>
-                <li><strong>Why we use an estimate:</strong> Rather than guessing, we take your exact live Lighthouse performance deficit and run it through standardized conversion-loss curves to calculate the mathematical floor of your monthly revenue losses.</li>
-              </ul>
             </div>
           )}
 
@@ -1022,10 +920,6 @@ export default function AuditReportPage() {
               <p className="text-xs sm:text-sm leading-relaxed font-light">
                 This metric utilizes direct data from the Chromium rendering engine to measure UI paralysis.
               </p>
-              <ul className="space-y-3 list-disc pl-5 text-xs sm:text-sm font-light text-zinc-200">
-                <li>When a site visually loads, users assume it is interactive. However, if background JavaScript is still executing, the browser's <strong>Main Thread</strong> is locked.</li>
-                <li>We measure the exact <strong>Total Blocking Time (TBT)</strong>. During this window, user inputs (like tapping a "Book Now" button or opening a menu) are completely ignored by the device.</li>
-              </ul>
             </div>
           )}
 
@@ -1035,10 +929,6 @@ export default function AuditReportPage() {
               <p className="text-xs sm:text-sm leading-relaxed font-light">
                 This extracts the <strong>Interaction to Next Paint (INP)</strong>, Google's newest and most heavily weighted Core Web Vital.
               </p>
-              <ul className="space-y-3 list-disc pl-5 text-xs sm:text-sm font-light text-zinc-200">
-                <li>INP measures the actual latency between a user interacting with the page and the browser visually updating.</li>
-                <li>Google Maps and Local Search algorithms officially penalize domains with an INP above 200 milliseconds.</li>
-              </ul>
             </div>
           )}
 
@@ -1048,103 +938,24 @@ export default function AuditReportPage() {
               <p className="text-xs sm:text-sm leading-relaxed font-light">
                 A forensic extraction of third-party network requests hijacking your local rendering pipeline.
               </p>
-              <div className="mt-4">
-                <h4 className="text-[10px] font-mono font-bold text-zinc-300 uppercase tracking-widest mb-3 flex items-center gap-2">
-                  <ShieldAlert size={14} className="text-yellow-400 shrink-0" /> Detected Network Hijackers
-                </h4>
-                {thirdPartyScripts.length > 0 ? (
-                  <div className="space-y-2 max-h-[250px] overflow-y-auto pr-2 custom-scrollbar">
-                    {thirdPartyScripts.map((script: any, idx: number) => (
-                      <div key={idx} className="flex items-center justify-between p-3 bg-[#12121c] border border-zinc-600/80 rounded-xl gap-2">
-                        <div className="flex items-center gap-3 min-w-0 pr-2">
-                          <span className="w-1.5 h-1.5 rounded-full bg-yellow-400 shrink-0"></span>
-                          <span className="text-xs text-zinc-100 truncate">{script.name || script.url || 'Unknown Tracker'}</span>
-                        </div>
-                        {script.mainThreadTime > 0 && (
-                          <span className="text-[10px] font-mono text-yellow-400 shrink-0 font-bold">
-                            {Math.round(script.mainThreadTime)}ms block
-                          </span>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="p-4 bg-[#12121c] border border-zinc-600/80 rounded-xl text-xs text-zinc-300 italic text-center">
-                    Script identities protected by enterprise firewall or not detected.
-                  </div>
-                )}
-              </div>
             </div>
           )}
 
-          {/* --- UPDATED ACCESSIBILITY DRAWER --- */}
           {activeDrawer === 'accessibility' && (
             <div className="animate-in fade-in duration-500 text-zinc-100 space-y-4">
               <h3 className="text-xl sm:text-2xl font-bold text-white mb-6">Accessibility & SEO Compliance</h3>
               <p className="text-xs sm:text-sm leading-relaxed font-light">
-                Images lacking alternative (alt) text prevent screen readers from interpreting visual content for visually impaired users and strip away valuable local image-search ranking signals.
+                Images lacking alternative (alt) text prevent screen readers from interpreting visual content.
               </p>
-              <div className="mt-6">
-                <h4 className="text-[10px] font-mono font-bold text-zinc-300 uppercase tracking-widest mb-3 flex items-center gap-2">
-                  <ImageIcon size={14} className="text-blue-400 shrink-0" /> {missingAltList.length} Non-Compliant Assets Detected
-                </h4>
-                {missingAltList.length > 0 ? (
-                  <div className="space-y-2 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
-                    {missingAltList.map((imgSrc: string, idx: number) => (
-                      <div key={idx} className="flex items-center gap-3 p-3 bg-[#12121c] border border-zinc-600/80 rounded-xl">
-                        <AlertTriangle size={14} className="text-yellow-400 shrink-0" />
-                        <span className="text-xs text-zinc-200 truncate font-mono" title={imgSrc}>{imgSrc}</span>
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="p-4 bg-[#12121c] border border-green-900/40 rounded-xl flex items-center gap-3">
-                    <CheckCircle size={16} className="text-green-400" />
-                    <span className="text-xs text-zinc-200">All scanned images contain valid alt attributes.</span>
-                  </div>
-                )}
-              </div>
             </div>
           )}
 
-          {/* --- UPDATED DNS / NURTURE TRUST DRAWER --- */}
           {activeDrawer === 'dns' && (
             <div className="animate-in fade-in duration-500 text-zinc-100 space-y-4">
               <h3 className="text-xl sm:text-2xl font-bold text-white mb-6">Marketing Nurture Trust Risk</h3>
               <p className="text-xs sm:text-sm leading-relaxed font-light">
-                We intercept and analyze the raw DNS records for critical email authentication protocols. Missing these guarantees automated client follow-ups (like abandoned carts or lead magnets) will trigger spam filters.
+                We intercept and analyze raw DNS records for critical email authentication protocols.
               </p>
-              <div className="mt-6 space-y-3">
-                
-                {/* SPF Checklist Item */}
-                <div className="flex items-center justify-between p-4 bg-[#12121c] border border-zinc-600/80 rounded-xl">
-                  <div className="flex items-center gap-3">
-                    {hasSpf ? <CheckCircle className="text-green-400" size={18} /> : <AlertCircle className="text-red-400" size={18} />}
-                    <div>
-                      <span className="text-sm font-bold text-zinc-100 block">SPF Protocol</span>
-                      <span className="text-[10px] text-zinc-400 font-mono">Sender Policy Framework</span>
-                    </div>
-                  </div>
-                  <span className={`text-xs font-bold font-mono px-2 py-1 rounded ${hasSpf ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'}`}>
-                    {hasSpf ? 'DETECTED' : 'MISSING'}
-                  </span>
-                </div>
-
-                {/* DMARC Checklist Item */}
-                <div className="flex items-center justify-between p-4 bg-[#12121c] border border-zinc-600/80 rounded-xl">
-                  <div className="flex items-center gap-3">
-                    {hasDmarc ? <CheckCircle className="text-green-400" size={18} /> : <AlertCircle className="text-red-400" size={18} />}
-                    <div>
-                      <span className="text-sm font-bold text-zinc-100 block">DMARC Protocol</span>
-                      <span className="text-[10px] text-zinc-400 font-mono">Domain-based Message Authentication</span>
-                    </div>
-                  </div>
-                  <span className={`text-xs font-bold font-mono px-2 py-1 rounded ${hasDmarc ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'}`}>
-                    {hasDmarc ? 'DETECTED' : 'MISSING'}
-                  </span>
-                </div>
-
-              </div>
             </div>
           )}
 
@@ -1157,18 +968,15 @@ export default function AuditReportPage() {
             </div>
           )}
         </div>
-        
-        {/* Background overlay when drawer is open */}
+
         {activeDrawer && (
           <div 
             className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40" 
             onClick={() => setActiveDrawer(null)}
           />
         )}
-
       </div>
 
-      {/* --- GLOBAL SCROLL-TO-TOP BUTTON (FLOATING) --- */}
       {showScrollTop && (
         <button 
           type="button"
@@ -1182,6 +990,5 @@ export default function AuditReportPage() {
     </main>
   );
 }
-
 
 

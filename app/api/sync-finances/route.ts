@@ -15,24 +15,34 @@ export async function POST(request: Request) {
 
     const supabase = createClient(supabaseUrl, supabaseKey);
 
-    // 1. Get the actual tenant context from the request
-    const { tenantId } = await request.json().catch(() => ({}));
+    // 1. Get tenant context or domain from the request payload
+    const body = await request.json().catch(() => ({}));
+    const { tenantId, domain } = body;
     
-    if (!tenantId) {
-       return NextResponse.json({ success: false, error: 'tenantId is required to sync finances' }, { status: 400 });
+    if (!tenantId && !domain) {
+       return NextResponse.json({ success: false, error: 'tenantId or domain is required to sync finances' }, { status: 400 });
     }
 
-    // 2. Fetch Tenant Configuration (The Switchboard)
-    const { data: tenant, error: tenantError } = await supabase
+    // 2. Fetch Tenant Configuration (Switchboard with flexible ID or domain resolution)
+    let query = supabase
       .from('tenants')
-      .select('active_provider, integration_config')
-      .eq('id', tenantId)
-      .single();
+      .select('id, active_provider, integration_config');
+
+    if (tenantId && tenantId !== '00000000-0000-0000-0000-000000000000') {
+      query = query.eq('id', tenantId);
+    } else if (domain) {
+      query = query.eq('domain', domain);
+    } else {
+      query = query.eq('id', '00000000-0000-0000-0000-000000000000');
+    }
+
+    const { data: tenant, error: tenantError } = await query.single();
 
     if (tenantError || !tenant) {
       return NextResponse.json({ success: false, error: 'Tenant not found or missing configuration' }, { status: 404 });
     }
 
+    const resolvedTenantId = tenant.id;
     let financialMetrics;
 
     // 3. Route to the correct platform adapter dynamically
@@ -52,15 +62,14 @@ export async function POST(request: Request) {
       return NextResponse.json({ success: false, error: 'Failed to compute financial metrics' }, { status: 500 });
     }
 
-    // 4. Upsert the normalized data to the unified database schema
+    // 4. Upsert normalized data to the unified database schema using resolvedTenantId
     const { error: dbError } = await supabase
       .from('tenant_financials')
       .upsert({
-        tenant_id: tenantId,
+        tenant_id: resolvedTenantId,
         provider: financialMetrics.provider,
         average_order_value: financialMetrics.average_order_value,
         total_revenue: financialMetrics.total_revenue,
-        // Optional tracking columns you included in your original file:
         total_orders_analyzed: financialMetrics.total_orders_analyzed,
         currency: financialMetrics.currency,
         updated_at: new Date().toISOString()
