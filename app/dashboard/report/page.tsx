@@ -6,7 +6,7 @@ import {
   AlertTriangle, DollarSign, Ghost, ShieldAlert, Activity, 
   Database, ServerCrash, X, ChevronRight, MapPin, MailWarning,
   ListOrdered, Layers, Globe, Image as ImageIcon, Accessibility, 
-  CheckCircle, AlertCircle, Cpu, Lock, Unlock, Search, Info, ArrowUp
+  CheckCircle, AlertCircle, Cpu, Lock, Unlock, Search, Info, ArrowUp, Zap
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
@@ -290,11 +290,11 @@ export default function AuditReportPage() {
               <DecorNode x={360} y={360} w={60} d={60} h={40} />
               <DecorNode x={200} y={180} w={40} d={40} h={30} />
               
-              {/* Live Telemetry Data Towers (Completely standalone quadrants with strict separation) */}
-              <DataNode x={80} y={80} w={60} d={60} h={hDom} color="cyan" label="DOM Nodes" value={domSize} />
-              <DataNode x={340} y={80} w={55} d={55} h={hParasite} color="purple" label="Parasite Load" value={`${parasiteImpact}%`} />
-              <DataNode x={80} y={320} w={60} d={60} h={hTbt} color="red" label="Thread Lock" value={`${rawTbt}ms`} />
-              <DataNode x={340} y={320} w={50} d={60} h={hInp} color="orange" label="Latency (INP)" value={`${rawInp}ms`} />
+              {/* Live Telemetry Data Towers (Strict Quadrant Separation: DOM top-left, Latency bottom-right shifted) */}
+              <DataNode x={60} y={60} w={60} d={60} h={hDom} color="cyan" label="DOM Nodes" value={domSize} />
+              <DataNode x={350} y={80} w={55} d={55} h={hParasite} color="purple" label="Parasite Load" value={`${parasiteImpact}%`} />
+              <DataNode x={60} y={320} w={60} d={60} h={hTbt} color="red" label="Thread Lock" value={`${rawTbt}ms`} />
+              <DataNode x={260} y={240} w={50} d={60} h={hInp} color="orange" label="Latency (INP)" value={`${rawInp}ms`} />
           </div>
         </div>
 
@@ -372,12 +372,19 @@ export default function AuditReportPage() {
             </div>
           </section>
 
+          {/* Tech Stack Migration with Locked Edge Computing Action */}
           <section className="bg-[#12121c] border border-zinc-700/50 rounded-2xl p-6 sm:p-8">
-             <div className="flex items-center gap-2 mb-6 border-b border-zinc-800 pb-4">
-                <Layers className="text-purple-400 shrink-0" size={18} />
-                <h2 className="text-xs font-mono font-bold text-zinc-100 uppercase tracking-widest">Tech Stack Migration</h2>
+             <div className="flex items-center justify-between mb-6 border-b border-zinc-800 pb-4">
+                <div className="flex items-center gap-2">
+                  <Layers className="text-purple-400 shrink-0" size={18} />
+                  <h2 className="text-xs font-mono font-bold text-zinc-100 uppercase tracking-widest">Tech Stack Migration</h2>
+                </div>
+                <div className="flex items-center gap-1.5 bg-purple-500/10 border border-purple-500/30 px-2.5 py-1 rounded text-[10px] font-mono text-purple-300">
+                  <Lock size={12} /> Paywall Protected
+                </div>
              </div>
-             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+             
+             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
               {infrastructure.length > 0 ? infrastructure.slice(0, 4).map((tech: any, idx: number) => {
                 const rec = TECH_UPGRADES[tech.name] || { upgrade: "Edge Compute Offloading", reason: "Shifts processing to edge servers." };
                 return (
@@ -390,6 +397,28 @@ export default function AuditReportPage() {
               }) : (
                 <div className="text-zinc-500 text-sm font-mono col-span-full">No infrastructure data available.</div>
               )}
+             </div>
+
+             {/* Locked Edge Computing Paywall CTA */}
+             <div className="p-5 bg-gradient-to-r from-purple-950/30 via-black/60 to-cyan-950/30 border border-purple-500/30 rounded-xl flex flex-col sm:flex-row items-center justify-between gap-4">
+                <div className="flex items-center gap-3">
+                   <div className="w-10 h-10 rounded-lg bg-purple-500/10 border border-purple-500/30 flex items-center justify-center shrink-0 text-purple-400 shadow-[0_0_15px_rgba(168,85,247,0.2)]">
+                      <Zap size={18} />
+                   </div>
+                   <div>
+                      <div className="text-sm font-bold text-white flex items-center gap-2">
+                        Advanced Edge Node Offloading 
+                        <span className="text-[10px] font-mono bg-purple-500/20 text-purple-300 px-2 py-0.5 rounded border border-purple-500/30 uppercase">Locked</span>
+                      </div>
+                      <p className="text-xs text-zinc-400 font-light mt-0.5">Route origin requests through global edge workers to eliminate TTFB bottlenecks.</p>
+                   </div>
+                </div>
+                <button 
+                  onClick={handleDeployPixel}
+                  className="w-full sm:w-auto bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white px-5 py-3 rounded-xl font-bold text-xs uppercase tracking-widest transition-all shadow-[0_0_20px_rgba(6,182,212,0.3)] flex items-center justify-center gap-2 shrink-0 cursor-pointer"
+                >
+                  <Lock size={14} /> Click for Edge Computing
+                </button>
              </div>
           </section>
 
