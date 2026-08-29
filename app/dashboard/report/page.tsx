@@ -221,28 +221,39 @@ export default function AuditReportPage() {
 
   return (
     <div className="min-h-screen bg-[#020205] text-white flex flex-col lg:flex-row overflow-hidden antialiased">
-      
-      {/* LEFT PANE: The Hologram / Atmospheric Visual */}
+    {/* LEFT PANE: The Hologram / Atmospheric Visual */}
       <div className="relative w-full lg:w-1/2 h-[40vh] lg:h-screen bg-black overflow-hidden flex items-center justify-center border-b lg:border-b-0 lg:border-r border-zinc-800 lg:sticky lg:top-0 shadow-[4px_0_24px_rgba(0,0,0,0.5)] z-20">
         
-        {/* The Native Spline Iframe (Bypasses NPM) */}
-        <iframe 
-          src="https://my.spline.design/wireframesphere-25a7eb8cfd7be082ea5709ad15c924bc/" 
-          frameBorder="0" 
-          width="100%" 
-          height="100%" 
-          className="absolute inset-0 z-10"
-          title="ClientScale Diagnostic Hologram"
-        ></iframe>
+        {/* Pure CSS Holographic Radar (Zero External Dependencies) */}
+        <div className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none">
+            <div className="relative w-64 h-64 sm:w-96 sm:h-96 flex items-center justify-center">
+                {/* Outer pulsing sonar ring */}
+                <div className="absolute inset-0 border border-cyan-500/20 rounded-full animate-ping" style={{ animationDuration: '4s' }}></div>
+                
+                {/* Middle spinning targeting ring */}
+                <div className="absolute inset-8 border border-dashed border-cyan-400/30 rounded-full animate-[spin_12s_linear_infinite]"></div>
+                
+                {/* Inner counter-spinning data ring */}
+                <div className="absolute inset-16 border-2 border-t-cyan-400 border-b-purple-500 border-r-transparent border-l-transparent rounded-full animate-[spin_6s_linear_infinite_reverse] shadow-[0_0_40px_rgba(6,182,212,0.2)]"></div>
+                
+                {/* Glowing Core */}
+                <div className="absolute inset-28 bg-gradient-to-tr from-cyan-600 to-purple-600 rounded-full blur-2xl opacity-40 animate-pulse"></div>
+                <div className="relative z-10 w-16 h-16 bg-[#020205] rounded-full border border-cyan-400/50 flex items-center justify-center shadow-[0_0_20px_rgba(6,182,212,0.6)]">
+                    <Globe className="text-cyan-400" size={24} />
+                </div>
+            </div>
+        </div>
 
-        <div className="absolute inset-0 opacity-40 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-cyan-900/40 via-gray-950 to-black pointer-events-none z-20"></div>
+        {/* Ambient Background Glow */}
+        <div className="absolute inset-0 opacity-50 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-cyan-900/40 via-[#020205] to-black pointer-events-none z-0"></div>
 
-        <div className="absolute bottom-4 left-4 flex items-center gap-2 z-30 pointer-events-none">
-            <span className="relative flex h-2 w-2">
+        {/* Scanning Badge */}
+        <div className="absolute bottom-4 left-4 flex items-center gap-3 z-30 pointer-events-none">
+            <span className="relative flex h-2.5 w-2.5">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-cyan-500"></span>
+              <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-cyan-500 shadow-[0_0_8px_rgba(6,182,212,1)]"></span>
             </span>
-            <span className="text-[10px] font-mono text-cyan-300 uppercase tracking-widest bg-black/60 px-2 py-1 rounded border border-cyan-900/50 backdrop-blur-md">
+            <span className="text-[10px] font-mono text-cyan-300 uppercase tracking-widest bg-black/80 px-3 py-1.5 rounded border border-cyan-900/80 backdrop-blur-md shadow-lg">
               Scanning {brandName} Infrastructure
             </span>
         </div>
