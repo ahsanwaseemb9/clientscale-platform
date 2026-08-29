@@ -316,11 +316,11 @@ export default function AuditReportPage() {
                 <div className="w-10 h-10 rounded-xl bg-cyan-500/10 border border-cyan-400/30 flex items-center justify-center shrink-0">
                   <Cpu size={20} className="text-cyan-300" /> 
                 </div>
-                <div>
-                    <h2 className="text-[10px] sm:text-xs font-mono font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-400 uppercase tracking-widest mb-2">
+                <div className="flex-1">
+                    <h2 className="text-[10px] sm:text-xs font-mono font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-400 uppercase tracking-widest mb-3">
                         Initial AI Assessment
                     </h2>
-                    <p className="text-sm text-zinc-200 leading-relaxed font-light">
+                    <p className="text-sm sm:text-[15px] text-zinc-300 leading-[1.8] font-light text-justify tracking-[0.015em]">
                         {dynamicSynthesis}
                     </p>
                 </div>
