@@ -29,62 +29,50 @@ const TECH_UPGRADES: Record<string, { upgrade: string; reason: string }> = {
   "HSTS": { upgrade: "Edge Node Routing", reason: "Maintains strict transport security while distributing server load across global edge nodes." },
 };
 
-// --- 3D CITY NODE GENERATOR (Hologram Table Effect) ---
-const CityNode = ({ x, y, w, d, h, delay = 0 }: any) => {
-  const u = 24; // Grid unit scale in pixels
+// --- DYNAMIC 3D TELEMETRY TOWER ---
+const DataNode = ({ x, y, w, d, h, color = 'cyan', label, value }: any) => {
+  const colors: Record<string, any> = {
+    cyan: { top: 'bg-cyan-400/80 border-cyan-200', south: 'bg-cyan-600/90', east: 'bg-cyan-800/90', glow: 'shadow-[0_0_40px_rgba(34,211,238,0.8)]' },
+    red: { top: 'bg-red-400/80 border-red-200', south: 'bg-red-600/90', east: 'bg-red-800/90', glow: 'shadow-[0_0_40px_rgba(239,68,68,0.8)]' },
+    purple: { top: 'bg-purple-400/80 border-purple-200', south: 'bg-purple-600/90', east: 'bg-purple-800/90', glow: 'shadow-[0_0_40px_rgba(168,85,247,0.8)]' },
+    orange: { top: 'bg-orange-400/80 border-orange-200', south: 'bg-orange-600/90', east: 'bg-orange-800/90', glow: 'shadow-[0_0_40px_rgba(249,115,22,0.8)]' }
+  };
+  const c = colors[color];
+
   return (
-    <div 
-      className="absolute [transform-style:preserve-3d] animate-[pulse_4s_ease-in-out_infinite]" 
-      style={{ left: x * u, top: y * u, width: w * u, height: d * u, animationDelay: `${delay}s` }}
-    >
-      {/* Base Floor Shadow/Glow */}
-      <div className="absolute inset-0 bg-cyan-500/40 blur-md" />
+    <div className="absolute [transform-style:preserve-3d] transition-all duration-1000 ease-in-out hover:[transform:translateZ(10px)]" style={{ left: x, top: y, width: w, height: d }}>
+      {/* South Wall (Folded up from bottom edge) */}
+      <div className={`absolute bottom-0 left-0 w-full origin-bottom ${c.south} border-l border-r border-t border-white/20`} style={{ height: h, transform: 'rotateX(-90deg)' }} />
+      {/* East Wall (Folded up from right edge) */}
+      <div className={`absolute top-0 right-0 h-full origin-right ${c.east} border-t border-b border-l border-white/20`} style={{ width: h, transform: 'rotateY(-90deg)' }} />
+      {/* Top Face (Pushed up Z axis) */}
+      <div className={`absolute inset-0 ${c.top} flex items-center justify-center overflow-hidden ${c.glow}`} style={{ transform: `translateZ(${h}px)` }}>
+         <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff44_1px,transparent_1px),linear-gradient(to_bottom,#ffffff44_1px,transparent_1px)] bg-[size:4px_4px]" />
+      </div>
       
-      {/* Front/Bottom Wall (Faces Bottom-Left in Isometric) */}
-      <div 
-        className="absolute bottom-0 left-0 bg-gradient-to-t from-cyan-800/90 to-cyan-400/20 border-l border-r border-t border-cyan-400/60 origin-bottom backdrop-blur-sm"
-        style={{ width: w * u, height: h * u, transform: `rotateX(-90deg)` }}
-      />
-      
-      {/* Right Wall (Faces Bottom-Right in Isometric) */}
-      <div 
-        className="absolute top-0 right-0 bg-gradient-to-l from-cyan-900/90 to-cyan-500/20 border-t border-b border-l border-cyan-500/60 origin-right backdrop-blur-sm"
-        style={{ width: h * u, height: d * u, transform: `rotateY(-90deg)` }}
-      />
-      
-      {/* Top Face (Roof) */}
-      <div 
-        className="absolute inset-0 bg-cyan-400/30 border-2 border-cyan-200 shadow-[0_0_25px_rgba(34,211,238,0.8)] flex items-center justify-center overflow-hidden backdrop-blur-md"
-        style={{ transform: `translateZ(${h * u}px)` }}
-      >
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,#67e8f944_1px,transparent_1px),linear-gradient(to_bottom,#67e8f944_1px,transparent_1px)] bg-[size:4px_4px]" />
+      {/* Floating 3D Label (Counter-rotated to face the camera) */}
+      <div className="absolute top-1/2 left-1/2 flex flex-col items-center justify-center pointer-events-none" style={{ transform: `translateZ(${h + 40}px) translateX(-50%) translateY(-50%) rotateZ(-45deg) rotateX(-60deg)` }}>
+         <span className="text-[9px] font-mono font-bold text-white uppercase tracking-widest whitespace-nowrap bg-black/60 px-2 py-0.5 rounded border border-white/20 backdrop-blur-md mb-1">{label}</span>
+         <span className={`text-sm font-mono font-black text-white bg-black/80 px-2 py-1 rounded border border-white/20 shadow-[0_0_15px_rgba(0,0,0,0.5)]`}>{value}</span>
+         <div className="w-px h-6 bg-white/50 mt-1" />
       </div>
     </div>
   );
 };
 
-// The architectural layout of the 3D City hologram
-const cityNodes = [
-  { id: 1, x: 2, y: 2, w: 2, d: 2, h: 3, delay: 0.1 },
-  { id: 2, x: 6, y: 1, w: 3, d: 2, h: 4, delay: 0.5 },
-  { id: 3, x: 14, y: 2, w: 2, d: 3, h: 3, delay: 1.2 },
-  { id: 4, x: 1, y: 8, w: 2, d: 4, h: 4, delay: 0.8 },
-  { id: 5, x: 16, y: 7, w: 3, d: 2, h: 5, delay: 0.3 },
-  { id: 6, x: 2, y: 15, w: 3, d: 3, h: 4, delay: 1.5 },
-  { id: 7, x: 15, y: 14, w: 2, d: 2, h: 3, delay: 0.6 },
-  { id: 8, x: 5, y: 6, w: 3, d: 3, h: 7, delay: 0.4 },
-  { id: 9, x: 11, y: 5, w: 4, d: 2, h: 6, delay: 0.9 },
-  { id: 10, x: 6, y: 11, w: 2, d: 4, h: 8, delay: 0.2 },
-  { id: 11, x: 12, y: 10, w: 3, d: 3, h: 7, delay: 1.1 },
-  { id: 12, x: 8, y: 7, w: 4, d: 4, h: 12, delay: 0.0 }, // Central Core Tower
-];
+// --- STATIC BACKGROUND CITY BLOCKS ---
+const DecorNode = ({ x, y, w, d, h }: any) => (
+  <div className="absolute [transform-style:preserve-3d]" style={{ left: x, top: y, width: w, height: d }}>
+    <div className="absolute bottom-0 left-0 w-full origin-bottom bg-cyan-900/60 border border-cyan-700/50" style={{ height: h, transform: 'rotateX(-90deg)' }} />
+    <div className="absolute top-0 right-0 h-full origin-right bg-cyan-950/60 border border-cyan-700/50" style={{ width: h, transform: 'rotateY(-90deg)' }} />
+    <div className="absolute inset-0 bg-cyan-800/40 border border-cyan-600/50" style={{ transform: `translateZ(${h}px)` }} />
+  </div>
+);
 
 export default function AuditReportPage() {
   const router = useRouter();
   const [auditData, setAuditData] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [activeDrawer, setActiveDrawer] = useState<'revenue' | 'ghost' | 'parasite' | 'dom' | 'inp' | 'dns' | 'accessibility' | null>(null);
-  const [isUpgradeUnlocked, setIsUpgradeUnlocked] = useState(false);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -136,20 +124,17 @@ export default function AuditReportPage() {
     );
   }
 
-  // --- DEFENSIVE DATA SANITIZER ---
   const safeExtractNumber = (val: any, fallback: number): number => {
     if (val === null || val === undefined || val === 'N/A') return fallback;
     const parsed = parseInt(String(val).replace(/[^0-9-]/g, ''), 10);
     return isNaN(parsed) ? fallback : Math.max(0, parsed);
   };
 
-  // --- SYNTHETIC FINANCIAL CALCULATIONS ---
   const syntheticDailySessions = 200;
   const estimatedAOV = 50;
   const syntheticDailyLeakage = syntheticDailySessions * 0.15 * estimatedAOV;
   const syntheticQuarterlyLeakage = syntheticDailyLeakage * 90;
 
-  const perfScore = safeExtractNumber(auditData?.diagnostics?.performanceScore, 50);
   const rawTbt = safeExtractNumber(auditData?.diagnostics?.latency?.tbt, 800);
   const rawInp = safeExtractNumber(auditData?.diagnostics?.latency?.inp, 340);
   const thirdPartyCount = safeExtractNumber(auditData?.diagnostics?.thirdPartyScriptCount, 5);
@@ -166,6 +151,12 @@ export default function AuditReportPage() {
   const rawDomNodes = safeExtractNumber(auditData?.diagnostics?.domElements, 1200 + (thirdPartyCount * 15));
   const domSize = rawDomNodes.toLocaleString();
   const isFragile = rawDomNodes > 800;
+
+  // --- DYNAMICALLY SCALED TOWER HEIGHTS ---
+  const hDom = Math.max(50, Math.min(220, (rawDomNodes / 1500) * 150));
+  const hTbt = Math.max(40, Math.min(220, (rawTbt / 1000) * 150));
+  const hInp = Math.max(40, Math.min(220, (rawInp / 500) * 150));
+  const hParasite = Math.max(40, Math.min(220, (parseFloat(parasiteImpact) / 50) * 150));
 
   const rawInfrastructure = Array.isArray(auditData?.infrastructure) ? auditData.infrastructure : [];
   const infrastructure = Array.from(
@@ -255,7 +246,6 @@ export default function AuditReportPage() {
   return (
     <div className="min-h-screen bg-[#020205] text-white flex flex-col antialiased w-full">
       
-      {/* Injecting Custom Animation Keyframes for the Hologram Table & HUD */}
       <style dangerouslySetInnerHTML={{__html: `
         @keyframes hologramScan {
           0% { transform: translateY(0px); opacity: 0; }
@@ -263,88 +253,49 @@ export default function AuditReportPage() {
           90% { opacity: 1; }
           100% { transform: translateY(480px); opacity: 0; }
         }
-        @keyframes hudFloat {
-          0%, 100% { transform: translateY(0px); }
-          50% { transform: translateY(-8px); }
-        }
       `}} />
 
-      {/* TOP PANE: 3D Holographic Table Header (Axiom Style) */}
+      {/* TOP PANE: 3D Holographic Table Header */}
       <div className="relative w-full h-[60vh] min-h-[500px] bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-cyan-950/40 via-[#020205] to-black overflow-hidden flex items-center justify-center border-b border-zinc-800 z-20 shrink-0">
         
         {/* The 3D Isometric Projection Engine */}
-        <div className="absolute inset-0 flex items-center justify-center [perspective:1200px] z-10 pointer-events-none mt-12">
+        <div className="absolute inset-0 flex items-center justify-center [perspective:1400px] z-10 pointer-events-none mt-16 sm:mt-12">
           
           {/* Base Table Orientation */}
-          <div className="relative w-[480px] h-[480px] [transform:scale(0.7)_rotateX(60deg)_rotateZ(45deg)] sm:[transform:scale(0.9)_rotateX(60deg)_rotateZ(45deg)] md:[transform:scale(1.1)_rotateX(60deg)_rotateZ(45deg)] [transform-style:preserve-3d]">
+          <div className="relative w-[400px] h-[400px] sm:w-[480px] sm:h-[480px] [transform:scale(0.8)_rotateX(60deg)_rotateZ(45deg)] sm:[transform:scale(1.1)_rotateX(60deg)_rotateZ(45deg)] [transform-style:preserve-3d]">
               
-              {/* Glowing Base Plate */}
+              {/* Glowing Base Plate & Grid Floor */}
               <div className="absolute inset-0 bg-cyan-950/80 border-2 border-cyan-500 shadow-[0_0_80px_rgba(6,182,212,0.4)] backdrop-blur-md" />
-              
-              {/* Grid Floor */}
               <div className="absolute inset-0 bg-[linear-gradient(to_right,#0891b266_2px,transparent_2px),linear-gradient(to_bottom,#0891b266_2px,transparent_2px)] bg-[size:24px_24px] opacity-80" />
-              
-              {/* Scanning Laser */}
               <div className="absolute top-0 left-0 w-full h-[4px] bg-white shadow-[0_0_40px_#22d3ee,0_0_20px_#22d3ee] animate-[hologramScan_4s_linear_infinite]" />
               
-              {/* Vertical Glass Screen (Standing up from the grid) */}
+              {/* Background Decorative Blocks */}
+              <DecorNode x={40} y={40} w={60} d={40} h={30} />
+              <DecorNode x={320} y={60} w={40} d={80} h={50} />
+              <DecorNode x={80} y={340} w={50} d={50} h={20} />
+              <DecorNode x={360} y={360} w={60} d={60} h={40} />
+              <DecorNode x={200} y={180} w={40} d={40} h={30} />
+              
+              {/* Live Telemetry Data Towers (Heights map directly to real data) */}
+              <DataNode x={60} y={120} w={65} d={65} h={hDom} color="cyan" label="DOM Nodes" value={domSize} />
+              <DataNode x={280} y={160} w={55} d={55} h={hParasite} color="purple" label="Parasite Load" value={`${parasiteImpact}%`} />
+              <DataNode x={140} y={260} w={60} d={60} h={hTbt} color="red" label="Thread Lock" value={`${rawTbt}ms`} />
+              <DataNode x={260} y={300} w={50} d={65} h={hInp} color="orange" label="Latency (INP)" value={`${rawInp}ms`} />
+
+              {/* Vertical Glass HUD Screen */}
               <div 
                  className="absolute border-2 border-cyan-400/40 bg-cyan-500/10 backdrop-blur-sm shadow-[0_0_40px_rgba(34,211,238,0.2)] flex items-center justify-center overflow-hidden"
-                 style={{ 
-                   left: '10%', top: '50%', width: '80%', height: '180px', 
-                   transform: 'rotateX(-90deg)', transformOrigin: 'bottom' 
-                 }}
+                 style={{ left: '10%', top: '50%', width: '80%', height: '180px', transform: 'rotateX(-90deg)', transformOrigin: 'bottom' }}
               >
                  <div className="absolute inset-0 bg-[linear-gradient(to_bottom,#0891b244_1px,transparent_1px)] bg-[size:100%_4px]" />
-                 <div className="text-cyan-300 font-mono text-2xl font-black tracking-[0.5em] opacity-50 drop-shadow-[0_0_10px_rgba(34,211,238,1)] animate-pulse">
-                   TELEMETRY
+                 <div className="text-cyan-300 font-mono text-xl sm:text-2xl font-black tracking-[0.5em] opacity-40 drop-shadow-[0_0_10px_rgba(34,211,238,1)] animate-pulse">
+                   LIVE TELEMETRY
                  </div>
               </div>
-
-              {/* Render the 3D City Nodes */}
-              {cityNodes.map(n => <CityNode key={n.id} {...n} />)}
           </div>
         </div>
 
-        {/* --- FLOATING HOLOGRAPHIC DATA HUD (2D Overlay) --- */}
-        <div className="absolute inset-0 z-20 pointer-events-none flex items-center justify-center max-w-5xl mx-auto w-full">
-            <div className="absolute top-[15%] left-[5%] sm:left-[15%] md:left-[20%] flex flex-col items-start animate-in fade-in zoom-in duration-700 delay-300" style={{ animation: 'hudFloat 6s ease-in-out infinite' }}>
-                <span className="text-[9px] font-mono text-cyan-500 uppercase tracking-widest mb-1 flex items-center gap-1">
-                  <Database size={10} /> DOM Nodes
-                </span>
-                <span className="text-sm font-mono font-bold text-cyan-100 bg-cyan-950/60 border border-cyan-800/50 px-3 py-1.5 rounded backdrop-blur-md shadow-[0_0_15px_rgba(6,182,212,0.3)]">
-                    {domSize}
-                </span>
-            </div>
-            
-            <div className="absolute top-[25%] right-[5%] sm:right-[15%] md:right-[20%] flex flex-col items-end text-right animate-in fade-in zoom-in duration-700 delay-500" style={{ animation: 'hudFloat 5s ease-in-out infinite' }}>
-                <span className="text-[9px] font-mono text-purple-400 uppercase tracking-widest mb-1 flex items-center gap-1">
-                  <ServerCrash size={10} /> Parasite Load
-                </span>
-                <span className="text-sm font-mono font-bold text-purple-100 bg-purple-950/60 border border-purple-800/50 px-3 py-1.5 rounded backdrop-blur-md shadow-[0_0_15px_rgba(168,85,247,0.3)]">
-                    {parasiteImpact}%
-                </span>
-            </div>
-
-            <div className="absolute bottom-[25%] left-[5%] sm:left-[10%] md:left-[15%] flex flex-col items-start animate-in fade-in zoom-in duration-700 delay-700" style={{ animation: 'hudFloat 7s ease-in-out infinite' }}>
-                <span className="text-[9px] font-mono text-red-400 uppercase tracking-widest mb-1 flex items-center gap-1">
-                  <Ghost size={10} /> Thread Lock
-                </span>
-                <span className="text-sm font-mono font-bold text-red-100 bg-red-950/60 border border-red-800/50 px-3 py-1.5 rounded backdrop-blur-md shadow-[0_0_15px_rgba(239,68,68,0.3)]">
-                    {rawTbt}ms
-                </span>
-            </div>
-
-            <div className="absolute bottom-[15%] right-[10%] sm:right-[20%] md:right-[25%] flex flex-col items-end text-right animate-in fade-in zoom-in duration-700 delay-1000" style={{ animation: 'hudFloat 6s ease-in-out infinite' }}>
-                <span className="text-[9px] font-mono text-orange-400 uppercase tracking-widest mb-1 flex items-center gap-1">
-                  <MapPin size={10} /> Latency (INP)
-                </span>
-                <span className="text-sm font-mono font-bold text-orange-100 bg-orange-950/60 border border-orange-800/50 px-3 py-1.5 rounded backdrop-blur-md shadow-[0_0_15px_rgba(249,115,22,0.3)]">
-                    {rawInp}ms
-                </span>
-            </div>
-        </div>
-
+        {/* Ambient Glows */}
         <div className="absolute bottom-6 left-6 flex items-center gap-3 z-30 pointer-events-none">
             <span className="relative flex h-2.5 w-2.5">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>
@@ -357,13 +308,9 @@ export default function AuditReportPage() {
       </div>
 
       {/* BOTTOM PANE: The Cold Data & Call to Action */}
-      <div 
-        ref={scrollContainerRef}
-        className="w-full relative z-10 bg-[radial-gradient(circle_at_top,rgba(6,182,212,0.05),transparent_60%)] flex-grow"
-      >
+      <div ref={scrollContainerRef} className="w-full relative z-10 bg-[radial-gradient(circle_at_top,rgba(6,182,212,0.05),transparent_60%)] flex-grow">
         <div className="max-w-3xl mx-auto w-full p-6 sm:p-12 xl:p-16 space-y-10 lg:space-y-12 pb-24">
           
-          {/* Header */}
           <header className="border-b border-zinc-800 pb-6">
             <h1 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">Synthetic Baseline Scan</h1>
             <p className="text-zinc-400 mt-2 font-mono text-sm flex items-center gap-2">
@@ -371,7 +318,6 @@ export default function AuditReportPage() {
             </p>
           </header>
 
-          {/* AI Executive Synthesis - Modernized & Justified */}
           <section className="bg-gradient-to-br from-[#0a0a0f] to-[#12121c] border border-zinc-700/60 rounded-2xl p-6 sm:p-10 shadow-2xl relative overflow-hidden group">
             <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/5 to-purple-600/5 pointer-events-none"></div>
             <div className="flex flex-col sm:flex-row gap-6 items-start relative z-10">
@@ -390,25 +336,13 @@ export default function AuditReportPage() {
             </div>
           </section>
 
-          {/* Friction Cards Grid */}
           <section className="space-y-6">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
               {frictionCards.map((card) => {
                 const IconComponent = card.icon;
                 return (
-                  <div 
-                    key={card.id}
-                    className={`bg-[#12121c] border ${
-                        card.highlight 
-                        ? 'border-red-900/60 shadow-[0_0_30px_rgba(220,38,38,0.15)] bg-gradient-to-br from-[#1a0f14] to-[#12121c] sm:col-span-2'
-                        : card.isGreen 
-                          ? 'border-green-900/30' 
-                          : 'border-zinc-700/50'
-                    } rounded-2xl p-6 sm:p-8 relative overflow-hidden transition-all flex flex-col justify-between`}
-                  >
-                    {card.highlight && (
-                        <div className="absolute top-0 left-0 w-1.5 h-full bg-red-600 shadow-[0_0_15px_rgba(220,38,38,1)]"></div>
-                    )}
+                  <div key={card.id} className={`bg-[#12121c] border ${card.highlight ? 'border-red-900/60 shadow-[0_0_30px_rgba(220,38,38,0.15)] bg-gradient-to-br from-[#1a0f14] to-[#12121c] sm:col-span-2' : card.isGreen ? 'border-green-900/30' : 'border-zinc-700/50'} rounded-2xl p-6 sm:p-8 relative overflow-hidden transition-all flex flex-col justify-between`}>
+                    {card.highlight && <div className="absolute top-0 left-0 w-1.5 h-full bg-red-600 shadow-[0_0_15px_rgba(220,38,38,1)]"></div>}
                     <div className="relative z-10">
                       <div className={`flex items-center justify-between mb-4 ${card.highlight ? 'text-red-400' : card.isGreen ? 'text-green-400' : 'text-blue-400'}`}>
                         <div className="flex items-center gap-2 font-mono font-bold">
@@ -420,9 +354,7 @@ export default function AuditReportPage() {
                       <div className={`${card.highlight ? 'text-5xl sm:text-6xl text-white drop-shadow-[0_0_10px_rgba(255,255,255,0.2)]' : 'text-3xl sm:text-4xl text-white'} font-black tracking-tight mb-3`}>
                         {card.value}
                       </div>
-                      <p className={`text-sm ${card.highlight ? 'text-zinc-300 font-mono' : 'text-zinc-400 font-light'} leading-relaxed`}>
-                        {card.description}
-                      </p>
+                      <p className={`text-sm ${card.highlight ? 'text-zinc-300 font-mono' : 'text-zinc-400 font-light'} leading-relaxed`}>{card.description}</p>
                     </div>
                   </div>
                 );
@@ -430,7 +362,6 @@ export default function AuditReportPage() {
             </div>
           </section>
 
-          {/* Tech Stack Upgrade Path */}
           <section className="bg-[#12121c] border border-zinc-700/50 rounded-2xl p-6 sm:p-8">
              <div className="flex items-center gap-2 mb-6 border-b border-zinc-800 pb-4">
                 <Layers className="text-purple-400 shrink-0" size={18} />
@@ -452,7 +383,6 @@ export default function AuditReportPage() {
              </div>
           </section>
 
-          {/* The Conversion Lock CTA */}
           <section className="mt-8 pt-8 border-t border-zinc-800">
             <div className="bg-gradient-to-b from-zinc-900 to-black border border-zinc-700/80 rounded-2xl p-8 text-center relative overflow-hidden shadow-2xl group hover:border-cyan-500/50 transition-colors">
                 <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(6,182,212,0.08),transparent_70%)] pointer-events-none"></div>
@@ -461,10 +391,7 @@ export default function AuditReportPage() {
                 <p className="text-sm text-zinc-400 mb-8 max-w-sm mx-auto">
                     The £{syntheticQuarterlyLeakage.toLocaleString()} leakage above is a synthetic projection. Deploy the ClientScale tracker to capture actual user rage-taps and API failures.
                 </p>
-                <button 
-                  onClick={handleDeployPixel}
-                  className="w-full bg-white hover:bg-gray-200 text-black py-4 rounded-xl font-bold text-xs sm:text-sm uppercase tracking-widest transition-all shadow-[0_0_20px_rgba(255,255,255,0.2)] flex items-center justify-center gap-2 cursor-pointer"
-                >
+                <button onClick={handleDeployPixel} className="w-full bg-white hover:bg-gray-200 text-black py-4 rounded-xl font-bold text-xs sm:text-sm uppercase tracking-widest transition-all shadow-[0_0_20px_rgba(255,255,255,0.2)] flex items-center justify-center gap-2 cursor-pointer">
                   Deploy Live Telemetry Pixel (48 Hrs)
                 </button>
             </div>
