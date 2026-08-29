@@ -290,11 +290,11 @@ export default function AuditReportPage() {
               <DecorNode x={360} y={360} w={60} d={60} h={40} />
               <DecorNode x={200} y={180} w={40} d={40} h={30} />
               
-              {/* Live Telemetry Data Towers (Strict Quadrant Separation: DOM top-left, Latency bottom-right shifted) */}
+              {/* Live Telemetry Data Towers (DOM top-left, Parasite top-right, Thread bottom-left, Latency bottom-center shifted away from DOM) */}
               <DataNode x={60} y={60} w={60} d={60} h={hDom} color="cyan" label="DOM Nodes" value={domSize} />
               <DataNode x={350} y={80} w={55} d={55} h={hParasite} color="purple" label="Parasite Load" value={`${parasiteImpact}%`} />
               <DataNode x={60} y={320} w={60} d={60} h={hTbt} color="red" label="Thread Lock" value={`${rawTbt}ms`} />
-              <DataNode x={260} y={240} w={50} d={60} h={hInp} color="orange" label="Latency (INP)" value={`${rawInp}ms`} />
+              <DataNode x={200} y={320} w={50} d={60} h={hInp} color="orange" label="Latency (INP)" value={`${rawInp}ms`} />
           </div>
         </div>
 
