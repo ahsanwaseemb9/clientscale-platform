@@ -281,11 +281,11 @@ export default function AuditReportPage() {
               <DecorNode x={360} y={360} w={60} d={60} h={40} />
               <DecorNode x={200} y={180} w={40} d={40} h={30} />
               
-              {/* Live Telemetry Data Towers */}
-              <DataNode x={60} y={120} w={65} d={65} h={hDom} color="cyan" label="DOM Nodes" value={domSize} />
-              <DataNode x={280} y={160} w={55} d={55} h={hParasite} color="purple" label="Parasite Load" value={`${parasiteImpact}%`} />
-              <DataNode x={140} y={260} w={60} d={60} h={hTbt} color="red" label="Thread Lock" value={`${rawTbt}ms`} />
-              <DataNode x={260} y={300} w={50} d={65} h={hInp} color="orange" label="Latency (INP)" value={`${rawInp}ms`} />
+              {/* Live Telemetry Data Towers (Spread across distinct quadrants to prevent label collisions) */}
+              <DataNode x={200} y={70} w={60} d={60} h={hDom} color="cyan" label="DOM Nodes" value={domSize} />
+              <DataNode x={340} y={200} w={55} d={55} h={hParasite} color="purple" label="Parasite Load" value={`${parasiteImpact}%`} />
+              <DataNode x={80} y={200} w={60} d={60} h={hTbt} color="red" label="Thread Lock" value={`${rawTbt}ms`} />
+              <DataNode x={200} y={330} w={50} d={60} h={hInp} color="orange" label="Latency (INP)" value={`${rawInp}ms`} />
           </div>
         </div>
 
