@@ -135,20 +135,21 @@ export default function AuditReportPage() {
     return isNaN(parsed) ? fallback : Math.max(0, parsed);
   };
 
-  // --- DYNAMICALLY CALCULATED REVENUE LEAKAGE (UNSQUEEZED PER URL) ---
+  // --- INTELLIGENT PERFORMANCE-BASED REVENUE LEAKAGE ---
   const perfScore = safeExtractNumber(auditData?.diagnostics?.performanceScore, 65);
   const rawTbt = safeExtractNumber(auditData?.diagnostics?.latency?.tbt, 800);
   const rawInp = safeExtractNumber(auditData?.diagnostics?.latency?.inp, 340);
   const thirdPartyCount = safeExtractNumber(auditData?.diagnostics?.thirdPartyScriptCount, 5);
   
-  // Friction multiplier scales dynamically based on actual site latency & performance penalties
+  // If performance is 95 or higher, friction is zero (fully optimized domain)
+  const isFullyOptimized = perfScore >= 95;
   const latencyPenaltyFactor = Math.max(1.0, (rawTbt / 500) + (rawInp / 300) + (thirdPartyCount * 0.15));
-  const performanceFrictionMultiplier = Math.min(0.35, Math.max(0.08, (100 - perfScore) / 200 * latencyPenaltyFactor));
+  const performanceFrictionMultiplier = isFullyOptimized ? 0 : Math.min(0.35, Math.max(0.04, (100 - perfScore) / 200 * latencyPenaltyFactor));
   
   const syntheticDailySessions = 250;
   const estimatedAOV = 65;
   const syntheticDailyLeakage = syntheticDailySessions * performanceFrictionMultiplier * estimatedAOV;
-  const syntheticQuarterlyLeakage = Math.round(syntheticDailyLeakage * 90 / 1000) * 1000; // Clean rounded figures
+  const syntheticQuarterlyLeakage = isFullyOptimized ? 0 : Math.round(syntheticDailyLeakage * 90 / 1000) * 1000;
 
   const isMapPenalized = rawInp > 200;
   const hasDmarc = auditData?.security?.dmarcConfigured === true; 
@@ -187,15 +188,17 @@ export default function AuditReportPage() {
   const frictionCards = [
     {
       id: 'revenue',
-      isGreen: false,
-      title: 'Projected Quarterly Leakage',
-      icon: AlertTriangle,
-      value: `£${syntheticQuarterlyLeakage.toLocaleString()}`,
-      description: `Synthetic projection based on standard traffic volume, real-time performance score (${perfScore}/100), and a ${(performanceFrictionMultiplier * 100).toFixed(1)}% friction drop-off rate.`,
+      isGreen: isFullyOptimized,
+      title: isFullyOptimized ? 'Pipeline Status: Optimized' : 'Projected Quarterly Leakage',
+      icon: isFullyOptimized ? CheckCircle : AlertTriangle,
+      value: isFullyOptimized ? '£0 (Optimized)' : `£${syntheticQuarterlyLeakage.toLocaleString()}`,
+      description: isFullyOptimized 
+        ? `Target achieves a pristine ${perfScore}/100 performance score. Zero structural leakage detected across traffic conduits.`
+        : `Synthetic projection based on standard traffic volume, real-time performance score (${perfScore}/100), and a ${(performanceFrictionMultiplier * 100).toFixed(1)}% friction drop-off rate.`,
       drawerKey: 'revenue' as const,
-      isZero: false,
+      isZero: isFullyOptimized,
       iconComp: DollarSign,
-      highlight: true
+      highlight: !isFullyOptimized
     },
     {
       id: 'ghost',
@@ -287,11 +290,11 @@ export default function AuditReportPage() {
               <DecorNode x={360} y={360} w={60} d={60} h={40} />
               <DecorNode x={200} y={180} w={40} d={40} h={30} />
               
-              {/* Live Telemetry Data Towers (Widened grid spread for absolute zero label collisions) */}
+              {/* Live Telemetry Data Towers (Latency anchored dead-center, Thread Lock shifted out to prevent collision) */}
               <DataNode x={160} y={60} w={60} d={60} h={hDom} color="cyan" label="DOM Nodes" value={domSize} />
               <DataNode x={360} y={180} w={55} d={55} h={hParasite} color="purple" label="Parasite Load" value={`${parasiteImpact}%`} />
-              <DataNode x={50} y={240} w={60} d={60} h={hTbt} color="red" label="Thread Lock" value={`${rawTbt}ms`} />
-              <DataNode x={240} y={350} w={50} d={60} h={hInp} color="orange" label="Latency (INP)" value={`${rawInp}ms`} />
+              <DataNode x={60} y={280} w={60} d={60} h={hTbt} color="red" label="Thread Lock" value={`${rawTbt}ms`} />
+              <DataNode x={230} y={220} w={50} d={60} h={hInp} color="orange" label="Latency (INP)" value={`${rawInp}ms`} />
           </div>
         </div>
 
@@ -396,7 +399,7 @@ export default function AuditReportPage() {
                 <Lock size={24} className="text-zinc-400 mx-auto mb-4 group-hover:text-cyan-400 transition-colors" />
                 <h3 className="text-lg font-bold text-white mb-2">Verify The Damage</h3>
                 <p className="text-sm text-zinc-400 mb-8 max-w-sm mx-auto">
-                    The £{syntheticQuarterlyLeakage.toLocaleString()} leakage above is a synthetic projection. Deploy the ClientScale tracker to capture actual user rage-taps and API failures.
+                    The £{syntheticQuarterlyLeakage.toLocaleString()} leakage above is a synthetic projection. Deploy the ClientScale tracker to capture actual user rage-ts and API failures.
                 </p>
                 <button onClick={handleDeployPixel} className="w-full bg-white hover:bg-gray-200 text-black py-4 rounded-xl font-bold text-xs sm:text-sm uppercase tracking-widest transition-all shadow-[0_0_20px_rgba(255,255,255,0.2)] flex items-center justify-center gap-2 cursor-pointer">
                   Deploy Live Telemetry Pixel (48 Hrs)
