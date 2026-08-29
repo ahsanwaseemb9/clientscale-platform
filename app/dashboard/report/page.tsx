@@ -135,16 +135,22 @@ export default function AuditReportPage() {
     return isNaN(parsed) ? fallback : Math.max(0, parsed);
   };
 
-  const syntheticDailySessions = 200;
-  const estimatedAOV = 50;
-  const syntheticDailyLeakage = syntheticDailySessions * 0.15 * estimatedAOV;
-  const syntheticQuarterlyLeakage = syntheticDailyLeakage * 90;
-
+  // --- DYNAMICALLY CALCULATED REVENUE LEAKAGE (UNSQUEEZED PER URL) ---
+  const perfScore = safeExtractNumber(auditData?.diagnostics?.performanceScore, 65);
   const rawTbt = safeExtractNumber(auditData?.diagnostics?.latency?.tbt, 800);
   const rawInp = safeExtractNumber(auditData?.diagnostics?.latency?.inp, 340);
   const thirdPartyCount = safeExtractNumber(auditData?.diagnostics?.thirdPartyScriptCount, 5);
-  const isMapPenalized = rawInp > 200;
   
+  // Friction multiplier scales dynamically based on actual site latency & performance penalties
+  const latencyPenaltyFactor = Math.max(1.0, (rawTbt / 500) + (rawInp / 300) + (thirdPartyCount * 0.15));
+  const performanceFrictionMultiplier = Math.min(0.35, Math.max(0.08, (100 - perfScore) / 200 * latencyPenaltyFactor));
+  
+  const syntheticDailySessions = 250;
+  const estimatedAOV = 65;
+  const syntheticDailyLeakage = syntheticDailySessions * performanceFrictionMultiplier * estimatedAOV;
+  const syntheticQuarterlyLeakage = Math.round(syntheticDailyLeakage * 90 / 1000) * 1000; // Clean rounded figures
+
+  const isMapPenalized = rawInp > 200;
   const hasDmarc = auditData?.security?.dmarcConfigured === true; 
   const hasSpf = auditData?.security?.spfConfigured === true;
   const isEmailVulnerable = !hasDmarc || !hasSpf;
@@ -185,7 +191,7 @@ export default function AuditReportPage() {
       title: 'Projected Quarterly Leakage',
       icon: AlertTriangle,
       value: `£${syntheticQuarterlyLeakage.toLocaleString()}`,
-      description: `Synthetic projection based on standard ${syntheticDailySessions} daily sessions, £${estimatedAOV} AOV, and a 15% friction drop-off rate.`,
+      description: `Synthetic projection based on standard traffic volume, real-time performance score (${perfScore}/100), and a ${(performanceFrictionMultiplier * 100).toFixed(1)}% friction drop-off rate.`,
       drawerKey: 'revenue' as const,
       isZero: false,
       iconComp: DollarSign,
@@ -281,11 +287,11 @@ export default function AuditReportPage() {
               <DecorNode x={360} y={360} w={60} d={60} h={40} />
               <DecorNode x={200} y={180} w={40} d={40} h={30} />
               
-              {/* Live Telemetry Data Towers (Spread across distinct quadrants to prevent label collisions) */}
-              <DataNode x={200} y={70} w={60} d={60} h={hDom} color="cyan" label="DOM Nodes" value={domSize} />
-              <DataNode x={340} y={200} w={55} d={55} h={hParasite} color="purple" label="Parasite Load" value={`${parasiteImpact}%`} />
-              <DataNode x={80} y={200} w={60} d={60} h={hTbt} color="red" label="Thread Lock" value={`${rawTbt}ms`} />
-              <DataNode x={200} y={330} w={50} d={60} h={hInp} color="orange" label="Latency (INP)" value={`${rawInp}ms`} />
+              {/* Live Telemetry Data Towers (Widened grid spread for absolute zero label collisions) */}
+              <DataNode x={160} y={60} w={60} d={60} h={hDom} color="cyan" label="DOM Nodes" value={domSize} />
+              <DataNode x={360} y={180} w={55} d={55} h={hParasite} color="purple" label="Parasite Load" value={`${parasiteImpact}%`} />
+              <DataNode x={50} y={240} w={60} d={60} h={hTbt} color="red" label="Thread Lock" value={`${rawTbt}ms`} />
+              <DataNode x={240} y={350} w={50} d={60} h={hInp} color="orange" label="Latency (INP)" value={`${rawInp}ms`} />
           </div>
         </div>
 
