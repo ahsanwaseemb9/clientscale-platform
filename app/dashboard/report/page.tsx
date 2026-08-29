@@ -29,6 +29,56 @@ const TECH_UPGRADES: Record<string, { upgrade: string; reason: string }> = {
   "HSTS": { upgrade: "Edge Node Routing", reason: "Maintains strict transport security while distributing server load across global edge nodes." },
 };
 
+// --- 3D CITY NODE GENERATOR (Hologram Table Effect) ---
+const CityNode = ({ x, y, w, d, h, delay = 0 }: any) => {
+  const u = 24; // Grid unit scale in pixels
+  return (
+    <div 
+      className="absolute [transform-style:preserve-3d] animate-[pulse_4s_ease-in-out_infinite]" 
+      style={{ left: x * u, top: y * u, width: w * u, height: d * u, animationDelay: `${delay}s` }}
+    >
+      {/* Base Floor Shadow/Glow */}
+      <div className="absolute inset-0 bg-cyan-500/40 blur-md" />
+      
+      {/* Front/Bottom Wall (Faces Bottom-Left in Isometric) */}
+      <div 
+        className="absolute bottom-0 left-0 bg-gradient-to-t from-cyan-800/90 to-cyan-400/20 border-l border-r border-t border-cyan-400/60 origin-bottom backdrop-blur-sm"
+        style={{ width: w * u, height: h * u, transform: `rotateX(-90deg)` }}
+      />
+      
+      {/* Right Wall (Faces Bottom-Right in Isometric) */}
+      <div 
+        className="absolute top-0 right-0 bg-gradient-to-l from-cyan-900/90 to-cyan-500/20 border-t border-b border-l border-cyan-500/60 origin-right backdrop-blur-sm"
+        style={{ width: h * u, height: d * u, transform: `rotateY(-90deg)` }}
+      />
+      
+      {/* Top Face (Roof) */}
+      <div 
+        className="absolute inset-0 bg-cyan-400/30 border-2 border-cyan-200 shadow-[0_0_25px_rgba(34,211,238,0.8)] flex items-center justify-center overflow-hidden backdrop-blur-md"
+        style={{ transform: `translateZ(${h * u}px)` }}
+      >
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,#67e8f944_1px,transparent_1px),linear-gradient(to_bottom,#67e8f944_1px,transparent_1px)] bg-[size:4px_4px]" />
+      </div>
+    </div>
+  );
+};
+
+// The architectural layout of the 3D City hologram
+const cityNodes = [
+  { id: 1, x: 2, y: 2, w: 2, d: 2, h: 3, delay: 0.1 },
+  { id: 2, x: 6, y: 1, w: 3, d: 2, h: 4, delay: 0.5 },
+  { id: 3, x: 14, y: 2, w: 2, d: 3, h: 3, delay: 1.2 },
+  { id: 4, x: 1, y: 8, w: 2, d: 4, h: 4, delay: 0.8 },
+  { id: 5, x: 16, y: 7, w: 3, d: 2, h: 5, delay: 0.3 },
+  { id: 6, x: 2, y: 15, w: 3, d: 3, h: 4, delay: 1.5 },
+  { id: 7, x: 15, y: 14, w: 2, d: 2, h: 3, delay: 0.6 },
+  { id: 8, x: 5, y: 6, w: 3, d: 3, h: 7, delay: 0.4 },
+  { id: 9, x: 11, y: 5, w: 4, d: 2, h: 6, delay: 0.9 },
+  { id: 10, x: 6, y: 11, w: 2, d: 4, h: 8, delay: 0.2 },
+  { id: 11, x: 12, y: 10, w: 3, d: 3, h: 7, delay: 1.1 },
+  { id: 12, x: 8, y: 7, w: 4, d: 4, h: 12, delay: 0.0 }, // Central Core Tower
+];
+
 export default function AuditReportPage() {
   const router = useRouter();
   const [auditData, setAuditData] = useState<any>(null);
@@ -53,7 +103,6 @@ export default function AuditReportPage() {
   }, []);
 
   const handleDeployPixel = async () => {
-    // This will eventually fire the API route, for now we simulate the redirect to the Boardroom
     router.push('/dashboard/boardroom');
   };
 
@@ -95,7 +144,6 @@ export default function AuditReportPage() {
   };
 
   // --- SYNTHETIC FINANCIAL CALCULATIONS ---
-  // Using the industry standard baseline formula to generate the hook
   const syntheticDailySessions = 200;
   const estimatedAOV = 50;
   const syntheticDailyLeakage = syntheticDailySessions * 0.15 * estimatedAOV;
@@ -124,10 +172,6 @@ export default function AuditReportPage() {
     new Map(rawInfrastructure.filter((tech: any) => tech && tech.name).map((tech: any) => [String(tech.name).toLowerCase().trim(), tech])).values()
   );
 
-  const meta = auditData?.metaAndSocial || {};
-  const a11y = auditData?.accessibility || {};
-  const displayTitle = meta.title ? String(meta.title).replace(/&#039;/g, "'").replace(/&amp;/g, "&").replace(/&quot;/g, '"') : 'No Title Found';
-
   const brandName = (() => {
     try {
       const name = new URL(auditData.target).hostname.replace(/^www\./, '').split('.')[0];
@@ -138,21 +182,10 @@ export default function AuditReportPage() {
   const industryTerms = auditData?.industryContext || { shortAction: `convert`, penalty: 'search engine visibility', buttons: 'forms and contact buttons' };
   const dynamicSynthesis = auditData?.industryContext?.executiveSynthesis || "Analyzing structural pipeline friction against conversion health...";
 
-  const activeLeakagePoints = [
-    `Latency is actively deflating conversions.`,
-    isMapPenalized ? `Interaction to Next Paint (${rawInp}ms) is triggering Google Maps and Local SEO penalties.` : null,
-    !isGhostOptimal ? `Main thread is blocked for ${ghostTapWindow}s, causing 'ghost taps' on mobile devices.` : null,
-    isFragile ? `Massive DOM structure (${domSize} nodes) is draining mobile batteries and risking crashes.` : null,
-    parseFloat(parasiteImpact) > 0 ? `${thirdPartyCount} external marketing trackers are responsible for ${parasiteImpact}% of mobile pipeline lag.` : null,
-    isEmailVulnerable ? `Missing DMARC/SPF protocols. Automated free-trial follow-ups risk spam routing.` : null
-  ].filter(Boolean) as string[];
-
-  const dynamicSeverityTier = activeLeakagePoints.length >= 3 || rawInp > 200 ? 'HIGH' : activeLeakagePoints.length > 0 ? 'MODERATE' : 'OPTIMIZED';
-
   const frictionCards = [
     {
       id: 'revenue',
-      isGreen: false, // Always false for the synthetic hook to create urgency
+      isGreen: false,
       title: 'Projected Quarterly Leakage',
       icon: AlertTriangle,
       value: `£${syntheticQuarterlyLeakage.toLocaleString()}`,
@@ -160,7 +193,7 @@ export default function AuditReportPage() {
       drawerKey: 'revenue' as const,
       isZero: false,
       iconComp: DollarSign,
-      highlight: true // Custom flag to style this specific card
+      highlight: true
     },
     {
       id: 'ghost',
@@ -221,67 +254,96 @@ export default function AuditReportPage() {
 
   return (
     <div className="min-h-screen bg-[#020205] text-white flex flex-col antialiased w-full">
+      
+      {/* Injecting Custom Animation Keyframes for the Hologram Table & HUD */}
+      <style dangerouslySetInnerHTML={{__html: `
+        @keyframes hologramScan {
+          0% { transform: translateY(0px); opacity: 0; }
+          10% { opacity: 1; }
+          90% { opacity: 1; }
+          100% { transform: translateY(480px); opacity: 0; }
+        }
+        @keyframes hudFloat {
+          0%, 100% { transform: translateY(0px); }
+          50% { transform: translateY(-8px); }
+        }
+      `}} />
 
-      {/* TOP PANE: The Holographic Radar Header */}
-      <div className="relative w-full h-[60vh] min-h-[500px] bg-black overflow-hidden flex items-center justify-center border-b border-zinc-800 z-20 shrink-0">
+      {/* TOP PANE: 3D Holographic Table Header (Axiom Style) */}
+      <div className="relative w-full h-[60vh] min-h-[500px] bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-cyan-950/40 via-[#020205] to-black overflow-hidden flex items-center justify-center border-b border-zinc-800 z-20 shrink-0">
         
-        {/* Pure CSS Holographic Radar */}
-        <div className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none">
-            <div className="relative w-64 h-64 sm:w-96 sm:h-96 flex items-center justify-center">
-                <div className="absolute inset-0 border border-cyan-500/20 rounded-full animate-ping" style={{ animationDuration: '4s' }}></div>
-                <div className="absolute inset-8 border border-dashed border-cyan-400/30 rounded-full animate-[spin_12s_linear_infinite]"></div>
-                <div className="absolute inset-16 border-2 border-t-cyan-400 border-b-purple-500 border-r-transparent border-l-transparent rounded-full animate-[spin_6s_linear_infinite_reverse] shadow-[0_0_40px_rgba(6,182,212,0.2)]"></div>
-                <div className="absolute inset-28 bg-gradient-to-tr from-cyan-600 to-purple-600 rounded-full blur-2xl opacity-40 animate-pulse"></div>
-                <div className="relative z-10 w-16 h-16 bg-[#020205] rounded-full border border-cyan-400/50 flex items-center justify-center shadow-[0_0_20px_rgba(6,182,212,0.6)]">
-                    <Globe className="text-cyan-400" size={24} />
-                </div>
-            </div>
+        {/* The 3D Isometric Projection Engine */}
+        <div className="absolute inset-0 flex items-center justify-center [perspective:1200px] z-10 pointer-events-none mt-12">
+          
+          {/* Base Table Orientation */}
+          <div className="relative w-[480px] h-[480px] [transform:scale(0.7)_rotateX(60deg)_rotateZ(45deg)] sm:[transform:scale(0.9)_rotateX(60deg)_rotateZ(45deg)] md:[transform:scale(1.1)_rotateX(60deg)_rotateZ(45deg)] [transform-style:preserve-3d]">
+              
+              {/* Glowing Base Plate */}
+              <div className="absolute inset-0 bg-cyan-950/80 border-2 border-cyan-500 shadow-[0_0_80px_rgba(6,182,212,0.4)] backdrop-blur-md" />
+              
+              {/* Grid Floor */}
+              <div className="absolute inset-0 bg-[linear-gradient(to_right,#0891b266_2px,transparent_2px),linear-gradient(to_bottom,#0891b266_2px,transparent_2px)] bg-[size:24px_24px] opacity-80" />
+              
+              {/* Scanning Laser */}
+              <div className="absolute top-0 left-0 w-full h-[4px] bg-white shadow-[0_0_40px_#22d3ee,0_0_20px_#22d3ee] animate-[hologramScan_4s_linear_infinite]" />
+              
+              {/* Vertical Glass Screen (Standing up from the grid) */}
+              <div 
+                 className="absolute border-2 border-cyan-400/40 bg-cyan-500/10 backdrop-blur-sm shadow-[0_0_40px_rgba(34,211,238,0.2)] flex items-center justify-center overflow-hidden"
+                 style={{ 
+                   left: '10%', top: '50%', width: '80%', height: '180px', 
+                   transform: 'rotateX(-90deg)', transformOrigin: 'bottom' 
+                 }}
+              >
+                 <div className="absolute inset-0 bg-[linear-gradient(to_bottom,#0891b244_1px,transparent_1px)] bg-[size:100%_4px]" />
+                 <div className="text-cyan-300 font-mono text-2xl font-black tracking-[0.5em] opacity-50 drop-shadow-[0_0_10px_rgba(34,211,238,1)] animate-pulse">
+                   TELEMETRY
+                 </div>
+              </div>
+
+              {/* Render the 3D City Nodes */}
+              {cityNodes.map(n => <CityNode key={n.id} {...n} />)}
+          </div>
         </div>
 
-        {/* --- FLOATING HOLOGRAPHIC DATA HUD --- */}
+        {/* --- FLOATING HOLOGRAPHIC DATA HUD (2D Overlay) --- */}
         <div className="absolute inset-0 z-20 pointer-events-none flex items-center justify-center max-w-5xl mx-auto w-full">
-            {/* Top Left: DOM Fragility */}
-            <div className="absolute top-[20%] left-[5%] sm:left-[15%] md:left-[20%] flex flex-col items-start animate-in fade-in zoom-in duration-700 delay-300">
+            <div className="absolute top-[15%] left-[5%] sm:left-[15%] md:left-[20%] flex flex-col items-start animate-in fade-in zoom-in duration-700 delay-300" style={{ animation: 'hudFloat 6s ease-in-out infinite' }}>
                 <span className="text-[9px] font-mono text-cyan-500 uppercase tracking-widest mb-1 flex items-center gap-1">
                   <Database size={10} /> DOM Nodes
                 </span>
-                <span className="text-sm font-mono font-bold text-cyan-100 bg-cyan-950/40 border border-cyan-800/50 px-2.5 py-1 rounded backdrop-blur-md shadow-[0_0_15px_rgba(6,182,212,0.2)]">
+                <span className="text-sm font-mono font-bold text-cyan-100 bg-cyan-950/60 border border-cyan-800/50 px-3 py-1.5 rounded backdrop-blur-md shadow-[0_0_15px_rgba(6,182,212,0.3)]">
                     {domSize}
                 </span>
             </div>
             
-            {/* Top Right: Parasite Load */}
-            <div className="absolute top-[30%] right-[5%] sm:right-[15%] md:right-[20%] flex flex-col items-end text-right animate-in fade-in zoom-in duration-700 delay-500">
+            <div className="absolute top-[25%] right-[5%] sm:right-[15%] md:right-[20%] flex flex-col items-end text-right animate-in fade-in zoom-in duration-700 delay-500" style={{ animation: 'hudFloat 5s ease-in-out infinite' }}>
                 <span className="text-[9px] font-mono text-purple-400 uppercase tracking-widest mb-1 flex items-center gap-1">
                   <ServerCrash size={10} /> Parasite Load
                 </span>
-                <span className="text-sm font-mono font-bold text-purple-100 bg-purple-950/40 border border-purple-800/50 px-2.5 py-1 rounded backdrop-blur-md shadow-[0_0_15px_rgba(168,85,247,0.2)]">
+                <span className="text-sm font-mono font-bold text-purple-100 bg-purple-950/60 border border-purple-800/50 px-3 py-1.5 rounded backdrop-blur-md shadow-[0_0_15px_rgba(168,85,247,0.3)]">
                     {parasiteImpact}%
                 </span>
             </div>
 
-            {/* Bottom Left: Thread Lock */}
-            <div className="absolute bottom-[30%] left-[5%] sm:left-[10%] md:left-[15%] flex flex-col items-start animate-in fade-in zoom-in duration-700 delay-700">
+            <div className="absolute bottom-[25%] left-[5%] sm:left-[10%] md:left-[15%] flex flex-col items-start animate-in fade-in zoom-in duration-700 delay-700" style={{ animation: 'hudFloat 7s ease-in-out infinite' }}>
                 <span className="text-[9px] font-mono text-red-400 uppercase tracking-widest mb-1 flex items-center gap-1">
                   <Ghost size={10} /> Thread Lock
                 </span>
-                <span className="text-sm font-mono font-bold text-red-100 bg-red-950/40 border border-red-800/50 px-2.5 py-1 rounded backdrop-blur-md shadow-[0_0_15px_rgba(239,68,68,0.2)]">
+                <span className="text-sm font-mono font-bold text-red-100 bg-red-950/60 border border-red-800/50 px-3 py-1.5 rounded backdrop-blur-md shadow-[0_0_15px_rgba(239,68,68,0.3)]">
                     {rawTbt}ms
                 </span>
             </div>
 
-            {/* Bottom Right: Latency (INP) */}
-            <div className="absolute bottom-[20%] right-[10%] sm:right-[20%] md:right-[25%] flex flex-col items-end text-right animate-in fade-in zoom-in duration-700 delay-1000">
+            <div className="absolute bottom-[15%] right-[10%] sm:right-[20%] md:right-[25%] flex flex-col items-end text-right animate-in fade-in zoom-in duration-700 delay-1000" style={{ animation: 'hudFloat 6s ease-in-out infinite' }}>
                 <span className="text-[9px] font-mono text-orange-400 uppercase tracking-widest mb-1 flex items-center gap-1">
                   <MapPin size={10} /> Latency (INP)
                 </span>
-                <span className="text-sm font-mono font-bold text-orange-100 bg-orange-950/40 border border-orange-800/50 px-2.5 py-1 rounded backdrop-blur-md shadow-[0_0_15px_rgba(249,115,22,0.2)]">
+                <span className="text-sm font-mono font-bold text-orange-100 bg-orange-950/60 border border-orange-800/50 px-3 py-1.5 rounded backdrop-blur-md shadow-[0_0_15px_rgba(249,115,22,0.3)]">
                     {rawInp}ms
                 </span>
             </div>
         </div>
-
-        <div className="absolute inset-0 opacity-50 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-cyan-900/40 via-[#020205] to-black pointer-events-none z-0"></div>
 
         <div className="absolute bottom-6 left-6 flex items-center gap-3 z-30 pointer-events-none">
             <span className="relative flex h-2.5 w-2.5">
@@ -309,18 +371,19 @@ export default function AuditReportPage() {
             </p>
           </header>
 
-          {/* AI Executive Synthesis */}
-          <section className="bg-[#0a0a0f]/95 border border-zinc-700/80 rounded-2xl p-6 sm:p-8 shadow-xl relative overflow-hidden group">
+          {/* AI Executive Synthesis - Modernized & Justified */}
+          <section className="bg-gradient-to-br from-[#0a0a0f] to-[#12121c] border border-zinc-700/60 rounded-2xl p-6 sm:p-10 shadow-2xl relative overflow-hidden group">
             <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/5 to-purple-600/5 pointer-events-none"></div>
-            <div className="flex gap-4 items-start relative z-10">
-                <div className="w-10 h-10 rounded-xl bg-cyan-500/10 border border-cyan-400/30 flex items-center justify-center shrink-0">
-                  <Cpu size={20} className="text-cyan-300" /> 
+            <div className="flex flex-col sm:flex-row gap-6 items-start relative z-10">
+                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-cyan-500/10 to-blue-500/10 border border-cyan-400/30 flex items-center justify-center shrink-0 shadow-[0_0_15px_rgba(6,182,212,0.15)]">
+                  <Cpu size={22} className="text-cyan-400" /> 
                 </div>
-                <div className="flex-1">
-                    <h2 className="text-[10px] sm:text-xs font-mono font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-400 uppercase tracking-widest mb-3">
+                <div className="flex-1 w-full">
+                    <h2 className="text-[11px] font-mono font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-400 uppercase tracking-[0.2em] mb-4 flex items-center gap-2">
                         Initial AI Assessment
+                        <span className="h-px flex-1 bg-gradient-to-r from-cyan-900/50 to-transparent"></span>
                     </h2>
-                    <p className="text-sm sm:text-[15px] text-zinc-300 leading-[1.8] font-light text-justify tracking-[0.015em]">
+                    <p className="text-sm sm:text-base text-zinc-300 leading-[1.8] font-light text-justify tracking-[0.015em] antialiased">
                         {dynamicSynthesis}
                     </p>
                 </div>
