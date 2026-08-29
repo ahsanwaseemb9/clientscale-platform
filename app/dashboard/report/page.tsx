@@ -73,9 +73,14 @@ export default function AuditReportPage() {
   const router = useRouter();
   const [auditData, setAuditData] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [scanTimestamp, setScanTimestamp] = useState<string>('');
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    // Generate static scan timestamp on client hydration
+    const now = new Date();
+    setScanTimestamp(now.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) + ' ' + now.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }));
+
     const storedData = sessionStorage.getItem('clientScale_auditData');
     if (storedData) {
       try {
@@ -256,13 +261,13 @@ export default function AuditReportPage() {
       `}} />
 
       {/* TOP PANE: 3D Holographic Table Header */}
-      <div className="relative w-full h-[60vh] min-h-[500px] bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-cyan-950/40 via-[#020205] to-black overflow-hidden flex items-center justify-center border-b border-zinc-800 z-20 shrink-0">
+      <div className="relative w-full h-[65vh] min-h-[520px] bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-cyan-950/40 via-[#020205] to-black overflow-hidden flex items-center justify-center border-b border-zinc-800 z-20 shrink-0">
         
         {/* The 3D Isometric Projection Engine */}
-        <div className="absolute inset-0 flex items-center justify-center [perspective:1400px] z-10 pointer-events-none mt-16 sm:mt-12">
+        <div className="absolute inset-0 flex items-center justify-center [perspective:1400px] z-10 pointer-events-none mt-12 sm:mt-8">
           
           {/* Base Table Orientation */}
-          <div className="relative w-[400px] h-[400px] sm:w-[480px] sm:h-[480px] [transform:scale(0.8)_rotateX(60deg)_rotateZ(45deg)] sm:[transform:scale(1.1)_rotateX(60deg)_rotateZ(45deg)] [transform-style:preserve-3d]">
+          <div className="relative w-[400px] h-[400px] sm:w-[480px] sm:h-[480px] [transform:scale(0.75)_rotateX(60deg)_rotateZ(45deg)] sm:[transform:scale(1.0)_rotateX(60deg)_rotateZ(45deg)] [transform-style:preserve-3d]">
               
               {/* Glowing Base Plate & Grid Floor */}
               <div className="absolute inset-0 bg-cyan-950/80 border-2 border-cyan-500 shadow-[0_0_80px_rgba(6,182,212,0.4)] backdrop-blur-md" />
@@ -276,34 +281,30 @@ export default function AuditReportPage() {
               <DecorNode x={360} y={360} w={60} d={60} h={40} />
               <DecorNode x={200} y={180} w={40} d={40} h={30} />
               
-              {/* Live Telemetry Data Towers (Heights map directly to real data) */}
+              {/* Live Telemetry Data Towers */}
               <DataNode x={60} y={120} w={65} d={65} h={hDom} color="cyan" label="DOM Nodes" value={domSize} />
               <DataNode x={280} y={160} w={55} d={55} h={hParasite} color="purple" label="Parasite Load" value={`${parasiteImpact}%`} />
               <DataNode x={140} y={260} w={60} d={60} h={hTbt} color="red" label="Thread Lock" value={`${rawTbt}ms`} />
               <DataNode x={260} y={300} w={50} d={65} h={hInp} color="orange" label="Latency (INP)" value={`${rawInp}ms`} />
-
-              {/* Vertical Glass HUD Screen */}
-              <div 
-                 className="absolute border-2 border-cyan-400/40 bg-cyan-500/10 backdrop-blur-sm shadow-[0_0_40px_rgba(34,211,238,0.2)] flex items-center justify-center overflow-hidden"
-                 style={{ left: '10%', top: '50%', width: '80%', height: '180px', transform: 'rotateX(-90deg)', transformOrigin: 'bottom' }}
-              >
-                 <div className="absolute inset-0 bg-[linear-gradient(to_bottom,#0891b244_1px,transparent_1px)] bg-[size:100%_4px]" />
-                 <div className="text-cyan-300 font-mono text-xl sm:text-2xl font-black tracking-[0.5em] opacity-40 drop-shadow-[0_0_10px_rgba(34,211,238,1)] animate-pulse">
-                   LIVE TELEMETRY
-                 </div>
-              </div>
           </div>
         </div>
 
-        {/* Ambient Glows */}
-        <div className="absolute bottom-6 left-6 flex items-center gap-3 z-30 pointer-events-none">
-            <span className="relative flex h-2.5 w-2.5">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-cyan-500 shadow-[0_0_8px_rgba(6,182,212,1)]"></span>
-            </span>
-            <span className="text-[10px] font-mono text-cyan-300 uppercase tracking-widest bg-black/80 px-3 py-1.5 rounded border border-cyan-900/80 backdrop-blur-md shadow-lg">
-              Scanning {brandName} Infrastructure
-            </span>
+        {/* Ambient Target Badge & Volatility Warning Overlay */}
+        <div className="absolute bottom-4 left-4 right-4 sm:right-auto flex flex-col sm:flex-row sm:items-end gap-3 z-30 pointer-events-none max-w-lg">
+            <div className="bg-black/80 border border-cyan-900/80 px-4 py-3 rounded-xl backdrop-blur-md shadow-xl pointer-events-auto">
+              <div className="flex items-center gap-2 mb-1.5">
+                <span className="relative flex h-2 w-2">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-cyan-500 shadow-[0_0_8px_rgba(6,182,212,1)]"></span>
+                </span>
+                <span className="text-[10px] font-mono text-cyan-300 uppercase tracking-widest">
+                  Scanning {brandName} Infrastructure &bull; {scanTimestamp || 'Initializing...'}
+                </span>
+              </div>
+              <p className="text-xs sm:text-[13px] text-zinc-300 leading-[1.6] font-light text-justify tracking-[0.015em]">
+                Live telemetry data is inherently volatile and subject to real-time network fluctuations. Metrics fluctuate continuously based on active user traffic loads, necessitating continuous baseline logging.
+              </p>
+            </div>
         </div>
       </div>
 
