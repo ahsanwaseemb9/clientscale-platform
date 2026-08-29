@@ -220,10 +220,10 @@ export default function AuditReportPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-[#020205] text-white flex flex-col lg:flex-row overflow-hidden antialiased">
+    <div className="min-h-screen bg-[#020205] text-white flex flex-col antialiased w-full">
 
-      {/* LEFT PANE: The Hologram / Atmospheric Visual (Sticky on Desktop) */}
-      <div className="relative w-full lg:w-1/2 h-[50vh] lg:h-screen bg-black overflow-hidden flex items-center justify-center border-b lg:border-b-0 lg:border-r border-zinc-800 lg:sticky lg:top-0 z-20 shrink-0">
+      {/* TOP PANE: The Holographic Radar Header */}
+      <div className="relative w-full h-[60vh] min-h-[500px] bg-black overflow-hidden flex items-center justify-center border-b border-zinc-800 z-20 shrink-0">
         
         {/* Pure CSS Holographic Radar */}
         <div className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none">
@@ -239,9 +239,9 @@ export default function AuditReportPage() {
         </div>
 
         {/* --- FLOATING HOLOGRAPHIC DATA HUD --- */}
-        <div className="absolute inset-0 z-20 pointer-events-none flex items-center justify-center max-w-lg mx-auto">
+        <div className="absolute inset-0 z-20 pointer-events-none flex items-center justify-center max-w-5xl mx-auto w-full">
             {/* Top Left: DOM Fragility */}
-            <div className="absolute top-[20%] left-[10%] sm:left-[15%] flex flex-col items-start animate-in fade-in zoom-in duration-700 delay-300">
+            <div className="absolute top-[20%] left-[5%] sm:left-[15%] md:left-[20%] flex flex-col items-start animate-in fade-in zoom-in duration-700 delay-300">
                 <span className="text-[9px] font-mono text-cyan-500 uppercase tracking-widest mb-1 flex items-center gap-1">
                   <Database size={10} /> DOM Nodes
                 </span>
@@ -251,7 +251,7 @@ export default function AuditReportPage() {
             </div>
             
             {/* Top Right: Parasite Load */}
-            <div className="absolute top-[30%] right-[5%] sm:right-[15%] flex flex-col items-end text-right animate-in fade-in zoom-in duration-700 delay-500">
+            <div className="absolute top-[30%] right-[5%] sm:right-[15%] md:right-[20%] flex flex-col items-end text-right animate-in fade-in zoom-in duration-700 delay-500">
                 <span className="text-[9px] font-mono text-purple-400 uppercase tracking-widest mb-1 flex items-center gap-1">
                   <ServerCrash size={10} /> Parasite Load
                 </span>
@@ -261,7 +261,7 @@ export default function AuditReportPage() {
             </div>
 
             {/* Bottom Left: Thread Lock */}
-            <div className="absolute bottom-[30%] left-[5%] sm:left-[10%] flex flex-col items-start animate-in fade-in zoom-in duration-700 delay-700">
+            <div className="absolute bottom-[30%] left-[5%] sm:left-[10%] md:left-[15%] flex flex-col items-start animate-in fade-in zoom-in duration-700 delay-700">
                 <span className="text-[9px] font-mono text-red-400 uppercase tracking-widest mb-1 flex items-center gap-1">
                   <Ghost size={10} /> Thread Lock
                 </span>
@@ -271,7 +271,7 @@ export default function AuditReportPage() {
             </div>
 
             {/* Bottom Right: Latency (INP) */}
-            <div className="absolute bottom-[20%] right-[10%] sm:right-[20%] flex flex-col items-end text-right animate-in fade-in zoom-in duration-700 delay-1000">
+            <div className="absolute bottom-[20%] right-[10%] sm:right-[20%] md:right-[25%] flex flex-col items-end text-right animate-in fade-in zoom-in duration-700 delay-1000">
                 <span className="text-[9px] font-mono text-orange-400 uppercase tracking-widest mb-1 flex items-center gap-1">
                   <MapPin size={10} /> Latency (INP)
                 </span>
@@ -283,7 +283,7 @@ export default function AuditReportPage() {
 
         <div className="absolute inset-0 opacity-50 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-cyan-900/40 via-[#020205] to-black pointer-events-none z-0"></div>
 
-        <div className="absolute bottom-4 left-4 flex items-center gap-3 z-30 pointer-events-none">
+        <div className="absolute bottom-6 left-6 flex items-center gap-3 z-30 pointer-events-none">
             <span className="relative flex h-2.5 w-2.5">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>
               <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-cyan-500 shadow-[0_0_8px_rgba(6,182,212,1)]"></span>
@@ -294,12 +294,12 @@ export default function AuditReportPage() {
         </div>
       </div>
 
-      {/* RIGHT PANE: The Cold Data & Call to Action */}
+      {/* BOTTOM PANE: The Cold Data & Call to Action */}
       <div 
         ref={scrollContainerRef}
-        className="w-full lg:w-1/2 h-auto lg:h-screen overflow-y-auto p-6 sm:p-12 xl:p-16 custom-scrollbar relative z-10 bg-[radial-gradient(circle_at_top,rgba(6,182,212,0.05),transparent_60%)]"
+        className="w-full relative z-10 bg-[radial-gradient(circle_at_top,rgba(6,182,212,0.05),transparent_60%)] flex-grow"
       >
-        <div className="max-w-xl mx-auto w-full space-y-10 lg:space-y-12 pb-24">
+        <div className="max-w-3xl mx-auto w-full p-6 sm:p-12 xl:p-16 space-y-10 lg:space-y-12 pb-24">
           
           {/* Header */}
           <header className="border-b border-zinc-800 pb-6">
@@ -329,7 +329,7 @@ export default function AuditReportPage() {
 
           {/* Friction Cards Grid */}
           <section className="space-y-6">
-            <div className="grid grid-cols-1 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
               {frictionCards.map((card) => {
                 const IconComponent = card.icon;
                 return (
@@ -337,7 +337,7 @@ export default function AuditReportPage() {
                     key={card.id}
                     className={`bg-[#12121c] border ${
                         card.highlight 
-                        ? 'border-red-900/60 shadow-[0_0_30px_rgba(220,38,38,0.15)] bg-gradient-to-br from-[#1a0f14] to-[#12121c]'
+                        ? 'border-red-900/60 shadow-[0_0_30px_rgba(220,38,38,0.15)] bg-gradient-to-br from-[#1a0f14] to-[#12121c] sm:col-span-2'
                         : card.isGreen 
                           ? 'border-green-900/30' 
                           : 'border-zinc-700/50'
@@ -373,18 +373,18 @@ export default function AuditReportPage() {
                 <Layers className="text-purple-400 shrink-0" size={18} />
                 <h2 className="text-xs font-mono font-bold text-zinc-100 uppercase tracking-widest">Tech Stack Migration</h2>
              </div>
-             <div className="space-y-4">
+             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {infrastructure.length > 0 ? infrastructure.slice(0, 4).map((tech: any, idx: number) => {
                 const rec = TECH_UPGRADES[tech.name] || { upgrade: "Edge Compute Offloading", reason: "Shifts processing to edge servers." };
                 return (
-                  <div key={idx} className="p-4 bg-black/40 border border-zinc-800 rounded-xl">
+                  <div key={idx} className="p-4 bg-black/40 border border-zinc-800 rounded-xl flex flex-col">
                       <div className="text-sm font-bold text-zinc-200 mb-1">{tech.name}</div>
-                      <div className="text-[10px] font-mono text-cyan-400 uppercase tracking-widest mb-1">Upgrade &rarr; {rec.upgrade}</div>
-                      <p className="text-xs text-zinc-500 font-light">{rec.reason}</p>
+                      <div className="text-[10px] font-mono text-cyan-400 uppercase tracking-widest mb-2">Upgrade &rarr; {rec.upgrade}</div>
+                      <p className="text-xs text-zinc-500 font-light mt-auto">{rec.reason}</p>
                   </div>
                 );
               }) : (
-                <div className="text-zinc-500 text-sm font-mono">No infrastructure data available.</div>
+                <div className="text-zinc-500 text-sm font-mono col-span-full">No infrastructure data available.</div>
               )}
              </div>
           </section>
@@ -400,7 +400,7 @@ export default function AuditReportPage() {
                 </p>
                 <button 
                   onClick={handleDeployPixel}
-                  className="w-full bg-white hover:bg-gray-200 text-black py-4 rounded-xl font-bold text-xs sm:text-sm uppercase tracking-widest transition-all shadow-[0_0_20px_rgba(255,255,255,0.2)] flex items-center justify-center gap-2"
+                  className="w-full bg-white hover:bg-gray-200 text-black py-4 rounded-xl font-bold text-xs sm:text-sm uppercase tracking-widest transition-all shadow-[0_0_20px_rgba(255,255,255,0.2)] flex items-center justify-center gap-2 cursor-pointer"
                 >
                   Deploy Live Telemetry Pixel (48 Hrs)
                 </button>
