@@ -224,22 +224,27 @@ export default function AuditReportPage() {
       
       {/* LEFT PANE: The Hologram / Atmospheric Visual */}
       <div className="relative w-full lg:w-1/2 h-[40vh] lg:h-screen bg-black overflow-hidden flex items-center justify-center border-b lg:border-b-0 lg:border-r border-zinc-800 lg:sticky lg:top-0 shadow-[4px_0_24px_rgba(0,0,0,0.5)] z-20">
-        <div className="absolute inset-0 opacity-40 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-cyan-900/40 via-gray-950 to-black pointer-events-none"></div>
-        {/* Placeholder for Spline or Video component */}
-        <div className="relative z-10 flex flex-col items-center text-center">
-            <div className="w-32 h-32 rounded-full border border-cyan-500/30 flex items-center justify-center animate-[spin_10s_linear_infinite] mb-4 shadow-[0_0_40px_rgba(6,182,212,0.2)]">
-                <div className="w-24 h-24 rounded-full border border-purple-500/30 animate-[spin_6s_linear_infinite_reverse]"></div>
-            </div>
-            <p className="text-cyan-500 font-mono text-sm tracking-widest uppercase animate-pulse">
-                [ Holographic Visual Engine ]
-            </p>
-        </div>
-        <div className="absolute bottom-4 left-4 flex items-center gap-2">
+        
+        {/* The Native Spline Iframe (Bypasses NPM) */}
+        <iframe 
+          src="https://my.spline.design/wireframesphere-25a7eb8cfd7be082ea5709ad15c924bc/" 
+          frameBorder="0" 
+          width="100%" 
+          height="100%" 
+          className="absolute inset-0 z-10"
+          title="ClientScale Diagnostic Hologram"
+        ></iframe>
+
+        <div className="absolute inset-0 opacity-40 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-cyan-900/40 via-gray-950 to-black pointer-events-none z-20"></div>
+
+        <div className="absolute bottom-4 left-4 flex items-center gap-2 z-30 pointer-events-none">
             <span className="relative flex h-2 w-2">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>
               <span className="relative inline-flex rounded-full h-2 w-2 bg-cyan-500"></span>
             </span>
-            <span className="text-[10px] font-mono text-zinc-500 uppercase tracking-widest">Scanning {brandName} Infrastructure</span>
+            <span className="text-[10px] font-mono text-cyan-300 uppercase tracking-widest bg-black/60 px-2 py-1 rounded border border-cyan-900/50 backdrop-blur-md">
+              Scanning {brandName} Infrastructure
+            </span>
         </div>
       </div>
 
