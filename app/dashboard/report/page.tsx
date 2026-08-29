@@ -290,11 +290,11 @@ export default function AuditReportPage() {
               <DecorNode x={360} y={360} w={60} d={60} h={40} />
               <DecorNode x={200} y={180} w={40} d={40} h={30} />
               
-              {/* Live Telemetry Data Towers (Latency anchored dead-center, Thread Lock shifted out to prevent collision) */}
-              <DataNode x={160} y={60} w={60} d={60} h={hDom} color="cyan" label="DOM Nodes" value={domSize} />
-              <DataNode x={360} y={180} w={55} d={55} h={hParasite} color="purple" label="Parasite Load" value={`${parasiteImpact}%`} />
-              <DataNode x={60} y={280} w={60} d={60} h={hTbt} color="red" label="Thread Lock" value={`${rawTbt}ms`} />
-              <DataNode x={230} y={220} w={50} d={60} h={hInp} color="orange" label="Latency (INP)" value={`${rawInp}ms`} />
+              {/* Live Telemetry Data Towers (Completely standalone quadrants with strict separation) */}
+              <DataNode x={80} y={80} w={60} d={60} h={hDom} color="cyan" label="DOM Nodes" value={domSize} />
+              <DataNode x={340} y={80} w={55} d={55} h={hParasite} color="purple" label="Parasite Load" value={`${parasiteImpact}%`} />
+              <DataNode x={80} y={320} w={60} d={60} h={hTbt} color="red" label="Thread Lock" value={`${rawTbt}ms`} />
+              <DataNode x={340} y={320} w={50} d={60} h={hInp} color="orange" label="Latency (INP)" value={`${rawInp}ms`} />
           </div>
         </div>
 
@@ -399,7 +399,7 @@ export default function AuditReportPage() {
                 <Lock size={24} className="text-zinc-400 mx-auto mb-4 group-hover:text-cyan-400 transition-colors" />
                 <h3 className="text-lg font-bold text-white mb-2">Verify The Damage</h3>
                 <p className="text-sm text-zinc-400 mb-8 max-w-sm mx-auto">
-                    The £{syntheticQuarterlyLeakage.toLocaleString()} leakage above is a synthetic projection. Deploy the ClientScale tracker to capture actual user rage-ts and API failures.
+                    The £{syntheticQuarterlyLeakage.toLocaleString()} leakage above is a synthetic projection. Deploy the ClientScale tracker to capture actual user rage-taps and API failures.
                 </p>
                 <button onClick={handleDeployPixel} className="w-full bg-white hover:bg-gray-200 text-black py-4 rounded-xl font-bold text-xs sm:text-sm uppercase tracking-widest transition-all shadow-[0_0_20px_rgba(255,255,255,0.2)] flex items-center justify-center gap-2 cursor-pointer">
                   Deploy Live Telemetry Pixel (48 Hrs)
