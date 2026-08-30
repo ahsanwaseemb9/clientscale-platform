@@ -292,7 +292,7 @@ export default function AuditReportPage() {
                 </span>
               </div>
               <p className="text-[11px] sm:text-xs text-zinc-300 leading-relaxed font-light">
-                Live telemetry data is volatile and subject to real-time network fluctuations.
+              Live telemetry data is inherently volatile and subject to real-time network fluctuations. Metrics fluctuate continuously based on active user traffic loads, necessitating continuous baseline logging.
               </p>
             </div>
         </div>
