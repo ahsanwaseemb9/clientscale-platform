@@ -257,8 +257,8 @@ export default function AuditReportPage() {
         {/* The 3D Isometric Projection Engine with Responsive Scaling */}
         <div className="absolute inset-0 flex items-center justify-center [perspective:1200px] z-10 pointer-events-none px-2 mt-8 sm:mt-0">
           
-          {/* Scaled down on mobile viewports using scale-[0.58] sm:scale-[0.95] */}
-          <div className="relative w-[340px] h-[340px] sm:w-[460px] sm:h-[460px] [transform:scale(0.58)_rotateX(60deg)_rotateZ(45deg)] sm:[transform:scale(0.95)_rotateX(60deg)_rotateZ(45deg)] [transform-style:preserve-3d] transition-transform">
+          {/* Scaled up on both viewports using scale-[0.75] sm:scale-[1.15] */}
+          <div className="relative w-[340px] h-[340px] sm:w-[460px] sm:h-[460px] [transform:scale(0.75)_rotateX(60deg)_rotateZ(45deg)] sm:[transform:scale(1.15)_rotateX(60deg)_rotateZ(45deg)] [transform-style:preserve-3d] transition-transform">
               
               {/* Glowing Base Plate & Grid Floor */}
               <div className="absolute inset-0 bg-cyan-950/80 border-2 border-cyan-500 shadow-[0_0_60px_rgba(6,182,212,0.3)] backdrop-blur-md" />
@@ -319,7 +319,7 @@ export default function AuditReportPage() {
                     <h2 className="text-[10px] sm:text-[11px] font-mono font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-400 uppercase tracking-[0.2em] mb-2 sm:mb-3">
                         Initial AI Assessment
                     </h2>
-                    <p className="text-xs sm:text-base text-zinc-300 leading-[1.7] font-light">
+                    <p className="text-xs sm:text-base text-zinc-300 leading-[1.7] font-light text-justify">
                         {dynamicSynthesis}
                     </p>
                 </div>
