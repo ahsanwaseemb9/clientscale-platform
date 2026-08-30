@@ -32,29 +32,29 @@ const TECH_UPGRADES: Record<string, { upgrade: string; reason: string }> = {
 // --- DYNAMIC 3D TELEMETRY TOWER ---
 const DataNode = ({ x, y, w, d, h, color = 'cyan', label, value }: any) => {
   const colors: Record<string, any> = {
-    cyan: { top: 'bg-cyan-400/80 border-cyan-200', south: 'bg-cyan-600/90', east: 'bg-cyan-800/90', glow: 'shadow-[0_0_40px_rgba(34,211,238,0.8)]' },
-    red: { top: 'bg-red-400/80 border-red-200', south: 'bg-red-600/90', east: 'bg-red-800/90', glow: 'shadow-[0_0_40px_rgba(239,68,68,0.8)]' },
-    purple: { top: 'bg-purple-400/80 border-purple-200', south: 'bg-purple-600/90', east: 'bg-purple-800/90', glow: 'shadow-[0_0_40px_rgba(168,85,247,0.8)]' },
-    orange: { top: 'bg-orange-400/80 border-orange-200', south: 'bg-orange-600/90', east: 'bg-orange-800/90', glow: 'shadow-[0_0_40px_rgba(249,115,22,0.8)]' }
+    cyan: { top: 'bg-cyan-400/80 border-cyan-200', south: 'bg-cyan-600/90', east: 'bg-cyan-800/90', glow: 'shadow-[0_0_30px_rgba(34,211,238,0.7)]' },
+    red: { top: 'bg-red-400/80 border-red-200', south: 'bg-red-600/90', east: 'bg-red-800/90', glow: 'shadow-[0_0_30px_rgba(239,68,68,0.7)]' },
+    purple: { top: 'bg-purple-400/80 border-purple-200', south: 'bg-purple-600/90', east: 'bg-purple-800/90', glow: 'shadow-[0_0_30px_rgba(168,85,247,0.7)]' },
+    orange: { top: 'bg-orange-400/80 border-orange-200', south: 'bg-orange-600/90', east: 'bg-orange-800/90', glow: 'shadow-[0_0_30px_rgba(249,115,22,0.7)]' }
   };
   const c = colors[color];
 
   return (
-    <div className="absolute [transform-style:preserve-3d] transition-all duration-1000 ease-in-out hover:[transform:translateZ(10px)]" style={{ left: x, top: y, width: w, height: d }}>
-      {/* South Wall (Folded up from bottom edge) */}
+    <div className="absolute [transform-style:preserve-3d] transition-all duration-1000 ease-in-out" style={{ left: x, top: y, width: w, height: d }}>
+      {/* South Wall */}
       <div className={`absolute bottom-0 left-0 w-full origin-bottom ${c.south} border-l border-r border-t border-white/20`} style={{ height: h, transform: 'rotateX(-90deg)' }} />
-      {/* East Wall (Folded up from right edge) */}
+      {/* East Wall */}
       <div className={`absolute top-0 right-0 h-full origin-right ${c.east} border-t border-b border-l border-white/20`} style={{ width: h, transform: 'rotateY(-90deg)' }} />
-      {/* Top Face (Pushed up Z axis) */}
+      {/* Top Face */}
       <div className={`absolute inset-0 ${c.top} flex items-center justify-center overflow-hidden ${c.glow}`} style={{ transform: `translateZ(${h}px)` }}>
          <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff44_1px,transparent_1px),linear-gradient(to_bottom,#ffffff44_1px,transparent_1px)] bg-[size:4px_4px]" />
       </div>
       
-      {/* Floating 3D Label (Counter-rotated to face the camera) */}
-      <div className="absolute top-1/2 left-1/2 flex flex-col items-center justify-center pointer-events-none" style={{ transform: `translateZ(${h + 40}px) translateX(-50%) translateY(-50%) rotateZ(-45deg) rotateX(-60deg)` }}>
-         <span className="text-[9px] font-mono font-bold text-white uppercase tracking-widest whitespace-nowrap bg-black/60 px-2 py-0.5 rounded border border-white/20 backdrop-blur-md mb-1">{label}</span>
-         <span className={`text-sm font-mono font-black text-white bg-black/80 px-2 py-1 rounded border border-white/20 shadow-[0_0_15px_rgba(0,0,0,0.5)]`}>{value}</span>
-         <div className="w-px h-6 bg-white/50 mt-1" />
+      {/* Floating 3D Label (Scaled for Mobile) */}
+      <div className="absolute top-1/2 left-1/2 flex flex-col items-center justify-center pointer-events-none" style={{ transform: `translateZ(${h + 35}px) translateX(-50%) translateY(-50%) rotateZ(-45deg) rotateX(-60deg)` }}>
+         <span className="text-[8px] sm:text-[9px] font-mono font-bold text-white uppercase tracking-widest whitespace-nowrap bg-black/70 px-1.5 py-0.5 rounded border border-white/20 backdrop-blur-md mb-0.5">{label}</span>
+         <span className={`text-xs sm:text-sm font-mono font-black text-white bg-black/90 px-2 py-0.5 rounded border border-white/20 shadow-md`}>{value}</span>
+         <div className="w-px h-4 sm:h-6 bg-white/50 mt-0.5" />
       </div>
     </div>
   );
@@ -165,10 +165,10 @@ export default function AuditReportPage() {
   const isFragile = rawDomNodes > 800;
 
   // --- DYNAMICALLY SCALED TOWER HEIGHTS ---
-  const hDom = Math.max(50, Math.min(220, (rawDomNodes / 1500) * 150));
-  const hTbt = Math.max(40, Math.min(220, (rawTbt / 1000) * 150));
-  const hInp = Math.max(40, Math.min(220, (rawInp / 500) * 150));
-  const hParasite = Math.max(40, Math.min(220, (parseFloat(parasiteImpact) / 50) * 150));
+  const hDom = Math.max(40, Math.min(160, (rawDomNodes / 1500) * 120));
+  const hTbt = Math.max(30, Math.min(160, (rawTbt / 1000) * 120));
+  const hInp = Math.max(30, Math.min(160, (rawInp / 500) * 120));
+  const hParasite = Math.max(30, Math.min(160, (parseFloat(parasiteImpact) / 50) * 120));
 
   const rawInfrastructure = Array.isArray(auditData?.infrastructure) ? auditData.infrastructure : [];
   const infrastructure = Array.from(
@@ -195,9 +195,6 @@ export default function AuditReportPage() {
       description: isFullyOptimized 
         ? `Target achieves a pristine ${perfScore}/100 performance score. Zero structural leakage detected across traffic conduits.`
         : `Synthetic projection based on standard traffic volume, real-time performance score (${perfScore}/100), and a ${(performanceFrictionMultiplier * 100).toFixed(1)}% friction drop-off rate.`,
-      drawerKey: 'revenue' as const,
-      isZero: isFullyOptimized,
-      iconComp: DollarSign,
       highlight: !isFullyOptimized
     },
     {
@@ -207,9 +204,6 @@ export default function AuditReportPage() {
       icon: Ghost,
       value: isGhostOptimal ? '0.0s' : `${ghostTapWindow}s`,
       description: isGhostOptimal ? 'Main thread is unblocked.' : `Screen appears loaded, but taps on ${industryTerms.buttons} are ignored for ${ghostTapWindow}s.`,
-      drawerKey: 'ghost' as const,
-      isZero: isGhostOptimal,
-      iconComp: Ghost
     },
     {
       id: 'inp',
@@ -218,9 +212,6 @@ export default function AuditReportPage() {
       icon: MapPin,
       value: `${rawInp}ms`,
       description: isMapPenalized ? `INP exceeds 200ms threshold. Google is actively suppressing ${industryTerms.penalty}.` : `INP is within passing limits.`,
-      drawerKey: 'inp' as const,
-      isZero: !isMapPenalized,
-      iconComp: MapPin
     },
     {
       id: 'parasite',
@@ -229,9 +220,6 @@ export default function AuditReportPage() {
       icon: ServerCrash,
       value: `${parasiteImpact}%`,
       description: parseFloat(parasiteImpact) === 0 ? 'Zero external tracking scripts detected.' : `${thirdPartyCount} external marketing scripts cause ${parasiteImpact}% of mobile lag.`,
-      drawerKey: 'parasite' as const,
-      isZero: parseFloat(parasiteImpact) === 0,
-      iconComp: ShieldAlert
     },
     {
       id: 'dns',
@@ -240,9 +228,6 @@ export default function AuditReportPage() {
       icon: MailWarning,
       value: isEmailVulnerable ? 'VULNERABLE' : 'SECURE',
       description: isEmailVulnerable ? `Missing DMARC/SPF. Outreach is highly likely routing to spam folders.` : `Domain authentication is intact.`,
-      drawerKey: 'dns' as const,
-      isZero: !isEmailVulnerable,
-      iconComp: MailWarning
     },
     {
       id: 'dom',
@@ -251,120 +236,115 @@ export default function AuditReportPage() {
       icon: Database,
       value: domSize,
       description: !isFragile ? `HTML structure is optimized.` : 'Massive HTML node count is draining batteries and risking browser crashes.',
-      drawerKey: 'dom' as const,
-      isZero: !isFragile,
-      iconComp: Database
     }
   ];
 
   return (
-    <div className="min-h-screen bg-[#020205] text-white flex flex-col antialiased w-full">
+    <div className="min-h-screen bg-[#020205] text-white flex flex-col antialiased w-full overflow-x-hidden">
       
       <style dangerouslySetInnerHTML={{__html: `
         @keyframes hologramScan {
           0% { transform: translateY(0px); opacity: 0; }
           10% { opacity: 1; }
           90% { opacity: 1; }
-          100% { transform: translateY(480px); opacity: 0; }
+          100% { transform: translateY(340px); opacity: 0; }
         }
       `}} />
 
-      {/* TOP PANE: 3D Holographic Table Header */}
-      <div className="relative w-full h-[65vh] min-h-[520px] bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-cyan-950/40 via-[#020205] to-black overflow-hidden flex items-center justify-center border-b border-zinc-800 z-20 shrink-0">
+      {/* TOP PANE: Responsive Mobile-Optimized 3D Holographic Stage */}
+      <div className="relative w-full h-[55vh] sm:h-[65vh] min-h-[420px] bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-cyan-950/40 via-[#020205] to-black overflow-hidden flex items-center justify-center border-b border-zinc-800 z-20 shrink-0">
         
-        {/* The 3D Isometric Projection Engine */}
-        <div className="absolute inset-0 flex items-center justify-center [perspective:1400px] z-10 pointer-events-none mt-12 sm:mt-8">
+        {/* The 3D Isometric Projection Engine with Responsive Scaling */}
+        <div className="absolute inset-0 flex items-center justify-center [perspective:1200px] z-10 pointer-events-none px-2 mt-8 sm:mt-0">
           
-          {/* Base Table Orientation */}
-          <div className="relative w-[400px] h-[400px] sm:w-[480px] sm:h-[480px] [transform:scale(0.75)_rotateX(60deg)_rotateZ(45deg)] sm:[transform:scale(1.0)_rotateX(60deg)_rotateZ(45deg)] [transform-style:preserve-3d]">
+          {/* Scaled down on mobile viewports using scale-[0.58] sm:scale-[0.95] */}
+          <div className="relative w-[340px] h-[340px] sm:w-[460px] sm:h-[460px] [transform:scale(0.58)_rotateX(60deg)_rotateZ(45deg)] sm:[transform:scale(0.95)_rotateX(60deg)_rotateZ(45deg)] [transform-style:preserve-3d] transition-transform">
               
               {/* Glowing Base Plate & Grid Floor */}
-              <div className="absolute inset-0 bg-cyan-950/80 border-2 border-cyan-500 shadow-[0_0_80px_rgba(6,182,212,0.4)] backdrop-blur-md" />
+              <div className="absolute inset-0 bg-cyan-950/80 border-2 border-cyan-500 shadow-[0_0_60px_rgba(6,182,212,0.3)] backdrop-blur-md" />
               <div className="absolute inset-0 bg-[linear-gradient(to_right,#0891b266_2px,transparent_2px),linear-gradient(to_bottom,#0891b266_2px,transparent_2px)] bg-[size:24px_24px] opacity-80" />
-              <div className="absolute top-0 left-0 w-full h-[4px] bg-white shadow-[0_0_40px_#22d3ee,0_0_20px_#22d3ee] animate-[hologramScan_4s_linear_infinite]" />
+              <div className="absolute top-0 left-0 w-full h-[4px] bg-white shadow-[0_0_30px_#22d3ee] animate-[hologramScan_4s_linear_infinite]" />
               
               {/* Background Decorative Blocks */}
-              <DecorNode x={40} y={40} w={60} d={40} h={30} />
-              <DecorNode x={320} y={60} w={40} d={80} h={50} />
-              <DecorNode x={80} y={340} w={50} d={50} h={20} />
-              <DecorNode x={360} y={360} w={60} d={60} h={40} />
-              <DecorNode x={200} y={180} w={40} d={40} h={30} />
+              <DecorNode x={30} y={30} w={50} d={30} h={25} />
+              <DecorNode x={280} y={50} w={40} d={60} h={40} />
+              <DecorNode x={60} y={280} w={40} d={40} h={20} />
+              <DecorNode x={280} y={280} w={50} d={50} h={30} />
               
-              {/* Live Telemetry Data Towers (DOM top-left, Parasite top-right, Thread bottom-left, Latency bottom-center shifted away from DOM) */}
-              <DataNode x={60} y={60} w={60} d={60} h={hDom} color="cyan" label="DOM Nodes" value={domSize} />
-              <DataNode x={350} y={80} w={55} d={55} h={hParasite} color="purple" label="Parasite Load" value={`${parasiteImpact}%`} />
-              <DataNode x={60} y={320} w={60} d={60} h={hTbt} color="red" label="Thread Lock" value={`${rawTbt}ms`} />
-              <DataNode x={200} y={320} w={50} d={60} h={hInp} color="orange" label="Latency (INP)" value={`${rawInp}ms`} />
+              {/* Isolated Mobile-Optimized Telemetry Towers */}
+              <DataNode x={50} y={50} w={50} d={50} h={hDom} color="cyan" label="DOM Nodes" value={domSize} />
+              <DataNode x={270} y={60} w={45} d={45} h={hParasite} color="purple" label="Parasite Load" value={`${parasiteImpact}%`} />
+              <DataNode x={50} y={270} w={50} d={50} h={hTbt} color="red" label="Thread Lock" value={`${rawTbt}ms`} />
+              <DataNode x={220} y={270} w={45} d={50} h={hInp} color="orange" label="Latency (INP)" value={`${rawInp}ms`} />
           </div>
         </div>
 
         {/* Ambient Target Badge & Volatility Warning Overlay */}
-        <div className="absolute bottom-4 left-4 right-4 sm:right-auto flex flex-col sm:flex-row sm:items-end gap-3 z-30 pointer-events-none max-w-lg">
-            <div className="bg-black/80 border border-cyan-900/80 px-4 py-3 rounded-xl backdrop-blur-md shadow-xl pointer-events-auto">
-              <div className="flex items-center gap-2 mb-1.5">
+        <div className="absolute bottom-3 left-3 right-3 sm:left-6 sm:bottom-4 flex flex-col gap-2 z-30 pointer-events-none max-w-sm sm:max-w-md">
+            <div className="bg-black/85 border border-cyan-900/80 px-3.5 py-2.5 rounded-xl backdrop-blur-md shadow-xl pointer-events-auto">
+              <div className="flex items-center gap-2 mb-1">
                 <span className="relative flex h-2 w-2">
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>
                   <span className="relative inline-flex rounded-full h-2 w-2 bg-cyan-500 shadow-[0_0_8px_rgba(6,182,212,1)]"></span>
                 </span>
-                <span className="text-[10px] font-mono text-cyan-300 uppercase tracking-widest">
-                  Scanning {brandName} Infrastructure &bull; {scanTimestamp || 'Initializing...'}
+                <span className="text-[9px] sm:text-[10px] font-mono text-cyan-300 uppercase tracking-widest truncate">
+                  Scanning {brandName} &bull; {scanTimestamp || 'Live'}
                 </span>
               </div>
-              <p className="text-xs sm:text-[13px] text-zinc-300 leading-[1.6] font-light text-justify tracking-[0.015em]">
-                Live telemetry data is inherently volatile and subject to real-time network fluctuations. Metrics fluctuate continuously based on active user traffic loads, necessitating continuous baseline logging.
+              <p className="text-[11px] sm:text-xs text-zinc-300 leading-relaxed font-light">
+                Live telemetry data is volatile and subject to real-time network fluctuations.
               </p>
             </div>
         </div>
       </div>
 
-      {/* BOTTOM PANE: The Cold Data & Call to Action */}
-      <div ref={scrollContainerRef} className="w-full relative z-10 bg-[radial-gradient(circle_at_top,rgba(6,182,212,0.05),transparent_60%)] flex-grow">
-        <div className="max-w-3xl mx-auto w-full p-6 sm:p-12 xl:p-16 space-y-10 lg:space-y-12 pb-24">
+      {/* BOTTOM PANE: Cold Data & Actions */}
+      <div ref={scrollContainerRef} className="w-full relative z-10 bg-[radial-gradient(circle_at_top,rgba(6,182,212,0.05),transparent_60%)] flex-grow px-4 sm:px-8 py-8">
+        <div className="max-w-3xl mx-auto w-full space-y-8 pb-16">
           
-          <header className="border-b border-zinc-800 pb-6">
-            <h1 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">Synthetic Baseline Scan</h1>
-            <p className="text-zinc-400 mt-2 font-mono text-sm flex items-center gap-2">
-                <Globe size={14} className="text-cyan-500" /> Target: {auditData.target.replace(/^https?:\/\//, '')}
+          <header className="border-b border-zinc-800 pb-5">
+            <h1 className="text-2xl sm:text-4xl font-extrabold text-white tracking-tight">Synthetic Baseline Scan</h1>
+            <p className="text-zinc-400 mt-1.5 font-mono text-xs sm:text-sm flex items-center gap-2 truncate">
+                <Globe size={13} className="text-cyan-500 shrink-0" /> Target: {auditData.target.replace(/^https?:\/\//, '')}
             </p>
           </header>
 
-          <section className="bg-gradient-to-br from-[#0a0a0f] to-[#12121c] border border-zinc-700/60 rounded-2xl p-6 sm:p-10 shadow-2xl relative overflow-hidden group">
+          <section className="bg-gradient-to-br from-[#0a0a0f] to-[#12121c] border border-zinc-700/65 rounded-2xl p-5 sm:p-8 shadow-2xl relative overflow-hidden">
             <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/5 to-purple-600/5 pointer-events-none"></div>
-            <div className="flex flex-col sm:flex-row gap-6 items-start relative z-10">
-                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-cyan-500/10 to-blue-500/10 border border-cyan-400/30 flex items-center justify-center shrink-0 shadow-[0_0_15px_rgba(6,182,212,0.15)]">
-                  <Cpu size={22} className="text-cyan-400" /> 
+            <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 items-start relative z-10">
+                <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-br from-cyan-500/10 to-blue-500/10 border border-cyan-400/30 flex items-center justify-center shrink-0 shadow-md">
+                  <Cpu size={20} className="text-cyan-400" /> 
                 </div>
                 <div className="flex-1 w-full">
-                    <h2 className="text-[11px] font-mono font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-400 uppercase tracking-[0.2em] mb-4 flex items-center gap-2">
+                    <h2 className="text-[10px] sm:text-[11px] font-mono font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-400 uppercase tracking-[0.2em] mb-2 sm:mb-3">
                         Initial AI Assessment
-                        <span className="h-px flex-1 bg-gradient-to-r from-cyan-900/50 to-transparent"></span>
                     </h2>
-                    <p className="text-sm sm:text-base text-zinc-300 leading-[1.8] font-light text-justify tracking-[0.015em] antialiased">
+                    <p className="text-xs sm:text-base text-zinc-300 leading-[1.7] font-light">
                         {dynamicSynthesis}
                     </p>
                 </div>
             </div>
           </section>
 
-          <section className="space-y-6">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+          <section className="space-y-4 sm:space-y-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
               {frictionCards.map((card) => {
                 const IconComponent = card.icon;
                 return (
-                  <div key={card.id} className={`bg-[#12121c] border ${card.highlight ? 'border-red-900/60 shadow-[0_0_30px_rgba(220,38,38,0.15)] bg-gradient-to-br from-[#1a0f14] to-[#12121c] sm:col-span-2' : card.isGreen ? 'border-green-900/30' : 'border-zinc-700/50'} rounded-2xl p-6 sm:p-8 relative overflow-hidden transition-all flex flex-col justify-between`}>
-                    {card.highlight && <div className="absolute top-0 left-0 w-1.5 h-full bg-red-600 shadow-[0_0_15px_rgba(220,38,38,1)]"></div>}
+                  <div key={card.id} className={`bg-[#12121c] border ${card.highlight ? 'border-red-900/60 shadow-[0_0_25px_rgba(220,38,38,0.15)] bg-gradient-to-br from-[#1a0f14] to-[#12121c] sm:col-span-2' : card.isGreen ? 'border-green-900/30' : 'border-zinc-700/50'} rounded-2xl p-5 sm:p-7 relative overflow-hidden flex flex-col justify-between`}>
+                    {card.highlight && <div className="absolute top-0 left-0 w-1.5 h-full bg-red-600 shadow-[0_0_10px_rgba(220,38,38,1)]"></div>}
                     <div className="relative z-10">
-                      <div className={`flex items-center justify-between mb-4 ${card.highlight ? 'text-red-400' : card.isGreen ? 'text-green-400' : 'text-blue-400'}`}>
+                      <div className={`flex items-center justify-between mb-3 ${card.highlight ? 'text-red-400' : card.isGreen ? 'text-green-400' : 'text-blue-400'}`}>
                         <div className="flex items-center gap-2 font-mono font-bold">
-                            <IconComponent size={18} />
-                            <h3 className="text-[11px] uppercase tracking-widest">{card.title}</h3>
+                            <IconComponent size={16} />
+                            <h3 className="text-[10px] sm:text-[11px] uppercase tracking-widest">{card.title}</h3>
                         </div>
-                        {card.highlight && <span className="text-[9px] px-2 py-1 bg-red-500/10 border border-red-500/20 rounded font-mono uppercase tracking-widest">Synthetic</span>}
+                        {card.highlight && <span className="text-[8px] sm:text-[9px] px-2 py-0.5 bg-red-500/10 border border-red-500/20 rounded font-mono uppercase">Synthetic</span>}
                       </div>
-                      <div className={`${card.highlight ? 'text-5xl sm:text-6xl text-white drop-shadow-[0_0_10px_rgba(255,255,255,0.2)]' : 'text-3xl sm:text-4xl text-white'} font-black tracking-tight mb-3`}>
+                      <div className={`${card.highlight ? 'text-4xl sm:text-5xl text-white' : 'text-2xl sm:text-3xl text-white'} font-black tracking-tight mb-2`}>
                         {card.value}
                       </div>
-                      <p className={`text-sm ${card.highlight ? 'text-zinc-300 font-mono' : 'text-zinc-400 font-light'} leading-relaxed`}>{card.description}</p>
+                      <p className={`text-xs sm:text-sm ${card.highlight ? 'text-zinc-300 font-mono' : 'text-zinc-400 font-light'} leading-relaxed`}>{card.description}</p>
                     </div>
                   </div>
                 );
@@ -372,66 +352,65 @@ export default function AuditReportPage() {
             </div>
           </section>
 
-          {/* Tech Stack Migration with Locked Edge Computing Action */}
-          <section className="bg-[#12121c] border border-zinc-700/50 rounded-2xl p-6 sm:p-8">
-             <div className="flex items-center justify-between mb-6 border-b border-zinc-800 pb-4">
+          {/* Tech Stack Migration */}
+          <section className="bg-[#12121c] border border-zinc-700/50 rounded-2xl p-5 sm:p-8">
+             <div className="flex items-center justify-between mb-5 border-b border-zinc-800 pb-3">
                 <div className="flex items-center gap-2">
-                  <Layers className="text-purple-400 shrink-0" size={18} />
-                  <h2 className="text-xs font-mono font-bold text-zinc-100 uppercase tracking-widest">Tech Stack Migration</h2>
+                  <Layers className="text-purple-400 shrink-0" size={16} />
+                  <h2 className="text-[10px] sm:text-xs font-mono font-bold text-zinc-100 uppercase tracking-widest">Tech Stack Migration</h2>
                 </div>
-                <div className="flex items-center gap-1.5 bg-purple-500/10 border border-purple-500/30 px-2.5 py-1 rounded text-[10px] font-mono text-purple-300">
-                  <Lock size={12} /> Paywall Protected
+                <div className="flex items-center gap-1 bg-purple-500/10 border border-purple-500/30 px-2 py-0.5 rounded text-[9px] sm:text-[10px] font-mono text-purple-300">
+                  <Lock size={10} /> Locked
                 </div>
              </div>
              
-             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 mb-4">
               {infrastructure.length > 0 ? infrastructure.slice(0, 4).map((tech: any, idx: number) => {
                 const rec = TECH_UPGRADES[tech.name] || { upgrade: "Edge Compute Offloading", reason: "Shifts processing to edge servers." };
                 return (
-                  <div key={idx} className="p-4 bg-black/40 border border-zinc-800 rounded-xl flex flex-col">
-                      <div className="text-sm font-bold text-zinc-200 mb-1">{tech.name}</div>
-                      <div className="text-[10px] font-mono text-cyan-400 uppercase tracking-widest mb-2">Upgrade &rarr; {rec.upgrade}</div>
-                      <p className="text-xs text-zinc-500 font-light mt-auto">{rec.reason}</p>
+                  <div key={idx} className="p-3.5 bg-black/40 border border-zinc-800 rounded-xl flex flex-col">
+                      <div className="text-xs sm:text-sm font-bold text-zinc-200 mb-1">{tech.name}</div>
+                      <div className="text-[9px] sm:text-[10px] font-mono text-cyan-400 uppercase tracking-widest mb-1.5">Upgrade &rarr; {rec.upgrade}</div>
+                      <p className="text-[11px] sm:text-xs text-zinc-500 font-light mt-auto">{rec.reason}</p>
                   </div>
                 );
               }) : (
-                <div className="text-zinc-500 text-sm font-mono col-span-full">No infrastructure data available.</div>
+                <div className="text-zinc-500 text-xs font-mono col-span-full">No infrastructure data available.</div>
               )}
              </div>
 
              {/* Locked Edge Computing Paywall CTA */}
-             <div className="p-5 bg-gradient-to-r from-purple-950/30 via-black/60 to-cyan-950/30 border border-purple-500/30 rounded-xl flex flex-col sm:flex-row items-center justify-between gap-4">
-                <div className="flex items-center gap-3">
-                   <div className="w-10 h-10 rounded-lg bg-purple-500/10 border border-purple-500/30 flex items-center justify-center shrink-0 text-purple-400 shadow-[0_0_15px_rgba(168,85,247,0.2)]">
-                      <Zap size={18} />
+             <div className="p-4 sm:p-5 bg-gradient-to-r from-purple-950/30 via-black/60 to-cyan-950/30 border border-purple-500/30 rounded-xl flex flex-col sm:flex-row items-center justify-between gap-4">
+                <div className="flex items-center gap-3 w-full sm:w-auto">
+                   <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-lg bg-purple-500/10 border border-purple-500/30 flex items-center justify-center shrink-0 text-purple-400">
+                      <Zap size={16} />
                    </div>
                    <div>
-                      <div className="text-sm font-bold text-white flex items-center gap-2">
-                        Advanced Edge Node Offloading 
-                        <span className="text-[10px] font-mono bg-purple-500/20 text-purple-300 px-2 py-0.5 rounded border border-purple-500/30 uppercase">Locked</span>
+                      <div className="text-xs sm:text-sm font-bold text-white flex items-center gap-2 flex-wrap">
+                        Edge Node Offloading 
+                        <span className="text-[9px] font-mono bg-purple-500/20 text-purple-300 px-1.5 py-0.5 rounded border border-purple-500/30 uppercase">Locked</span>
                       </div>
-                      <p className="text-xs text-zinc-400 font-light mt-0.5">Route origin requests through global edge workers to eliminate TTFB bottlenecks.</p>
+                      <p className="text-[11px] sm:text-xs text-zinc-400 font-light mt-0.5">Route requests through global edge workers to eliminate bottlenecks.</p>
                    </div>
                 </div>
                 <button 
                   onClick={handleDeployPixel}
-                  className="w-full sm:w-auto bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white px-5 py-3 rounded-xl font-bold text-xs uppercase tracking-widest transition-all shadow-[0_0_20px_rgba(6,182,212,0.3)] flex items-center justify-center gap-2 shrink-0 cursor-pointer"
+                  className="w-full sm:w-auto bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white px-4 py-3 rounded-xl font-bold text-[11px] sm:text-xs uppercase tracking-widest transition-all shadow-lg flex items-center justify-center gap-2 shrink-0 cursor-pointer"
                 >
-                  <Lock size={14} /> Click for Edge Computing
+                  <Lock size={13} /> Unlock Edge Computing
                 </button>
              </div>
           </section>
 
-          <section className="mt-8 pt-8 border-t border-zinc-800">
-            <div className="bg-gradient-to-b from-zinc-900 to-black border border-zinc-700/80 rounded-2xl p-8 text-center relative overflow-hidden shadow-2xl group hover:border-cyan-500/50 transition-colors">
-                <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(6,182,212,0.08),transparent_70%)] pointer-events-none"></div>
-                <Lock size={24} className="text-zinc-400 mx-auto mb-4 group-hover:text-cyan-400 transition-colors" />
-                <h3 className="text-lg font-bold text-white mb-2">Verify The Damage</h3>
-                <p className="text-sm text-zinc-400 mb-8 max-w-sm mx-auto">
-                    The £{syntheticQuarterlyLeakage.toLocaleString()} leakage above is a synthetic projection. Deploy the ClientScale tracker to capture actual user rage-taps and API failures.
+          <section className="pt-6 border-t border-zinc-800">
+            <div className="bg-gradient-to-b from-zinc-900 to-black border border-zinc-700/80 rounded-2xl p-6 sm:p-8 text-center relative overflow-hidden shadow-2xl">
+                <Lock size={20} className="text-cyan-400 mx-auto mb-3" />
+                <h3 className="text-base sm:text-lg font-bold text-white mb-2">Verify The Damage</h3>
+                <p className="text-xs sm:text-sm text-zinc-400 mb-6 max-w-sm mx-auto leading-relaxed">
+                    Deploy the ClientScale tracker to capture actual user rage-taps and API failures from your live traffic.
                 </p>
-                <button onClick={handleDeployPixel} className="w-full bg-white hover:bg-gray-200 text-black py-4 rounded-xl font-bold text-xs sm:text-sm uppercase tracking-widest transition-all shadow-[0_0_20px_rgba(255,255,255,0.2)] flex items-center justify-center gap-2 cursor-pointer">
-                  Deploy Live Telemetry Pixel (48 Hrs)
+                <button onClick={handleDeployPixel} className="w-full bg-white hover:bg-gray-200 text-black py-3.5 sm:py-4 rounded-xl font-bold text-xs uppercase tracking-widest transition-all shadow-lg flex items-center justify-center gap-2 cursor-pointer">
+                  Deploy Telemetry Pixel (48 Hrs)
                 </button>
             </div>
           </section>
