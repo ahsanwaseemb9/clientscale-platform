@@ -50,11 +50,11 @@ const DataNode = ({ x, y, w, d, h, color = 'cyan', label, value }: any) => {
          <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff44_1px,transparent_1px),linear-gradient(to_bottom,#ffffff44_1px,transparent_1px)] bg-[size:4px_4px]" />
       </div>
       
-      {/* Floating 3D Label (Scaled for Mobile) */}
+      {/* Floating 3D Label (Enlarged Mobile Fonts, Untouched sm: Desktop Fonts) */}
       <div className="absolute top-1/2 left-1/2 flex flex-col items-center justify-center pointer-events-none" style={{ transform: `translateZ(${h + 35}px) translateX(-50%) translateY(-50%) rotateZ(-45deg) rotateX(-60deg)` }}>
-         <span className="text-[8px] sm:text-[9px] font-mono font-bold text-white uppercase tracking-widest whitespace-nowrap bg-black/70 px-1.5 py-0.5 rounded border border-white/20 backdrop-blur-md mb-0.5">{label}</span>
-         <span className={`text-xs sm:text-sm font-mono font-black text-white bg-black/90 px-2 py-0.5 rounded border border-white/20 shadow-md`}>{value}</span>
-         <div className="w-px h-4 sm:h-6 bg-white/50 mt-0.5" />
+         <span className="text-[11px] sm:text-[9px] font-mono font-bold text-white uppercase tracking-widest whitespace-nowrap bg-black/70 px-2 sm:px-1.5 py-0.5 rounded border border-white/20 backdrop-blur-md mb-1 sm:mb-0.5">{label}</span>
+         <span className={`text-base sm:text-sm font-mono font-black text-white bg-black/90 px-2.5 sm:px-2 py-0.5 rounded border border-white/20 shadow-md`}>{value}</span>
+         <div className="w-px h-5 sm:h-6 bg-white/50 mt-1 sm:mt-0.5" />
       </div>
     </div>
   );
@@ -292,7 +292,7 @@ export default function AuditReportPage() {
                 </span>
               </div>
               <p className="text-[11px] sm:text-xs text-zinc-300 leading-relaxed font-light">
-              Live telemetry data is inherently volatile and subject to real-time network fluctuations. Metrics fluctuate continuously based on active user traffic loads, necessitating continuous baseline logging.
+                Live telemetry data is inherently volatile and subject to real-time network fluctuations. Metrics fluctuate continuously based on active user traffic loads, necessitating continuous baseline logging.
               </p>
             </div>
         </div>
