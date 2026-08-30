@@ -294,7 +294,7 @@ export default function AuditReportPage() {
                   Scanning {brandName} &bull; {scanTimestamp || 'Live'}
                 </span>
               </div>
-              <p className="text-[12px] sm:text-xs text-zinc-300 leading-relaxed font-light">
+              <p className="text-[13px] sm:text-xs text-zinc-300 leading-relaxed font-light">
                 Live telemetry data is inherently volatile and subject to real-time network fluctuations. Metrics fluctuate continuously based on active user traffic loads, necessitating continuous baseline logging.
               </p>
             </div>
