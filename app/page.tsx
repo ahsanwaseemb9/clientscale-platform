@@ -2,13 +2,18 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
+import { Play } from 'lucide-react';
 import DecryptedLogo from './components/DecryptedLogo';
+import CinematicTour from './components/CinematicTour';
 
 const FREE_EMAIL_SUBSTRINGS = ['gmail', 'gmall', 'gmai', 'yahoo', 'yaho', 'hotmail', 'hotmai', 'outlook', 'outlok', 'aol', 'icloud', 'iclud', 'proton', 'zoho', 'live', 'msn'];
 
 export default function Home() {
   // Navigation states: 'none' | 'features' | 'pricing'
   const [activeSection, setActiveSection] = useState<'none' | 'features' | 'pricing'>('none');
+  
+  // Cinematic Tour State
+  const [isTourOpen, setIsTourOpen] = useState(false);
 
   // Step 1: Form & Navigation States
   const router = useRouter();
@@ -242,8 +247,22 @@ export default function Home() {
             )}
           </div>
         </form>
+
+        {/* --- CINEMATIC TOUR TRIGGER --- */}
+        <div className="w-full flex justify-center mt-6 sm:mt-8 animate-fade-in pb-12">
+          <button 
+            onClick={() => setIsTourOpen(true)}
+            className="group flex items-center gap-3 bg-zinc-900/50 border border-zinc-800 hover:border-cyan-500/50 px-6 py-3 rounded-full text-[10px] sm:text-xs font-mono uppercase tracking-widest transition-all backdrop-blur-sm shadow-lg hover:shadow-[0_0_20px_rgba(6,182,212,0.2)]"
+          >
+            <div className="w-6 h-6 rounded-full bg-cyan-500/20 flex items-center justify-center group-hover:bg-cyan-500/40 transition-colors">
+              <Play size={12} className="text-cyan-400 ml-0.5" />
+            </div>
+            Take a Tour
+          </button>
+        </div>
       </div>
 
+      <CinematicTour isOpen={isTourOpen} onClose={() => setIsTourOpen(false)} />
     </main>
   );
 }
