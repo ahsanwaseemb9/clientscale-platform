@@ -75,8 +75,8 @@ export default function CinematicTour({ isOpen, onClose }: { isOpen: boolean; on
           </p>
         </div>
 
-        {/* 3D Grid - Stacked below text on mobile, centered on desktop */}
-        <div className="relative w-[340px] h-[340px] sm:w-[480px] sm:h-[480px] [transform:scale(0.85)_rotateX(60deg)_rotateZ(45deg)] sm:[transform:scale(1.05)_rotateX(60deg)_rotateZ(45deg)] [transform-style:preserve-3d] mt-8 sm:mt-0 shrink-0">
+        {/* 3D Grid - Scaled to 0.7 and nudged right on mobile to prevent edge cutoffs */}
+        <div className="relative w-[340px] h-[340px] sm:w-[480px] sm:h-[480px] [transform:scale(0.7)_translateX(25px)_rotateX(60deg)_rotateZ(45deg)] sm:[transform:scale(1.05)_translateX(0px)_rotateX(60deg)_rotateZ(45deg)] [transform-style:preserve-3d] mt-8 sm:mt-0 shrink-0 transition-transform duration-1000">
            <div className="absolute inset-0 border-2 border-cyan-500/50 shadow-[0_0_50px_rgba(6,182,212,0.2)] bg-cyan-950/40 backdrop-blur-sm" />
            <div className="absolute inset-0 bg-[linear-gradient(to_right,#0891b244_2px,transparent_2px),linear-gradient(to_bottom,#0891b244_2px,transparent_2px)] bg-[size:24px_24px]" />
            <div className="absolute top-0 left-0 w-full h-[2px] bg-cyan-400 shadow-[0_0_20px_#22d3ee] animate-[hologramScan_3s_linear_infinite]" />
@@ -120,12 +120,12 @@ export default function CinematicTour({ isOpen, onClose }: { isOpen: boolean; on
              <div className="absolute top-0 right-0 h-full bg-red-800/90 w-[140px] sm:h-[160px] border border-red-400/50 origin-right [transform:rotateY(-90deg)]" />
              <div className="absolute inset-0 bg-red-500/80 shadow-[0_0_40px_rgba(239,68,68,0.8)] border border-red-300 [transform:translateZ(140px)] sm:[transform:translateZ(160px)]" />
              
-             {/* Vitals Dossier */}
-             <div className="absolute top-0 left-1/2 [transform:translateZ(195px)_translateX(-50%)_rotateZ(-45deg)_rotateX(-60deg)] sm:[transform:translateZ(215px)_translateX(-50%)_rotateZ(-45deg)_rotateX(-60deg)] w-44 sm:w-48 pointer-events-none">
+             {/* Vitals Dossier - Adjusted width and origin (-35%) to fit mobile screen edge */}
+             <div className="absolute top-0 left-1/2 [transform:translateZ(195px)_translateX(-35%)_rotateZ(-45deg)_rotateX(-60deg)] sm:[transform:translateZ(215px)_translateX(-50%)_rotateZ(-45deg)_rotateX(-60deg)] w-[160px] sm:w-48 pointer-events-none">
                <div className="bg-black/95 border border-red-500/70 p-2.5 sm:p-3 rounded-lg backdrop-blur-md shadow-[0_0_30px_rgba(239,68,68,0.4)] animate-pulse">
                  <div className="text-[9px] sm:text-[10px] text-red-400 uppercase tracking-widest mb-1 flex items-center gap-1.5 font-bold"><ShieldAlert size={12}/> Critical Threat</div>
-                 <div className="text-white text-xs sm:text-sm font-bold">Thread Lock</div>
-                 <div className="text-red-300 text-[10px] sm:text-xs mt-0.5">TBT: 800ms (Frozen)</div>
+                 <div className="text-white text-[11px] sm:text-sm font-bold truncate">Thread Lock</div>
+                 <div className="text-red-300 text-[9px] sm:text-xs mt-0.5 truncate">TBT: 800ms (Frozen)</div>
                </div>
                <div className="w-px h-8 bg-red-500/50 mx-auto mt-1" />
              </div>
