@@ -63,30 +63,66 @@ export default function CinematicTour({ isOpen, onClose }: { isOpen: boolean; on
       <div className={`absolute inset-0 flex items-center justify-center transition-all duration-1000 ${step === 2 ? 'opacity-100 z-20 scale-100' : step > 2 ? 'opacity-30 scale-90 translate-x-[-20%] sm:translate-x-[-30%] z-0' : 'opacity-0 scale-110 z-0 pointer-events-none'}`}>
         
         {/* Module Label */}
-        <div className="absolute top-24 left-6 sm:left-12 z-30 max-w-xs">
-          <div className="text-[10px] text-cyan-400 font-bold uppercase tracking-widest mb-1">Phase 01: Simulation</div>
-          <div className="text-xl font-black text-white mb-2">/dashboard/report</div>
-          <p className="text-xs text-zinc-400 leading-relaxed">We scan the prospect's infrastructure inside a synthetic sandbox. Anomalies like DOM fragility and Thread Locks are isolated and rendered as threat vectors.</p>
+        <div className="absolute top-20 sm:top-24 left-6 sm:left-12 z-30 max-w-sm sm:max-w-md">
+          <div className="text-[11px] sm:text-xs text-cyan-400 font-bold uppercase tracking-widest mb-1.5">Phase 01: Simulation</div>
+          <div className="text-2xl sm:text-3xl font-black text-white mb-2.5">/dashboard/report</div>
+          <p className="text-xs sm:text-sm text-zinc-300 leading-relaxed font-light">
+            We scan the prospect's infrastructure inside a synthetic sandbox. Anomalies like DOM fragility and Thread Locks are isolated and rendered as threat vectors.
+          </p>
         </div>
 
-        <div className="relative w-[300px] h-[300px] sm:w-[450px] sm:h-[450px] [transform:scale(0.8)_rotateX(60deg)_rotateZ(45deg)] sm:[transform:scale(1.0)_rotateX(60deg)_rotateZ(45deg)] [transform-style:preserve-3d]">
+        <div className="relative w-[340px] h-[340px] sm:w-[480px] sm:h-[480px] [transform:scale(0.85)_rotateX(60deg)_rotateZ(45deg)] sm:[transform:scale(1.05)_rotateX(60deg)_rotateZ(45deg)] [transform-style:preserve-3d] mt-12 sm:mt-0">
            <div className="absolute inset-0 border-2 border-cyan-500/50 shadow-[0_0_50px_rgba(6,182,212,0.2)] bg-cyan-950/40 backdrop-blur-sm" />
+           <div className="absolute inset-0 bg-[linear-gradient(to_right,#0891b244_2px,transparent_2px),linear-gradient(to_bottom,#0891b244_2px,transparent_2px)] bg-[size:24px_24px]" />
            <div className="absolute top-0 left-0 w-full h-[2px] bg-cyan-400 shadow-[0_0_20px_#22d3ee] animate-[hologramScan_3s_linear_infinite]" />
            
-           {/* Threat Tower (Thread Lock) */}
-           <div className="absolute left-1/4 top-1/2 w-12 h-12 sm:w-16 sm:h-16 [transform-style:preserve-3d]">
-             <div className="absolute bottom-0 left-0 w-full bg-red-600/90 h-[140px] sm:h-[180px] border border-red-400/50 origin-bottom [transform:rotateX(-90deg)]" />
-             <div className="absolute top-0 right-0 h-full bg-red-800/90 w-[140px] sm:w-[180px] border border-red-400/50 origin-right [transform:rotateY(-90deg)]" />
-             <div className="absolute inset-0 bg-red-500/80 shadow-[0_0_40px_rgba(239,68,68,0.8)] border border-red-300 [transform:translateZ(140px)] sm:[transform:translateZ(180px)]" />
+           {/* Tower 1: DOM Nodes (Cyan) */}
+           <div className="absolute left-[50px] top-[50px] w-12 h-12 [transform-style:preserve-3d]">
+             <div className="absolute bottom-0 left-0 w-full bg-cyan-600/90 h-[100px] border border-cyan-400/50 origin-bottom [transform:rotateX(-90deg)]" />
+             <div className="absolute top-0 right-0 h-full bg-cyan-800/90 w-[100px] border border-cyan-400/50 origin-right [transform:rotateY(-90deg)]" />
+             <div className="absolute inset-0 bg-cyan-500/80 shadow-[0_0_30px_rgba(34,211,238,0.7)] border border-cyan-300 [transform:translateZ(100px)]" />
+             <div className="absolute top-0 left-1/2 [transform:translateZ(135px)_translateX(-50%)_rotateZ(-45deg)_rotateX(-60deg)] pointer-events-none flex flex-col items-center">
+               <span className="text-[10px] font-bold text-white uppercase tracking-wider bg-black/80 px-1.5 py-0.5 rounded border border-white/20 whitespace-nowrap mb-0.5">DOM Nodes</span>
+               <span className="text-xs font-black text-white bg-black/90 px-2 py-0.5 rounded border border-white/20">1,200</span>
+             </div>
+           </div>
+
+           {/* Tower 2: Parasite Load (Purple) */}
+           <div className="absolute left-[270px] top-[60px] w-11 h-11 [transform-style:preserve-3d]">
+             <div className="absolute bottom-0 left-0 w-full bg-purple-600/90 h-[60px] border border-purple-400/50 origin-bottom [transform:rotateX(-90deg)]" />
+             <div className="absolute top-0 right-0 h-full bg-purple-800/90 w-[60px] border border-purple-400/50 origin-right [transform:rotateY(-90deg)]" />
+             <div className="absolute inset-0 bg-purple-500/80 shadow-[0_0_30px_rgba(168,85,247,0.7)] border border-purple-300 [transform:translateZ(60px)]" />
+             <div className="absolute top-0 left-1/2 [transform:translateZ(95px)_translateX(-50%)_rotateZ(-45deg)_rotateX(-60deg)] pointer-events-none flex flex-col items-center">
+               <span className="text-[10px] font-bold text-white uppercase tracking-wider bg-black/80 px-1.5 py-0.5 rounded border border-white/20 whitespace-nowrap mb-0.5">Parasite Load</span>
+               <span className="text-xs font-black text-white bg-black/90 px-2 py-0.5 rounded border border-white/20">0%</span>
+             </div>
+           </div>
+
+           {/* Tower 3: Latency INP (Orange) */}
+           <div className="absolute left-[220px] top-[260px] w-11 h-12 [transform-style:preserve-3d]">
+             <div className="absolute bottom-0 left-0 w-full bg-orange-600/90 h-[80px] border border-orange-400/50 origin-bottom [transform:rotateX(-90deg)]" />
+             <div className="absolute top-0 right-0 h-full bg-orange-800/90 w-[80px] border border-orange-400/50 origin-right [transform:rotateY(-90deg)]" />
+             <div className="absolute inset-0 bg-orange-500/80 shadow-[0_0_30px_rgba(249,115,22,0.7)] border border-orange-300 [transform:translateZ(80px)]" />
+             <div className="absolute top-0 left-1/2 [transform:translateZ(115px)_translateX(-50%)_rotateZ(-45deg)_rotateX(-60deg)] pointer-events-none flex flex-col items-center">
+               <span className="text-[10px] font-bold text-white uppercase tracking-wider bg-black/80 px-1.5 py-0.5 rounded border border-white/20 whitespace-nowrap mb-0.5">Latency (INP)</span>
+               <span className="text-xs font-black text-white bg-black/90 px-2 py-0.5 rounded border border-white/20">302ms</span>
+             </div>
+           </div>
+
+           {/* Tower 4: Threat Vector (Thread Lock - Red) */}
+           <div className="absolute left-[50px] top-[260px] w-12 h-12 [transform-style:preserve-3d]">
+             <div className="absolute bottom-0 left-0 w-full bg-red-600/90 h-[140px] sm:h-[160px] border border-red-400/50 origin-bottom [transform:rotateX(-90deg)]" />
+             <div className="absolute top-0 right-0 h-full bg-red-800/90 w-[140px] sm:h-[160px] border border-red-400/50 origin-right [transform:rotateY(-90deg)]" />
+             <div className="absolute inset-0 bg-red-500/80 shadow-[0_0_40px_rgba(239,68,68,0.8)] border border-red-300 [transform:translateZ(140px)] sm:[transform:translateZ(160px)]" />
              
              {/* Vitals Dossier */}
-             <div className="absolute top-0 left-1/2 [transform:translateZ(190px)_translateX(-50%)_rotateZ(-45deg)_rotateX(-60deg)] sm:[transform:translateZ(240px)_translateX(-50%)_rotateZ(-45deg)_rotateX(-60deg)] w-40 sm:w-48 pointer-events-none">
-               <div className="bg-black/90 border border-red-500/50 p-2.5 sm:p-3 rounded-lg backdrop-blur-md shadow-[0_0_30px_rgba(239,68,68,0.3)] animate-pulse">
-                 <div className="text-[9px] sm:text-[10px] text-red-400 uppercase tracking-widest mb-1 flex items-center gap-2"><ShieldAlert size={12}/> Critical Threat</div>
+             <div className="absolute top-0 left-1/2 [transform:translateZ(195px)_translateX(-50%)_rotateZ(-45deg)_rotateX(-60deg)] sm:[transform:translateZ(215px)_translateX(-50%)_rotateZ(-45deg)_rotateX(-60deg)] w-44 sm:w-48 pointer-events-none">
+               <div className="bg-black/95 border border-red-500/70 p-2.5 sm:p-3 rounded-lg backdrop-blur-md shadow-[0_0_30px_rgba(239,68,68,0.4)] animate-pulse">
+                 <div className="text-[9px] sm:text-[10px] text-red-400 uppercase tracking-widest mb-1 flex items-center gap-1.5 font-bold"><ShieldAlert size={12}/> Critical Threat</div>
                  <div className="text-white text-xs sm:text-sm font-bold">Thread Lock</div>
-                 <div className="text-red-300 text-[10px] sm:text-xs mt-1">TBT: 800ms (Main thread frozen)</div>
+                 <div className="text-red-300 text-[10px] sm:text-xs mt-0.5">TBT: 800ms (Frozen)</div>
                </div>
-               <div className="w-px h-8 sm:h-12 bg-red-500/50 mx-auto mt-1 sm:mt-2" />
+               <div className="w-px h-8 bg-red-500/50 mx-auto mt-1" />
              </div>
            </div>
         </div>
@@ -98,7 +134,9 @@ export default function CinematicTour({ isOpen, onClose }: { isOpen: boolean; on
             <h2 className="text-xs sm:text-sm text-cyan-400 uppercase tracking-[0.2em] flex items-center gap-2 mb-6 font-bold">
               <Activity size={16} /> Synthetic DNA Extracted
             </h2>
-            <p className="text-xs text-zinc-400 leading-relaxed mb-6">We sequence the exact financial cost of these bottlenecks to build an undeniable business case before a single line of code is touched.</p>
+            <p className="text-xs sm:text-sm text-zinc-300 leading-relaxed mb-6 font-light">
+              We sequence the exact financial cost of these bottlenecks to build an undeniable business case before a single line of code is touched.
+            </p>
             
             <div className="space-y-4 relative before:absolute before:left-[19px] before:top-8 before:bottom-8 before:w-px before:bg-gradient-to-b before:from-cyan-500 before:to-red-500">
                <div className="flex items-center gap-4 relative z-10">
@@ -132,14 +170,16 @@ export default function CinematicTour({ isOpen, onClose }: { isOpen: boolean; on
       <div className={`absolute inset-0 flex flex-col items-center justify-center transition-all duration-1000 ${step === 4 ? 'opacity-100 z-40 scale-100' : step > 4 ? 'opacity-0 scale-110 z-0' : 'opacity-0 scale-90 z-0 pointer-events-none'}`}>
         
         {/* Module Label */}
-        <div className="absolute top-24 left-6 sm:left-12 z-30 max-w-sm">
-          <div className="text-[10px] text-purple-400 font-bold uppercase tracking-widest mb-1">Phase 02: Ground Truth</div>
-          <div className="text-xl font-black text-white mb-2">/dashboard/boardroom</div>
-          <p className="text-xs text-zinc-400 leading-relaxed">The simulation ends. We release the telemetry beacon into the wild, capturing real physical frustration and linking it directly to lost cart revenue.</p>
+        <div className="absolute top-20 sm:top-24 left-6 sm:left-12 z-30 max-w-sm">
+          <div className="text-[11px] sm:text-xs text-purple-400 font-bold uppercase tracking-widest mb-1.5">Phase 02: Ground Truth</div>
+          <div className="text-2xl sm:text-3xl font-black text-white mb-2.5">/dashboard/boardroom</div>
+          <p className="text-xs sm:text-sm text-zinc-300 leading-relaxed font-light">
+            The simulation ends. We release the telemetry beacon into the wild, capturing real physical frustration and linking it directly to lost cart revenue.
+          </p>
         </div>
 
         {/* 3D Data Pipeline Hologram */}
-        <div className="relative w-full max-w-4xl px-4 flex flex-col sm:flex-row items-center justify-center gap-8 sm:gap-12 mt-16 sm:mt-0 [perspective:1000px]">
+        <div className="relative w-full max-w-4xl px-4 flex flex-col sm:flex-row items-center justify-center gap-8 sm:gap-12 mt-20 sm:mt-0 [perspective:1000px]">
           
           {/* Node 1: Client UI */}
           <div className="flex flex-col items-center relative z-10 [transform:rotateY(15deg)]">
@@ -187,17 +227,17 @@ export default function CinematicTour({ isOpen, onClose }: { isOpen: boolean; on
           <p className="text-zinc-400 max-w-lg mb-8 leading-relaxed text-sm sm:text-base">
             You've seen the mechanics. Now see your own data. Enter a target URL on the mainframe to initialize a live structural scan of your infrastructure.
           </p>
-          <button onClick={onClose} className="bg-white text-black px-8 py-4 rounded-xl font-bold text-sm uppercase tracking-widest hover:bg-cyan-400 transition-colors shadow-[0_0_30px_rgba(255,255,255,0.2)] flex items-center gap-3">
+          <button onClick={onClose} className="bg-white text-black px-8 py-4 rounded-xl font-bold text-sm uppercase tracking-widest hover:bg-cyan-400 transition-colors shadow-[0_0_30px_rgba(255,255,255,0.2)] flex items-center gap-3 cursor-pointer">
             <Lock size={16} /> Access Mainframe
           </button>
       </div>
 
-      {/* Navigation Controls */}
-      <div className="absolute bottom-8 left-0 w-full flex justify-center z-50 px-4">
+      {/* Raised Navigation Controls */}
+      <div className="absolute bottom-16 sm:bottom-20 left-0 w-full flex justify-center z-50 px-4">
          {step < 5 && (
            <button 
              onClick={() => setStep(s => s + 1)}
-             className="flex items-center gap-2 bg-cyan-950/80 border border-cyan-500/50 text-cyan-400 px-6 sm:px-8 py-3.5 rounded-full text-[10px] sm:text-xs font-bold uppercase tracking-widest hover:bg-cyan-900 transition-colors backdrop-blur-md shadow-[0_0_20px_rgba(6,182,212,0.2)]"
+             className="flex items-center gap-2 bg-cyan-950/90 border border-cyan-500/60 text-cyan-300 px-7 sm:px-9 py-3.5 rounded-full text-xs font-bold uppercase tracking-widest hover:bg-cyan-900 transition-all backdrop-blur-md shadow-[0_0_25px_rgba(6,182,212,0.3)] hover:scale-105 cursor-pointer"
            >
              {step === 1 ? 'Initiate Core Scan' : step === 2 ? 'Sequence Genome' : step === 3 ? 'Deploy Tracker' : 'Complete Tour'} <ChevronRight size={14} />
            </button>
