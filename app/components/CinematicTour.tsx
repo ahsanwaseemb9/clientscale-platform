@@ -232,8 +232,8 @@ export default function CinematicTour({ isOpen, onClose }: { isOpen: boolean; on
           </button>
       </div>
 
-      {/* Raised Navigation Controls */}
-      <div className="absolute bottom-16 sm:bottom-20 left-0 w-full flex justify-center z-50 px-4">
+      {/* Raised Navigation Controls - Hidden until Text Stage 3 is reached */}
+      <div className={`absolute bottom-16 sm:bottom-20 left-0 w-full flex justify-center z-50 px-4 transition-all duration-1000 ${step === 1 && textStage < 3 ? 'opacity-0 pointer-events-none translate-y-4' : 'opacity-100 translate-y-0'}`}>
          {step < 5 && (
            <button 
              onClick={() => setStep(s => s + 1)}
