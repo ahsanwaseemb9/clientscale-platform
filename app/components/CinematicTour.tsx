@@ -60,7 +60,7 @@ export default function CinematicTour({ isOpen, onClose }: { isOpen: boolean; on
       </div>
 
       {/* ACT 2: The Specimen Scan (dashboard/report) */}
-      <div className={`absolute inset-0 flex flex-col sm:block items-center justify-start sm:justify-center pt-20 sm:pt-0 transition-all duration-1000 ${
+      <div className={`absolute inset-0 flex flex-col sm:flex-row items-center justify-start sm:justify-center pt-20 sm:pt-0 transition-all duration-1000 ${
         step === 2 ? 'opacity-100 z-20' : 
         step === 3 ? 'opacity-0 sm:opacity-30 sm:scale-90 sm:translate-x-[-30%] z-0 pointer-events-none' : 
         'opacity-0 sm:scale-90 sm:translate-x-[-30%] z-0 pointer-events-none'
@@ -172,7 +172,7 @@ export default function CinematicTour({ isOpen, onClose }: { isOpen: boolean; on
       </div>
 
       {/* ACT 4: The Live Feed / Boardroom */}
-      <div className={`absolute inset-0 flex flex-col sm:block items-center justify-start sm:justify-center pt-20 sm:pt-0 transition-all duration-1000 ${
+      <div className={`absolute inset-0 flex flex-col sm:flex-row items-center justify-start sm:justify-center pt-20 sm:pt-0 transition-all duration-1000 ${
         step === 4 ? 'opacity-100 z-40 scale-100' : 
         step > 4 ? 'opacity-0 scale-110 z-0 pointer-events-none' : 
         'opacity-0 scale-90 z-0 pointer-events-none'
