@@ -60,7 +60,8 @@ export default function CinematicTour({ isOpen, onClose }: { isOpen: boolean; on
       </div>
 
       {/* ACT 2: The Specimen Scan (dashboard/report) */}
-      <div className={`absolute inset-0 flex items-center justify-center transition-all duration-1000 ${step === 2 ? 'opacity-100 z-20 scale-100' : step > 2 ? 'opacity-30 scale-90 translate-x-[-20%] sm:translate-x-[-30%] z-0' : 'opacity-0 scale-110 z-0 pointer-events-none'}`}>
+      {/* BUG FIX: Added step > 3 opacity-0 to prevent overlap with Act 4 */}
+      <div className={`absolute inset-0 flex items-center justify-center transition-all duration-1000 ${step === 2 ? 'opacity-100 z-20 scale-100' : step === 3 ? 'opacity-30 scale-90 translate-x-[-20%] sm:translate-x-[-30%] z-0' : step > 3 ? 'opacity-0 scale-90 translate-x-[-20%] sm:translate-x-[-30%] z-0 pointer-events-none' : 'opacity-0 scale-110 z-0 pointer-events-none'}`}>
         
         {/* Module Label */}
         <div className="absolute top-20 sm:top-24 left-6 sm:left-12 z-30 max-w-sm sm:max-w-md">
@@ -211,7 +212,7 @@ export default function CinematicTour({ isOpen, onClose }: { isOpen: boolean; on
              </div>
              <div className="bg-green-950/60 border border-green-500/30 px-3 py-1.5 rounded text-center backdrop-blur-md">
                <div className="text-white text-sm font-bold font-sans">£4,200 Lost</div>
-               <div className="text-green-300 text-[10px] uppercase tracking-wider">Stripe/Shopify API</div>
+               <div className="text-green-300 text-[10px] uppercase tracking-wider">Stripe/Shopify/Custom APIs</div>
              </div>
           </div>
 
