@@ -60,19 +60,23 @@ export default function CinematicTour({ isOpen, onClose }: { isOpen: boolean; on
       </div>
 
       {/* ACT 2: The Specimen Scan (dashboard/report) */}
-      {/* BUG FIX: Added step > 3 opacity-0 to prevent overlap with Act 4 */}
-      <div className={`absolute inset-0 flex items-center justify-center transition-all duration-1000 ${step === 2 ? 'opacity-100 z-20 scale-100' : step === 3 ? 'opacity-30 scale-90 translate-x-[-20%] sm:translate-x-[-30%] z-0' : step > 3 ? 'opacity-0 scale-90 translate-x-[-20%] sm:translate-x-[-30%] z-0 pointer-events-none' : 'opacity-0 scale-110 z-0 pointer-events-none'}`}>
+      <div className={`absolute inset-0 flex flex-col sm:block items-center justify-start sm:justify-center pt-20 sm:pt-0 transition-all duration-1000 ${
+        step === 2 ? 'opacity-100 z-20' : 
+        step === 3 ? 'opacity-0 sm:opacity-30 sm:scale-90 sm:translate-x-[-30%] z-0 pointer-events-none' : 
+        'opacity-0 sm:scale-90 sm:translate-x-[-30%] z-0 pointer-events-none'
+      }`}>
         
-        {/* Module Label */}
-        <div className="absolute top-20 sm:top-24 left-6 sm:left-12 z-30 max-w-sm sm:max-w-md">
+        {/* Module Label - Pushed to top on mobile, absolute on desktop */}
+        <div className="w-full px-6 sm:px-0 sm:absolute sm:top-24 sm:left-12 z-30 max-w-full sm:max-w-md shrink-0">
           <div className="text-[11px] sm:text-xs text-cyan-400 font-bold uppercase tracking-widest mb-1.5">Phase 01: Simulation</div>
-          <div className="text-2xl sm:text-3xl font-black text-white mb-2.5">/dashboard/report</div>
+          <div className="text-xl sm:text-3xl font-black text-white mb-2.5">/dashboard/report</div>
           <p className="text-xs sm:text-sm text-zinc-300 leading-relaxed font-light">
             We scan the prospect's infrastructure inside a synthetic sandbox. Anomalies like DOM fragility and Thread Locks are isolated and rendered as threat vectors.
           </p>
         </div>
 
-        <div className="relative w-[340px] h-[340px] sm:w-[480px] sm:h-[480px] [transform:scale(0.85)_rotateX(60deg)_rotateZ(45deg)] sm:[transform:scale(1.05)_rotateX(60deg)_rotateZ(45deg)] [transform-style:preserve-3d] mt-12 sm:mt-0">
+        {/* 3D Grid - Stacked below text on mobile, centered on desktop */}
+        <div className="relative w-[340px] h-[340px] sm:w-[480px] sm:h-[480px] [transform:scale(0.85)_rotateX(60deg)_rotateZ(45deg)] sm:[transform:scale(1.05)_rotateX(60deg)_rotateZ(45deg)] [transform-style:preserve-3d] mt-8 sm:mt-0 shrink-0">
            <div className="absolute inset-0 border-2 border-cyan-500/50 shadow-[0_0_50px_rgba(6,182,212,0.2)] bg-cyan-950/40 backdrop-blur-sm" />
            <div className="absolute inset-0 bg-[linear-gradient(to_right,#0891b244_2px,transparent_2px),linear-gradient(to_bottom,#0891b244_2px,transparent_2px)] bg-[size:24px_24px]" />
            <div className="absolute top-0 left-0 w-full h-[2px] bg-cyan-400 shadow-[0_0_20px_#22d3ee] animate-[hologramScan_3s_linear_infinite]" />
@@ -130,8 +134,8 @@ export default function CinematicTour({ isOpen, onClose }: { isOpen: boolean; on
       </div>
 
       {/* ACT 3: Unpacking the Genome */}
-      <div className={`absolute inset-0 flex items-center justify-end pr-6 sm:pr-24 transition-all duration-1000 ${step === 3 ? 'opacity-100 z-30 translate-x-0' : 'opacity-0 translate-x-12 z-0 pointer-events-none'}`}>
-         <div className="w-full max-w-[280px] sm:max-w-md space-y-6">
+      <div className={`absolute inset-0 flex items-center justify-center sm:justify-end px-6 sm:pr-24 transition-all duration-1000 ${step === 3 ? 'opacity-100 z-30 translate-x-0' : 'opacity-0 translate-x-12 z-0 pointer-events-none'}`}>
+         <div className="w-full max-w-[320px] sm:max-w-md space-y-6">
             <h2 className="text-xs sm:text-sm text-cyan-400 uppercase tracking-[0.2em] flex items-center gap-2 mb-6 font-bold">
               <Activity size={16} /> Synthetic DNA Extracted
             </h2>
@@ -168,19 +172,23 @@ export default function CinematicTour({ isOpen, onClose }: { isOpen: boolean; on
       </div>
 
       {/* ACT 4: The Live Feed / Boardroom */}
-      <div className={`absolute inset-0 flex flex-col items-center justify-center transition-all duration-1000 ${step === 4 ? 'opacity-100 z-40 scale-100' : step > 4 ? 'opacity-0 scale-110 z-0' : 'opacity-0 scale-90 z-0 pointer-events-none'}`}>
+      <div className={`absolute inset-0 flex flex-col sm:block items-center justify-start sm:justify-center pt-20 sm:pt-0 transition-all duration-1000 ${
+        step === 4 ? 'opacity-100 z-40 scale-100' : 
+        step > 4 ? 'opacity-0 scale-110 z-0 pointer-events-none' : 
+        'opacity-0 scale-90 z-0 pointer-events-none'
+      }`}>
         
         {/* Module Label */}
-        <div className="absolute top-20 sm:top-24 left-6 sm:left-12 z-30 max-w-sm">
+        <div className="w-full px-6 sm:px-0 sm:absolute sm:top-24 sm:left-12 z-30 max-w-full sm:max-w-md shrink-0">
           <div className="text-[11px] sm:text-xs text-purple-400 font-bold uppercase tracking-widest mb-1.5">Phase 02: Ground Truth</div>
-          <div className="text-2xl sm:text-3xl font-black text-white mb-2.5">/dashboard/boardroom</div>
+          <div className="text-xl sm:text-3xl font-black text-white mb-2.5">/dashboard/boardroom</div>
           <p className="text-xs sm:text-sm text-zinc-300 leading-relaxed font-light">
             The simulation ends. We release the telemetry beacon into the wild, capturing real physical frustration and linking it directly to lost cart revenue.
           </p>
         </div>
 
         {/* 3D Data Pipeline Hologram */}
-        <div className="relative w-full max-w-4xl px-4 flex flex-col sm:flex-row items-center justify-center gap-8 sm:gap-12 mt-20 sm:mt-0 [perspective:1000px]">
+        <div className="relative w-full max-w-4xl px-4 flex flex-col sm:flex-row items-center justify-center gap-6 sm:gap-12 mt-12 sm:mt-0 [perspective:1000px] shrink-0">
           
           {/* Node 1: Client UI */}
           <div className="flex flex-col items-center relative z-10 [transform:rotateY(15deg)]">
