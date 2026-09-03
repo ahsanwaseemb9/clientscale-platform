@@ -5,6 +5,7 @@ import { useState, useEffect } from 'react';
 
 export default function BoardroomDashboard() {
   const [showMath, setShowMath] = useState(false);
+  const [showDetailedExplanation, setShowDetailedExplanation] = useState(false);
   const [briefing, setBriefing] = useState('Fetching live database metrics and generating briefing...');
   const [isLoading, setIsLoading] = useState(true);
   
@@ -103,12 +104,49 @@ export default function BoardroomDashboard() {
           </p>
         </header>
 
-        {/* Step 4.3: The Executive Briefing UI */}
-        <section className="bg-gray-900 border border-gray-800 p-8 rounded-xl shadow-2xl">
-          <h2 className="text-sm font-semibold text-blue-400 uppercase tracking-wider mb-4">Structural Health Summary</h2>
-          <div className={`text-lg leading-relaxed text-gray-300 text-justify ${isLoading ? 'animate-pulse' : ''}`}>
-            {briefing}
+        {/* Step 4.3: The Executive Briefing UI with Toggleable Detailed Explanation */}
+        <section className="bg-gray-900 border border-gray-800 p-8 rounded-xl shadow-2xl space-y-6">
+          <div>
+            <h2 className="text-sm font-semibold text-blue-400 uppercase tracking-wider mb-4">Structural Health Summary</h2>
+            <div className={`text-lg leading-relaxed text-gray-300 text-justify ${isLoading ? 'animate-pulse' : ''}`}>
+              {briefing}
+            </div>
           </div>
+
+          {!isLoading && (
+            <div className="border-t border-gray-800 pt-4">
+              <button 
+                onClick={() => setShowDetailedExplanation(!showDetailedExplanation)}
+                className="text-sm text-blue-400 hover:text-blue-300 transition-colors underline decoration-blue-500/50 underline-offset-4 font-mono flex items-center gap-2 cursor-pointer"
+              >
+                {showDetailedExplanation ? "Hide Detailed Explanation" : "Show Detailed Explanation"}
+              </button>
+
+              {showDetailedExplanation && (
+                <div className="mt-6 p-6 bg-black/60 rounded-xl border border-blue-950 space-y-4 text-sm text-gray-300 animate-in fade-in slide-in-from-top-2 font-light leading-relaxed">
+                  <div className="text-xs font-mono font-bold text-blue-400 uppercase tracking-widest mb-2">
+                    // Strategic Breakdown & Sales Mechanics
+                  </div>
+                  
+                  <p>
+                    <strong className="text-white font-medium">The Psychology of the "Rage-Tap":</strong> When users tap a button repeatedly, they aren't just browsing—they have high purchase intent colliding with structural failure. Your marketing team did their job, but the infrastructure dropped the ball at the one-yard line.
+                  </p>
+                  
+                  <p>
+                    <strong className="text-white font-medium">The Invisible Wall (Latency):</strong> A latency bottleneck on the backend API creates a "Ghost Tap" window where the UI freezes, forcing users to bounce to a competitor. Naming the exact database endpoint removes all deniability from their engineering team.
+                  </p>
+                  
+                  <p>
+                    <strong className="text-white font-medium">The Daily Bleed:</strong> Executives rarely care about generic software bugs, but they care deeply about losing revenue every 24 hours. This translates an abstract IT metric into a quantifiable daily hemorrhage for the CFO.
+                  </p>
+                  
+                  <p>
+                    <strong className="text-white font-medium">The Strategic Threat:</strong> Projecting the loss over 90 days frames the issue not as a minor glitch, but as a six-figure quarterly revenue threat, creating the absolute urgency required to close the deal.
+                  </p>
+                </div>
+              )}
+            </div>
+          )}
         </section>
 
         {/* Step 4.2: The "Show Your Work" Financials */}
