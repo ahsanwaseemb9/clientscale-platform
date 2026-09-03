@@ -2,6 +2,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import LiveBleedTicker from '../../components/LiveBleedTicker';
 
 export default function BoardroomDashboard() {
   const [showMath, setShowMath] = useState(false);
@@ -155,22 +156,27 @@ export default function BoardroomDashboard() {
 
         {/* Step 4.2: The "Show Your Work" Financials */}
         {financialData && (
-          <section className="bg-gray-900 border border-red-900/30 p-8 rounded-xl relative overflow-hidden shadow-2xl">
+          <section className="bg-gray-900 border border-red-900/30 p-8 rounded-xl relative overflow-hidden shadow-2xl flex flex-col justify-center">
             <div className="absolute top-0 left-0 w-2 h-full bg-red-500"></div>
+            
             <h2 className="text-sm font-semibold text-red-400 uppercase tracking-wider mb-2">Projected Quarterly Leakage</h2>
-            <div className="text-6xl font-black text-white mb-6">
+            
+            {/* The Live Bleed Ticker Component is Injected Here */}
+            <LiveBleedTicker dailyLeakage={financialData.dailyLeakage} />
+            
+            <div className="text-6xl font-black text-white mb-6 mt-6">
               £{financialData.projectedQuarterlyLeakage.toLocaleString()}
             </div>
             
             <button 
               onClick={() => setShowMath(!showMath)}
-              className="text-sm text-gray-400 hover:text-white transition-colors underline decoration-gray-600 underline-offset-4"
+              className="text-sm text-gray-400 hover:text-white transition-colors underline decoration-gray-600 underline-offset-4 w-fit"
             >
               {showMath ? "Hide Financial Formula" : "Show Defensible Math"}
             </button>
 
             {showMath && (
-              <div className="mt-6 p-4 bg-black/50 rounded-lg border border-gray-800 text-sm font-mono text-gray-300 animate-in fade-in slide-in-from-top-2">
+              <div className="mt-6 p-4 bg-black/50 rounded-lg border border-gray-800 text-sm font-mono text-gray-300 animate-in fade-in slide-in-from-top-2 w-fit">
                 <p className="text-gray-500 mb-2">// Daily Leakage Calculation (The Moat)</p>
                 <p>Sessions × Conversion Rate × AOV = £{financialData.dailyLeakage.toLocaleString()} / day</p>
                 <div className="h-px bg-gray-800 my-3"></div>
