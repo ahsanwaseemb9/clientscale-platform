@@ -31,7 +31,8 @@ export async function POST(request: Request) {
       // £135,000 lost per quarter
       const syntheticQuarterlyLeakage = syntheticDailyLeakage * 90; 
 
-      const targetId = url || 'synthetic-url-scan';
+      // FIX: Use a valid UUID format for the demo record to satisfy Postgres strict typing
+      const targetId = '00000000-0000-0000-0000-000000000000';
 
       const { error: syntheticError } = await supabase
         .from('tenant_financials')
