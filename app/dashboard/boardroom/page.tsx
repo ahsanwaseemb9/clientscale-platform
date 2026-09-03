@@ -123,25 +123,29 @@ export default function BoardroomDashboard() {
               </button>
 
               {showDetailedExplanation && (
-                <div className="mt-6 p-6 bg-black/60 rounded-xl border border-blue-950 space-y-4 text-sm text-gray-300 animate-in fade-in slide-in-from-top-2 font-light leading-relaxed">
-                  <div className="text-xs font-mono font-bold text-blue-400 uppercase tracking-widest mb-2">
+                <div className="mt-6 p-8 bg-black/70 rounded-xl border border-blue-950 space-y-6 text-base text-gray-300 animate-in fade-in slide-in-from-top-2 font-light leading-relaxed">
+                  <div className="text-xs font-mono font-bold text-blue-400 uppercase tracking-widest mb-4">
                     // Strategic Breakdown & Sales Mechanics
                   </div>
                   
                   <p>
-                    <strong className="text-white font-medium">The Psychology of the "Rage-Tap":</strong> When users tap a button repeatedly, they aren't just browsing—they have high purchase intent colliding with structural failure. Your marketing team did their job, but the infrastructure dropped the ball at the one-yard line.
+                    <strong className="text-white font-medium">The Psychology of the "Rage-Tap":</strong> A "rage-tap" is the ultimate signal of high purchase intent colliding with structural failure. When a user taps <code className="bg-black px-1.5 py-0.5 rounded text-blue-300 border border-blue-900/50">button#checkout-mobile</code> 42 times, they aren't just browsing—they are actively trying to give the company their money. This metric proves that their marketing team did their job perfectly, but the infrastructure dropped the ball at the one-yard line. It is the digital equivalent of a customer slamming their credit card on a locked cash register.
                   </p>
                   
                   <p>
-                    <strong className="text-white font-medium">The Invisible Wall (Latency):</strong> A latency bottleneck on the backend API creates a "Ghost Tap" window where the UI freezes, forcing users to bounce to a competitor. Naming the exact database endpoint removes all deniability from their engineering team.
+                    <strong className="text-white font-medium">The Invisible Wall (1205ms Latency):</strong> By explicitly naming <code className="bg-black px-1.5 py-0.5 rounded text-blue-300 border border-blue-900/50">/api/cart/sync</code> and the exact 1205ms delay, the AI proves this isn't a generic marketing audit. In mobile e-commerce, a 1.2-second delay is an eternity that shatters user trust. It creates a "Ghost Tap" window where the UI freezes, the user assumes the site is broken, and they bounce to a competitor. Naming the exact database endpoint removes all deniability from their engineering team—you aren't guessing; you have the receipts.
                   </p>
                   
                   <p>
-                    <strong className="text-white font-medium">The Daily Bleed:</strong> Executives rarely care about generic software bugs, but they care deeply about losing revenue every 24 hours. This translates an abstract IT metric into a quantifiable daily hemorrhage for the CFO.
+                    <strong className="text-white font-medium">The Daily Bleed (£1,500/day):</strong> This bridges the gap between the IT department and the C-suite. Executives rarely care about "optimizing API routes," but they absolutely care about losing £1,500 every 24 hours. This transforms an abstract technical bug into a highly quantifiable daily hemorrhage, moving the issue from the bottom of an engineering backlog to the top of the CFO's priority list.
                   </p>
                   
                   <p>
-                    <strong className="text-white font-medium">The Strategic Threat:</strong> Projecting the loss over 90 days frames the issue not as a minor glitch, but as a six-figure quarterly revenue threat, creating the absolute urgency required to close the deal.
+                    <strong className="text-white font-medium">The Strategic Threat (£135,000/Quarter):</strong> This is the anchor that closes the deal. £1,500 is a bad day, but £135,000 is a missed quarterly revenue target. By projecting the loss over 90 days, the AI frames the issue not as a minor glitch, but as a systemic, six-figure threat to the business that requires immediate intervention.
+                  </p>
+
+                  <p>
+                    <strong className="text-white font-medium">The Assumptive Close:</strong> The final sentence—"Immediate technical resolution is essential"—strips away the traditional sales pitch. It positions you not as a software vendor asking for a meeting, but as a triage medic holding the tourniquet. The only logical next step for the prospect is to let you install the 48-hour telemetry pixel to stop the bleeding.
                   </p>
                 </div>
               )}
