@@ -71,7 +71,7 @@ export default function IncidentTimeline() {
       <div className="mb-8">
         <div className="text-xs font-mono font-bold text-blue-400 uppercase tracking-widest mb-4 flex items-center gap-2">
           <span className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></span>
-          // Incident Response Log: Active Vulnerability
+          Incident Response Log: Active Vulnerability
         </div>
         <div className="flex gap-2">
           {phases.map((phase, idx) => (
