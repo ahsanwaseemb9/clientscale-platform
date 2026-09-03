@@ -76,6 +76,7 @@ export default function AuditReportPage() {
   const router = useRouter();
   const [auditData, setAuditData] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isDeploying, setIsDeploying] = useState(false);
   const [scanTimestamp, setScanTimestamp] = useState<string>('');
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
@@ -99,7 +100,36 @@ export default function AuditReportPage() {
   }, []);
 
   const handleDeployPixel = async () => {
-    router.push('/dashboard/boardroom');
+    if (!auditData?.target || isDeploying) return;
+    setIsDeploying(true);
+
+    try {
+      // 1. Fire the synthetic calculation to the database
+      const response = await fetch('/api/sync-finances', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          url: auditData.target,
+          businessName: (() => {
+            try {
+              const name = new URL(auditData.target).hostname.replace(/^www\./, '').split('.')[0];
+              return name ? name.charAt(0).toUpperCase() + name.slice(1) : 'Target Prospect';
+            } catch { return 'Target Prospect'; }
+          })(),
+          isSynthetic: true
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to generate synthetic baseline');
+      }
+
+      // 2. Instantly redirect to the Boardroom UI to see the damage
+      router.push('/dashboard/boardroom');
+    } catch (error) {
+      console.error('[Synthetic Baseline Error]:', error);
+      setIsDeploying(false);
+    }
   };
 
   if (isLoading) {
@@ -398,9 +428,10 @@ export default function AuditReportPage() {
                 </div>
                 <button 
                   onClick={handleDeployPixel}
-                  className="w-full sm:w-auto bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white px-4 py-3 rounded-xl font-bold text-[11px] sm:text-xs uppercase tracking-widest transition-all shadow-lg flex items-center justify-center gap-2 shrink-0 cursor-pointer"
+                  disabled={isDeploying}
+                  className="w-full sm:w-auto bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 disabled:opacity-50 text-white px-4 py-3 rounded-xl font-bold text-[11px] sm:text-xs uppercase tracking-widest transition-all shadow-lg flex items-center justify-center gap-2 shrink-0 cursor-pointer"
                 >
-                  <Lock size={13} /> Unlock Edge Computing
+                  <Lock size={13} /> {isDeploying ? 'Deploying...' : 'Unlock Edge Computing'}
                 </button>
              </div>
           </section>
@@ -412,8 +443,12 @@ export default function AuditReportPage() {
                 <p className="text-xs sm:text-sm text-zinc-400 mb-6 max-w-sm mx-auto leading-relaxed">
                     Deploy the ClientScale tracker to capture actual user rage-taps and API failures from your live traffic.
                 </p>
-                <button onClick={handleDeployPixel} className="w-full bg-white hover:bg-gray-200 text-black py-3.5 sm:py-4 rounded-xl font-bold text-xs uppercase tracking-widest transition-all shadow-lg flex items-center justify-center gap-2 cursor-pointer">
-                  Deploy Telemetry Pixel (48 Hrs)
+                <button 
+                  onClick={handleDeployPixel} 
+                  disabled={isDeploying}
+                  className="w-full bg-white hover:bg-gray-200 text-black py-3.5 sm:py-4 rounded-xl font-bold text-xs uppercase tracking-widest transition-all shadow-lg flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+                >
+                  {isDeploying ? 'Initializing Tracker...' : 'Deploy Telemetry Pixel (48 Hrs)'}
                 </button>
             </div>
           </section>

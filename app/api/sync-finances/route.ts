@@ -15,18 +15,58 @@ export async function POST(request: Request) {
 
     const supabase = createClient(supabaseUrl, supabaseKey);
 
-    // 1. Get tenant context or domain from the request payload
+    // 1. Parse the request payload
     const body = await request.json().catch(() => ({}));
-    const { tenantId, domain } = body;
+    const { tenantId, domain, url, businessName, isSynthetic } = body;
     
-    if (!tenantId && !domain) {
-       return NextResponse.json({ success: false, error: 'tenantId or domain is required to sync finances' }, { status: 400 });
+    // --- PATH 2: SYNTHETIC BASELINE HOOK (PRE-SALES) ---
+    // If a URL is passed directly, we generate a synthetic financial baseline to hook the prospect.
+    if (url || isSynthetic) {
+      const syntheticDailySessions = 200;
+      const estimatedAOV = 50;
+      
+      // £1,500/day lost to 15% friction drop-off
+      const syntheticDailyLeakage = syntheticDailySessions * 0.15 * estimatedAOV; 
+      
+      // £135,000 lost per quarter
+      const syntheticQuarterlyLeakage = syntheticDailyLeakage * 90; 
+
+      const targetId = url || 'synthetic-url-scan';
+
+      const { error: syntheticError } = await supabase
+        .from('tenant_financials')
+        .upsert({
+          tenant_id: targetId,
+          business_name: businessName || 'New Prospect Target',
+          defensible_daily_leakage: syntheticDailyLeakage,
+          projected_quarterly_leakage: syntheticQuarterlyLeakage,
+          updated_at: new Date().toISOString(),
+          // Adding fake friction data so the boardroom UI populates instantly
+          friction_element_id: 'button#checkout-mobile',
+          rage_clicks: 42,
+          api_endpoint: '/api/cart/sync',
+          latency_ms: 1205
+        }, { onConflict: 'tenant_id' });
+
+      if (syntheticError) {
+        console.error('[Synthetic Upsert Error]:', syntheticError);
+        throw syntheticError;
+      }
+
+      return NextResponse.json({ 
+        success: true, 
+        message: 'Synthetic baseline synchronized.',
+        isSynthetic: true 
+      });
     }
 
-    // 2. Fetch Tenant Configuration (Switchboard with flexible ID or domain resolution)
-    let query = supabase
-      .from('tenants')
-      .select('id, active_provider, integration_config');
+    // --- ORIGINAL PATH: REAL TELEMETRY SYNC (STRIPE/SHOPIFY) ---
+    if (!tenantId && !domain) {
+       return NextResponse.json({ success: false, error: 'tenantId, domain, or url is required' }, { status: 400 });
+    }
+
+    // Fetch Tenant Configuration
+    let query = supabase.from('tenants').select('id, active_provider, integration_config');
 
     if (tenantId && tenantId !== '00000000-0000-0000-0000-000000000000') {
       query = query.eq('id', tenantId);
@@ -45,10 +85,9 @@ export async function POST(request: Request) {
     const resolvedTenantId = tenant.id;
     let financialMetrics;
 
-    // 3. Route to the correct platform adapter dynamically
+    // Route to the correct platform adapter dynamically
     switch (tenant.active_provider) {
       case 'stripe':
-        // Passes the tenant's specific JSON configuration to the adapter
         financialMetrics = await fetchStripeFinancials(tenant.integration_config);
         break;
       case 'shopify':
@@ -62,7 +101,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ success: false, error: 'Failed to compute financial metrics' }, { status: 500 });
     }
 
-    // 4. Upsert normalized data to the unified database schema using resolvedTenantId
+    // Upsert normalized real data to the unified database schema
     const { error: dbError } = await supabase
       .from('tenant_financials')
       .upsert({
@@ -75,10 +114,7 @@ export async function POST(request: Request) {
         updated_at: new Date().toISOString()
       }, { onConflict: 'tenant_id' });
 
-    if (dbError) {
-      console.error('[Supabase Upsert Error]:', dbError);
-      return NextResponse.json({ success: false, error: `Supabase DB Error: ${dbError.message}` }, { status: 500 });
-    }
+    if (dbError) throw dbError;
 
     return NextResponse.json({
       success: true,

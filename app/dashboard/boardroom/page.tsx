@@ -8,11 +8,19 @@ export default function BoardroomDashboard() {
   const [briefing, setBriefing] = useState('Fetching live database metrics and generating briefing...');
   const [isLoading, setIsLoading] = useState(true);
   
-  // Start with empty state instead of hardcoded numbers
+  // Financial State
   const [financialData, setFinancialData] = useState<{
     businessName: string;
     projectedQuarterlyLeakage: number;
     dailyLeakage: number;
+  } | null>(null);
+
+  // NEW: Dynamic Telemetry State
+  const [frictionData, setFrictionData] = useState<{
+    elementId: string;
+    rageClicks: number;
+    apiEndpoint: string;
+    latencyMs: number;
   } | null>(null);
 
   useEffect(() => {
@@ -30,25 +38,39 @@ export default function BoardroomDashboard() {
 
         const liveData = dbResult.data;
 
-        // THE FIX: Provide a fallback if business_name doesn't exist in the DB
+        // Fallback if business_name doesn't exist in the DB
         const displayName = liveData.business_name || `Tenant: ${liveData.tenant_id.substring(0, 8)}...`;
 
-        // Set the UI to show the real database numbers
+        // Wire live financial numbers
         setFinancialData({
           businessName: displayName,
-          projectedQuarterlyLeakage: liveData.projected_quarterly_leakage,
-          dailyLeakage: liveData.defensible_daily_leakage,
+          projectedQuarterlyLeakage: liveData.projected_quarterly_leakage || 0,
+          dailyLeakage: liveData.defensible_daily_leakage || 0,
         });
 
-        // 2. Feed the LIVE database numbers directly into the OpenAI Agent
+        // Wire live friction data (with safe fallbacks if DB fields are empty)
+        const elementId = liveData.friction_element_id || 'button#submit-order';
+        const rageClicks = liveData.rage_clicks || 0;
+        const apiEndpoint = liveData.api_endpoint || '/api/checkout/process';
+        const latencyMs = liveData.latency_ms || 0;
+
+        setFrictionData({
+          elementId,
+          rageClicks,
+          apiEndpoint,
+          latencyMs
+        });
+
+        // 2. Feed the LIVE database numbers AND LIVE friction data directly into the OpenAI Agent
         const aiResponse = await fetch('/api/ai/executive-briefing', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            businessName: displayName, // Using the fallback name here too
+            businessName: displayName,
             projectedQuarterlyLeakage: liveData.projected_quarterly_leakage,
             dailyLeakage: liveData.defensible_daily_leakage,
-            primaryFriction: "violent rage-tapping on the mobile 'Submit Order' button"
+            // Replaced hardcoded string with dynamic friction variables
+            primaryFriction: `${rageClicks} rage-taps on the '${elementId}' element, and ${latencyMs}ms latency bottlenecks on the ${apiEndpoint} endpoint`
           })
         });
         
@@ -95,7 +117,7 @@ export default function BoardroomDashboard() {
             <div className="absolute top-0 left-0 w-2 h-full bg-red-500"></div>
             <h2 className="text-sm font-semibold text-red-400 uppercase tracking-wider mb-2">Projected Quarterly Leakage</h2>
             <div className="text-6xl font-black text-white mb-6">
-              £{financialData.projectedQuarterlyLeakage}
+              £{financialData.projectedQuarterlyLeakage.toLocaleString()}
             </div>
             
             <button 
@@ -108,10 +130,10 @@ export default function BoardroomDashboard() {
             {showMath && (
               <div className="mt-6 p-4 bg-black/50 rounded-lg border border-gray-800 text-sm font-mono text-gray-300 animate-in fade-in slide-in-from-top-2">
                 <p className="text-gray-500 mb-2">// Daily Leakage Calculation (The Moat)</p>
-                <p>Sessions × Conversion Rate × AOV = £{financialData.dailyLeakage} / day</p>
+                <p>Sessions × Conversion Rate × AOV = £{financialData.dailyLeakage.toLocaleString()} / day</p>
                 <div className="h-px bg-gray-800 my-3"></div>
                 <p className="text-gray-500 mb-2">// 90-Day Extrapolation</p>
-                <p>£{financialData.dailyLeakage} × 90 Days = <span className="text-red-400 font-bold">£{financialData.projectedQuarterlyLeakage}</span></p>
+                <p>£{financialData.dailyLeakage.toLocaleString()} × 90 Days = <span className="text-red-400 font-bold">£{financialData.projectedQuarterlyLeakage.toLocaleString()}</span></p>
               </div>
             )}
           </section>
@@ -121,12 +143,31 @@ export default function BoardroomDashboard() {
         <section className="space-y-4">
           <h2 className="text-lg font-semibold text-gray-200 mb-4">Identified Friction Points</h2>
           
-          <div className="bg-gray-900 border border-gray-800 p-6 rounded-xl">
-            <h3 className="text-sm font-semibold text-orange-400 mb-2">Visual Friction (UI/UX)</h3>
-            <p className="text-gray-300 text-sm">
-              Your users violently tapped the <code className="bg-black px-1.5 py-0.5 rounded text-red-400 border border-red-900/50">button#submit-order</code> element 14 times yesterday across mobile devices.
-            </p>
-          </div>
+          {frictionData ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              
+              {/* Visual Friction Card (Dynamically Rendered) */}
+              <div className="bg-gray-900 border border-gray-800 p-6 rounded-xl shadow-lg hover:border-orange-500/30 transition-colors">
+                <h3 className="text-sm font-semibold text-orange-400 mb-3">Visual Friction (UI/UX)</h3>
+                <p className="text-gray-300 text-sm leading-relaxed">
+                  Your users violently tapped the <code className="bg-black px-1.5 py-0.5 rounded text-red-400 border border-red-900/50">{frictionData.elementId}</code> element <strong className="text-white text-base">{frictionData.rageClicks}</strong> times yesterday across mobile devices.
+                </p>
+              </div>
+
+              {/* Infrastructure Friction Card (Dynamically Rendered) */}
+              <div className="bg-gray-900 border border-gray-800 p-6 rounded-xl shadow-lg hover:border-purple-500/30 transition-colors">
+                <h3 className="text-sm font-semibold text-purple-400 mb-3">Infrastructure Friction (API)</h3>
+                <p className="text-gray-300 text-sm leading-relaxed">
+                  Critical latency detected. The <code className="bg-black px-1.5 py-0.5 rounded text-purple-400 border border-purple-900/50">{frictionData.apiEndpoint}</code> endpoint is hanging at <strong className="text-white text-base">{frictionData.latencyMs}ms</strong>, causing cart abandonment.
+                </p>
+              </div>
+
+            </div>
+          ) : (
+            <div className="bg-gray-900 border border-gray-800 p-6 rounded-xl text-sm text-gray-500 animate-pulse">
+              Awaiting telemetry synchronization...
+            </div>
+          )}
         </section>
 
       </div>
