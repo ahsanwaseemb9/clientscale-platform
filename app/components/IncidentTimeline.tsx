@@ -7,120 +7,148 @@ export default function IncidentTimeline() {
 
   const phases = [
     {
-      label: "PHASE 1 : INTENT COLLISION",
-      title: 'The "Rage-Tap" Anomaly',
-      color: "bg-orange-500",
-      titleColor: "text-white",
+      label: "NODE 01 // INTENT_COLLISION",
+      title: "THE 'RAGE-TAP' ANOMALY",
+      nodeColor: "bg-yellow-500",
+      textColor: "text-yellow-400",
+      borderColor: "border-yellow-900/50",
       content: (
         <>
-          A "rage-tap" is the ultimate signal of high purchase intent colliding with structural failure. When a user taps <code className="bg-black px-1.5 py-0.5 rounded text-orange-400 border border-orange-900/50">button#checkout-mobile</code> 42 times, they are actively trying to give you money. The marketing team succeeded; the infrastructure dropped the ball at the one-yard line.
+          A "RAGE-TAP" IS THE ULTIMATE SIGNAL OF HIGH PURCHASE INTENT COLLIDING WITH STRUCTURAL FAILURE. WHEN A USER TAPS <code className="bg-black/50 px-1 py-0.5 border border-yellow-900/50 text-yellow-300">BUTTON#CHECKOUT-MOBILE</code> 42 TIMES, THEY ARE ACTIVELY TRYING TO COMPLETE A TRANSACTION. THE FRONT-END ACQUISITION SUCCEEDED; THE INFRASTRUCTURE DROPPED THE SIGNAL AT THE TERMINAL NODE.
         </>
       )
     },
     {
-      label: "PHASE 2 : INFRASTRUCTURE FREEZE",
-      title: "The Invisible Wall",
-      color: "bg-purple-500",
-      titleColor: "text-white",
+      label: "NODE 02 // INFRASTRUCTURE_FREEZE",
+      title: "THE INVISIBLE WALL",
+      nodeColor: "bg-purple-500",
+      textColor: "text-purple-400",
+      borderColor: "border-purple-900/50",
       content: (
         <>
-          Tracing the exact <code className="bg-black px-1.5 py-0.5 rounded text-purple-400 border border-purple-900/50">/api/cart/sync</code> bottleneck at 1205ms removes engineering deniability. In mobile e-commerce, a 1.2-second delay shatters user trust, creating a "Ghost Tap" window where the UI freezes and the user bounces to a competitor.
+          TRACING THE EXACT <code className="bg-black/50 px-1 py-0.5 border border-purple-900/50 text-purple-300">/API/CART/SYNC</code> BOTTLENECK AT 1205MS REMOVES ENGINEERING DENIABILITY. IN MOBILE ARCHITECTURE, A 1.2-SECOND DELAY SHATTERS USER TRUST, CREATING A "GHOST TAP" WINDOW WHERE THE UI FREEZES AND THE USER ABORTS THE SESSION TO A COMPETITOR.
         </>
       )
     },
     {
-      label: "PHASE 3 : ACTIVE HEMORRHAGE",
-      title: "Quantifiable Daily Bleed (£1,500/day)",
-      color: "bg-red-500",
-      titleColor: "text-red-400",
+      label: "NODE 03 // ACTIVE_HEMORRHAGE",
+      title: "QUANTIFIABLE DAILY BLEED",
+      nodeColor: "bg-red-500",
+      textColor: "text-red-500",
+      borderColor: "border-red-900/50",
       pulse: true,
       content: (
         <>
-          This bridges the gap between IT and the C-suite. Transforming an abstract technical bug into a highly quantifiable £1,500 daily loss moves the issue from the bottom of an engineering backlog directly to the top of the CFO's priority list.
+          THIS BRIDGES THE GAP BETWEEN TELEMETRY DATA AND THE C-SUITE. TRANSFORMING AN ABSTRACT TECHNICAL BUG INTO A HIGHLY QUANTIFIABLE £1,500 DAILY LOSS ESCALATES THE VULNERABILITY FROM THE BOTTOM OF AN ENGINEERING BACKLOG DIRECTLY TO THE TOP OF THE CFO'S PRIORITY LIST.
         </>
       )
     },
     {
-      label: "PHASE 4 : SYSTEMIC THREAT",
-      title: "The Strategic Anchor (£135,000/Quarter)",
-      color: "bg-red-600",
-      titleColor: "text-white",
+      label: "NODE 04 // SYSTEMIC_THREAT",
+      title: "THE STRATEGIC ANCHOR",
+      nodeColor: "bg-red-600",
+      textColor: "text-red-400",
+      borderColor: "border-red-900/80",
+      pulse: true,
       content: (
         <>
-          £1,500 is a bad day, but £135,000 is a missed quarterly revenue target. Projecting the loss over 90 days frames the vulnerability not as a minor glitch, but as a systemic, six-figure threat requiring executive intervention.
+          £1,500 IS A BAD CYCLE, BUT £135,000 IS A MISSED QUARTERLY REVENUE TARGET. PROJECTING THE LOSS OVER 90 DAYS FRAMES THE VULNERABILITY NOT AS A MINOR GLITCH, BUT AS A SYSTEMIC, SIX-FIGURE THREAT REQUIRING IMMEDIATE EXECUTIVE INTERVENTION.
         </>
       )
     },
     {
-      label: "PHASE 5 : TRIAGE PROTOCOL",
-      title: "The Assumptive Close",
-      color: "bg-blue-500",
-      titleColor: "text-blue-400",
+      label: "NODE 05 // TRIAGE_PROTOCOL",
+      title: "THE ASSUMPTIVE CLOSE",
+      nodeColor: "bg-cyan-500",
+      textColor: "text-cyan-400",
+      borderColor: "border-cyan-900/50",
       content: (
         <>
-          "Immediate technical resolution is essential." This positions you as a triage medic holding the tourniquet, not a vendor pushing software. The only logical next step is deploying the 48-hour telemetry pixel to stop the bleeding.
+          "IMMEDIATE TECHNICAL RESOLUTION IS ESSENTIAL." THIS POSITIONS CLIENT SCALE AS A TRIAGE MEDIC HOLDING THE TOURNIQUET, NOT A VENDOR PUSHING SOFTWARE. THE ONLY LOGICAL NEXT STEP IS DEPLOYING THE AUTONOMOUS CODE REMEDIATION PROTOCOL TO SEVER THE BLEED.
         </>
       )
     }
   ];
 
   return (
-    <div className="mt-6 p-8 bg-black/80 rounded-xl border border-blue-950 shadow-2xl relative overflow-hidden">
+    <div className="mt-4 p-4 md:p-6 bg-black/60 border border-cyan-900/40 relative overflow-hidden font-mono text-[9px] md:text-[10px] tracking-widest backdrop-blur-sm shadow-[0_0_15px_rgba(6,182,212,0.05)]">
       
-      {/* Header & Segmented Progress Bar */}
-      <div className="mb-8">
-        <div className="text-xs font-mono font-bold text-blue-400 uppercase tracking-widest mb-4 flex items-center gap-2">
-          <span className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></span>
-          Incident Response Log: Active Vulnerability
+      {/* Corner Accents */}
+      <div className="absolute top-0 left-0 w-3 h-3 border-t border-l border-cyan-500"></div>
+      <div className="absolute bottom-0 right-0 w-3 h-3 border-b border-r border-cyan-500"></div>
+
+      {/* Header & Neural Pathway Visualizer */}
+      <div className="mb-6">
+        <div className="text-cyan-500 uppercase flex items-center gap-3 mb-4 border-b border-cyan-900/50 pb-2">
+          <span className="w-2 h-2 bg-red-500 rounded-full animate-ping"></span>
+          TRACE_LOG: ACTIVE_VULNERABILITY_PATHWAY
         </div>
-        <div className="flex gap-2">
+        
+        {/* Neural Pathway Nodes */}
+        <div className="flex items-center justify-between relative px-2">
+          {/* Connecting Line */}
+          <div className="absolute left-0 top-1/2 -translate-y-1/2 w-full h-px bg-cyan-900/30 z-0"></div>
+          
           {phases.map((phase, idx) => (
-            <div 
-              key={idx} 
-              className={`h-1.5 flex-1 rounded-full transition-all duration-500 ${
-                idx <= currentPhase ? phase.color : 'bg-gray-800'
-              } ${idx === currentPhase && phase.pulse ? 'animate-pulse' : ''}`} 
-            />
+            <div key={idx} className="relative z-10 flex flex-col items-center gap-2">
+              <div 
+                className={`w-3 h-3 border transition-all duration-300 ${
+                  idx === currentPhase 
+                    ? `bg-black ${phase.borderColor} shadow-[0_0_8px_currentColor] ${phase.textColor}` 
+                    : idx < currentPhase 
+                      ? 'bg-cyan-800 border-cyan-600' 
+                      : 'bg-black border-cyan-900/50'
+                } ${idx === currentPhase && phase.pulse ? 'animate-pulse' : ''} ${idx === currentPhase ? 'rotate-45' : ''}`} 
+              />
+              <span className={`text-[8px] absolute top-5 whitespace-nowrap transition-colors duration-300 ${
+                idx === currentPhase ? phase.textColor : 'text-cyan-800'
+              }`}>
+                N_0{idx + 1}
+              </span>
+            </div>
           ))}
         </div>
       </div>
 
-      {/* Dynamic Slide Content (Keys on currentPhase to re-trigger animation) */}
-      <div key={currentPhase} className="min-h-[160px] animate-in fade-in slide-in-from-right-4 duration-500">
-        <div className="text-xs font-mono text-gray-500 mb-2">
+      {/* Dynamic Slide Content */}
+      <div 
+        key={currentPhase} 
+        className={`mt-10 min-h-[140px] p-4 border bg-black/40 ${phases[currentPhase].borderColor} animate-in fade-in slide-in-from-right-4 duration-300`}
+      >
+        <div className="text-cyan-600 mb-2 border-b border-cyan-900/30 pb-1">
           {phases[currentPhase].label}
         </div>
-        <h4 className={`${phases[currentPhase].titleColor} font-semibold text-xl tracking-wide mb-4`}>
+        <h4 className={`${phases[currentPhase].textColor} font-bold text-xs md:text-sm tracking-[0.2em] mb-3 drop-shadow-[0_0_3px_currentColor]`}>
           {phases[currentPhase].title}
         </h4>
-        <p className="text-gray-300 text-base leading-relaxed">
+        <p className="text-cyan-300/70 leading-loose text-justify">
           {phases[currentPhase].content}
         </p>
       </div>
 
-      {/* Tour Navigation Controls */}
-      <div className="mt-8 flex items-center justify-between border-t border-gray-800 pt-6">
+      {/* Terminal Navigation Controls */}
+      <div className="mt-6 flex items-center justify-between border-t border-cyan-900/40 pt-4">
         <button
           onClick={() => setCurrentPhase(prev => Math.max(0, prev - 1))}
           disabled={currentPhase === 0}
-          className="text-sm font-mono text-gray-500 hover:text-gray-300 disabled:opacity-0 transition-colors cursor-pointer"
+          className="text-cyan-700 hover:text-cyan-400 disabled:opacity-0 transition-colors cursor-pointer"
         >
-          &lt; PREVIOUS
+          [ &lt; PREV_NODE ]
         </button>
 
         {currentPhase < phases.length - 1 ? (
           <button
             onClick={() => setCurrentPhase(prev => Math.min(phases.length - 1, prev + 1))}
-            className="px-6 py-2 bg-blue-900/50 hover:bg-blue-800 text-blue-300 border border-blue-700/50 text-sm font-semibold rounded transition-colors cursor-pointer"
+            className="text-cyan-400 hover:text-white transition-colors cursor-pointer bg-cyan-950/30 border border-cyan-800/50 px-4 py-1"
           >
-            NEXT PHASE &gt;
+            [ NEXT_NODE &gt; ]
           </button>
         ) : (
           <button
-            onClick={() => alert("Ready to deploy tracking pixel.")}
-            className="px-6 py-2 bg-red-600 hover:bg-red-500 text-white text-sm font-semibold rounded shadow-[0_0_15px_rgba(220,38,38,0.5)] transition-all cursor-pointer"
+            onClick={() => alert("Ready to deploy autonomous patch.")}
+            className="text-red-400 hover:text-white transition-all cursor-pointer bg-red-950/30 border border-red-800 px-4 py-1 animate-pulse"
           >
-            INITIATE PIXEL DEPLOYMENT
+            [ INITIATE_PATCH_DEPLOYMENT ]
           </button>
         )}
       </div>

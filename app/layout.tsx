@@ -25,7 +25,6 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  // 1. Await the headers promise securely on the server
   const headersList = await headers();
   const tenantDomain = headersList.get("host") || "unknown";
   
@@ -35,12 +34,14 @@ export default async function RootLayout({
   return (
     <html lang="en" className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}>
       <head>
+      </head>
+      <body className="min-h-full flex flex-col">
         {/* Stream 1: Native Custom Pixel with Persistent Session ID (Mobile Optimized) */}
-        <Script id="native-pixel" strategy="beforeInteractive" dangerouslySetInnerHTML={{ __html: `
+        <Script id="native-pixel" dangerouslySetInnerHTML={{ __html: `
           window.ClientScaleConfig = { tenantDomain: '${tenantDomain}' };
 
           (function() {
-            // Retrieve or create a persistent session ID across page navigations
+            /* Retrieve or create a persistent session ID across page navigations */
             let sessionId = localStorage.getItem('client_scale_session');
             if (!sessionId) {
               sessionId = 'sess_' + Math.random().toString(36).substring(2, 9);
@@ -49,20 +50,20 @@ export default async function RootLayout({
 
             let interactionTimestamps = [];
             const RAGE_TAP_THRESHOLD = 3;
-            const RAGE_TAP_TIMEFRAME = 400; // ms
+            const RAGE_TAP_TIMEFRAME = 400; 
             
-            // Upgraded to 'pointerup' for zero-delay mobile and desktop tracking
+            /* Upgraded to pointerup for zero-delay mobile and desktop tracking */
             window.addEventListener('pointerup', function(e) {
               const now = Date.now();
               interactionTimestamps.push(now);
 
-              // Filter out interactions older than our 400ms window
+              /* Filter out interactions older than our 400ms window */
               interactionTimestamps = interactionTimestamps.filter(t => now - t <= RAGE_TAP_TIMEFRAME);
 
               if (interactionTimestamps.length >= RAGE_TAP_THRESHOLD) {
                 console.log("[Telemetry] Mobile-Optimized Rage Tap captured! Firing to backend...");
                 
-                // Precision Element Targeting
+                /* Precision Element Targeting */
                 const target = e.target;
                 const elementTag = target && target.tagName ? target.tagName.toLowerCase() : 'unknown';
                 const elementId = target && target.id ? '#' + target.id : '';
@@ -76,7 +77,7 @@ export default async function RootLayout({
                   method: 'POST',
                   headers: { 'Content-Type': 'application/json' },
                   body: JSON.stringify({
-                    event: 'rage_click', // Keeping the same event name for downstream Phase 3 compatibility
+                    event: 'rage_click',
                     session_id: sessionId,
                     element: cssSelector,
                     x_coordinate: e.clientX,
@@ -86,7 +87,7 @@ export default async function RootLayout({
                   })
                 }).catch(() => {});
                 
-                // Clear the array to prevent duplicate rapid-firing
+                /* Clear the array to prevent duplicate rapid-firing */
                 interactionTimestamps = [];
               }
             });
@@ -105,7 +106,7 @@ export default async function RootLayout({
         `}} />
 
         {/* Stream 3: Sentry RUM */}
-        <Script id="sentry-init" strategy="beforeInteractive" dangerouslySetInnerHTML={{ __html: `
+        <Script id="sentry-init" dangerouslySetInnerHTML={{ __html: `
           window.sentryOnLoad = function () {
             if (typeof Sentry !== 'undefined') {
               Sentry.init({
@@ -119,14 +120,16 @@ export default async function RootLayout({
             }
           };
         `}} />
+        
+        {/* Stream 3: Sentry External Script (Removed beforeInteractive to fix React crash) */}
         <Script 
           src="https://js-de.sentry-cdn.com/a15742f687c92e3dd2f71907f98c8458.min.js" 
-          strategy="beforeInteractive" 
           crossOrigin="anonymous" 
           data-lazy="false" 
         />
-      </head>
-      <body className="min-h-full flex flex-col">{children}</body>
+        
+        {children}
+      </body>
     </html>
   );
 }

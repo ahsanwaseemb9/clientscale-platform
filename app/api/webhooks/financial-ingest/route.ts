@@ -6,10 +6,55 @@ const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env
 
 export async function POST(req: NextRequest) {
   try {
-    // 1. Receive the payload pushed by the custom client
-    const { tenant_id, webhook_secret, total_revenue, average_order_value } = await req.json();
+    // Read the payload once
+    const payload = await req.json();
 
-    // 2. Security Check: Verify the client's webhook secret matches the database
+    // ==============================================================
+    // 1. STRIPE WEBHOOK HANDLER (Catching the Live Revenue Bleed)
+    // ==============================================================
+    if (payload.object === 'event' && payload.type) {
+      const event = payload;
+
+      // We specifically want to catch failed payments to prove the financial threat
+      if (event.type === 'payment_intent.payment_failed') {
+        const paymentIntent = event.data.object;
+        
+        // When deploying to a client, ensure 'tenant_id' is passed in their Stripe metadata
+        const tenant_id = paymentIntent.metadata?.tenant_id; 
+        
+        if (tenant_id) {
+          const lostRevenue = paymentIntent.amount / 100;
+          
+          // Log the exact financial bleed event into a telemetry table
+          const { error: bleedError } = await supabase
+            .from('financial_bleed_events')
+            .insert({
+              tenant_id,
+              source: 'stripe',
+              event_type: 'payment_failed',
+              amount_lost: lostRevenue,
+              reason: paymentIntent.last_payment_error?.message || 'Card declined',
+              created_at: new Date().toISOString()
+            });
+
+          if (bleedError) console.error('[Stripe Ingest Error]:', bleedError);
+        }
+      }
+      
+      // Always return 200 to Stripe quickly so they don't retry the webhook
+      return NextResponse.json({ success: true, message: 'Stripe event acknowledged' });
+    }
+
+    // ==============================================================
+    // 2. CUSTOM PROVIDER HANDLER (Your Existing Baseline Logic)
+    // ==============================================================
+    const { tenant_id, webhook_secret, total_revenue, average_order_value } = payload;
+
+    if (!tenant_id || !webhook_secret) {
+      return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
+    }
+
+    // Security Check: Verify the client's webhook secret matches the database
     const { data: tenant } = await supabase
       .from('tenants')
       .select('integration_config, active_provider')
@@ -17,14 +62,14 @@ export async function POST(req: NextRequest) {
       .single();
 
     if (!tenant || tenant.active_provider !== 'custom') {
-      return NextResponse.json({ error: 'Invalid tenant or provider' }, { status: 400 });
+      return NextResponse.json({ error: 'Invalid tenant or provider configuration' }, { status: 400 });
     }
 
-    if (tenant.integration_config.webhookSecret !== webhook_secret) {
+    if (tenant.integration_config?.webhookSecret !== webhook_secret) {
       return NextResponse.json({ error: 'Unauthorized: Invalid webhook secret' }, { status: 401 });
     }
 
-    // 3. Write to the Unified Schema (Same as Stripe/Shopify)
+    // Write to the Unified Schema
     const { error: dbError } = await supabase
       .from('tenant_financials')
       .upsert({
@@ -40,6 +85,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ success: true, message: 'Custom financial baseline updated' });
 
   } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    console.error('[Financial Ingest Exception]:', error.message);
+    return NextResponse.json({ error: 'Internal server error processing payload' }, { status: 500 });
   }
 }
