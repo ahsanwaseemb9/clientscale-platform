@@ -39,21 +39,16 @@ const DataNode = ({ x, y, w, d, h, color = 'cyan', label, value }: any) => {
   };
   const c = colors[color];
   
-  // Conditionally target ONLY the DOM Nodes title for a larger font size
   const titleSize = label === 'DOM Nodes' ? 'text-[13px] sm:text-[12px]' : 'text-[11px] sm:text-[9px]';
 
   return (
     <div className="absolute [transform-style:preserve-3d] transition-all duration-1000 ease-in-out" style={{ left: x, top: y, width: w, height: d }}>
-      {/* South Wall */}
       <div className={`absolute bottom-0 left-0 w-full origin-bottom ${c.south} border-l border-r border-t border-white/20`} style={{ height: h, transform: 'rotateX(-90deg)' }} />
-      {/* East Wall */}
       <div className={`absolute top-0 right-0 h-full origin-right ${c.east} border-t border-b border-l border-white/20`} style={{ width: h, transform: 'rotateY(-90deg)' }} />
-      {/* Top Face */}
       <div className={`absolute inset-0 ${c.top} flex items-center justify-center overflow-hidden ${c.glow}`} style={{ transform: `translateZ(${h}px)` }}>
          <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff44_1px,transparent_1px),linear-gradient(to_bottom,#ffffff44_1px,transparent_1px)] bg-[size:4px_4px]" />
       </div>
       
-      {/* Floating 3D Label (Enlarged DOM Nodes title on both viewports) */}
       <div className="absolute top-1/2 left-1/2 flex flex-col items-center justify-center pointer-events-none" style={{ transform: `translateZ(${h + 35}px) translateX(-50%) translateY(-50%) rotateZ(-45deg) rotateX(-60deg)` }}>
          <span className={`${titleSize} font-mono font-bold text-white uppercase tracking-widest whitespace-nowrap bg-black/70 px-2 sm:px-1.5 py-0.5 rounded border border-white/20 backdrop-blur-md mb-1 sm:mb-0.5`}>{label}</span>
          <span className={`text-base sm:text-sm font-mono font-black text-white bg-black/90 px-2.5 sm:px-2 py-0.5 rounded border border-white/20 shadow-md`}>{value}</span>
@@ -63,7 +58,6 @@ const DataNode = ({ x, y, w, d, h, color = 'cyan', label, value }: any) => {
   );
 };
 
-// --- STATIC BACKGROUND CITY BLOCKS ---
 const DecorNode = ({ x, y, w, d, h }: any) => (
   <div className="absolute [transform-style:preserve-3d]" style={{ left: x, top: y, width: w, height: d }}>
     <div className="absolute bottom-0 left-0 w-full origin-bottom bg-cyan-900/60 border border-cyan-700/50" style={{ height: h, transform: 'rotateX(-90deg)' }} />
@@ -81,7 +75,6 @@ export default function AuditReportPage() {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    // Generate static scan timestamp on client hydration
     const now = new Date();
     setScanTimestamp(now.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) + ' ' + now.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }));
 
@@ -104,7 +97,6 @@ export default function AuditReportPage() {
     setIsDeploying(true);
 
     try {
-      // 1. Fire the synthetic calculation to the database
       const response = await fetch('/api/sync-finances', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -124,7 +116,6 @@ export default function AuditReportPage() {
         throw new Error('Failed to generate synthetic baseline');
       }
 
-      // 2. Instantly redirect to the Boardroom UI to see the damage
       router.push('/dashboard/boardroom');
     } catch (error) {
       console.error('[Synthetic Baseline Error]:', error);
@@ -168,13 +159,11 @@ export default function AuditReportPage() {
     return isNaN(parsed) ? fallback : Math.max(0, parsed);
   };
 
-  // --- INTELLIGENT PERFORMANCE-BASED REVENUE LEAKAGE ---
   const perfScore = safeExtractNumber(auditData?.diagnostics?.performanceScore, 65);
   const rawTbt = safeExtractNumber(auditData?.diagnostics?.latency?.tbt, 800);
   const rawInp = safeExtractNumber(auditData?.diagnostics?.latency?.inp, 340);
   const thirdPartyCount = safeExtractNumber(auditData?.diagnostics?.thirdPartyScriptCount, 5);
   
-  // If performance is 95 or higher, friction is zero (fully optimized domain)
   const isFullyOptimized = perfScore >= 95;
   const latencyPenaltyFactor = Math.max(1.0, (rawTbt / 500) + (rawInp / 300) + (thirdPartyCount * 0.15));
   const performanceFrictionMultiplier = isFullyOptimized ? 0 : Math.min(0.35, Math.max(0.04, (100 - perfScore) / 200 * latencyPenaltyFactor));
@@ -197,7 +186,6 @@ export default function AuditReportPage() {
   const domSize = rawDomNodes.toLocaleString();
   const isFragile = rawDomNodes > 800;
 
-  // --- DYNAMICALLY SCALED TOWER HEIGHTS ---
   const hDom = Math.max(40, Math.min(160, (rawDomNodes / 1500) * 120));
   const hTbt = Math.max(30, Math.min(160, (rawTbt / 1000) * 120));
   const hInp = Math.max(30, Math.min(160, (rawInp / 500) * 120));
@@ -284,27 +272,21 @@ export default function AuditReportPage() {
         }
       `}} />
 
-      {/* TOP PANE: Responsive Mobile-Optimized 3D Holographic Stage */}
       <div className="relative w-full h-[55vh] sm:h-[65vh] min-h-[420px] bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-cyan-950/40 via-[#020205] to-black overflow-hidden flex items-center justify-center border-b border-zinc-800 z-20 shrink-0">
         
-        {/* The 3D Isometric Projection Engine with Responsive Scaling */}
         <div className="absolute inset-0 flex items-center justify-center [perspective:1200px] z-10 pointer-events-none px-2 mt-8 sm:mt-0">
           
-          {/* Scaled up on both viewports using scale-[0.75] sm:scale-[1.15] */}
           <div className="relative w-[340px] h-[340px] sm:w-[460px] sm:h-[460px] [transform:scale(0.75)_rotateX(60deg)_rotateZ(45deg)] sm:[transform:scale(1.15)_rotateX(60deg)_rotateZ(45deg)] [transform-style:preserve-3d] transition-transform">
               
-              {/* Glowing Base Plate & Grid Floor */}
               <div className="absolute inset-0 bg-cyan-950/80 border-2 border-cyan-500 shadow-[0_0_60px_rgba(6,182,212,0.3)] backdrop-blur-md" />
               <div className="absolute inset-0 bg-[linear-gradient(to_right,#0891b266_2px,transparent_2px),linear-gradient(to_bottom,#0891b266_2px,transparent_2px)] bg-[size:24px_24px] opacity-80" />
               <div className="absolute top-0 left-0 w-full h-[4px] bg-white shadow-[0_0_30px_#22d3ee] animate-[hologramScan_4s_linear_infinite]" />
               
-              {/* Background Decorative Blocks */}
               <DecorNode x={30} y={30} w={50} d={30} h={25} />
               <DecorNode x={280} y={50} w={40} d={60} h={40} />
               <DecorNode x={60} y={280} w={40} d={40} h={20} />
               <DecorNode x={280} y={280} w={50} d={50} h={30} />
               
-              {/* Isolated Mobile-Optimized Telemetry Towers */}
               <DataNode x={50} y={50} w={50} d={50} h={hDom} color="cyan" label="DOM Nodes" value={domSize} />
               <DataNode x={270} y={60} w={45} d={45} h={hParasite} color="purple" label="Parasite Load" value={`${parasiteImpact}%`} />
               <DataNode x={50} y={270} w={50} d={50} h={hTbt} color="red" label="Thread Lock" value={`${rawTbt}ms`} />
@@ -312,7 +294,6 @@ export default function AuditReportPage() {
           </div>
         </div>
 
-        {/* Ambient Target Badge & Volatility Warning Overlay */}
         <div className="absolute bottom-3 left-3 right-3 sm:left-6 sm:bottom-4 flex flex-col gap-2 z-30 pointer-events-none max-w-sm sm:max-w-md">
             <div className="bg-black/85 border border-cyan-900/80 px-3.5 py-2.5 rounded-xl backdrop-blur-md shadow-xl pointer-events-auto">
               <div className="flex items-center gap-2 mb-1">
@@ -331,7 +312,6 @@ export default function AuditReportPage() {
         </div>
       </div>
 
-      {/* BOTTOM PANE: Cold Data & Actions */}
       <div ref={scrollContainerRef} className="w-full relative z-10 bg-[radial-gradient(circle_at_top,rgba(6,182,212,0.05),transparent_60%)] flex-grow px-4 sm:px-8 py-8">
         <div className="max-w-3xl mx-auto w-full space-y-8 pb-16">
           
@@ -385,7 +365,6 @@ export default function AuditReportPage() {
             </div>
           </section>
 
-          {/* Tech Stack Migration */}
           <section className="bg-[#12121c] border border-zinc-700/50 rounded-2xl p-5 sm:p-8">
              <div className="flex items-center justify-between mb-5 border-b border-zinc-800 pb-3">
                 <div className="flex items-center gap-2">
@@ -412,7 +391,6 @@ export default function AuditReportPage() {
               )}
              </div>
 
-             {/* Locked Edge Computing Paywall CTA */}
              <div className="p-4 sm:p-5 bg-gradient-to-r from-purple-950/30 via-black/60 to-cyan-950/30 border border-purple-500/30 rounded-xl flex flex-col sm:flex-row items-center justify-between gap-4">
                 <div className="flex items-center gap-3 w-full sm:w-auto">
                    <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-lg bg-purple-500/10 border border-purple-500/30 flex items-center justify-center shrink-0 text-purple-400">
