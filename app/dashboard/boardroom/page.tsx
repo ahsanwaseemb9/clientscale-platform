@@ -7,7 +7,6 @@ import IncidentTimeline from '../../components/IncidentTimeline';
 import RemediationTerminal from '../../components/RemediationTerminal';
 
 export default function BoardroomDashboard() {
-  const [showMath, setShowMath] = useState(false);
   const [showDetailedExplanation, setShowDetailedExplanation] = useState(false);
   const [briefing, setBriefing] = useState('Fetching live database metrics and generating briefing...');
   const [isLoading, setIsLoading] = useState(true);
@@ -38,21 +37,21 @@ export default function BoardroomDashboard() {
         const dbResponse = await fetch('/api/financials');
         const dbResult = await dbResponse.json();
 
-        if (!dbResult.success || !dbResult.data) {
+        if (!dbResult?.success || !dbResult?.data) {
           setBriefing("Awaiting telemetry data. Install the tracking pixel to begin.");
           setIsLoading(false);
           return;
         }
 
         const liveData = dbResult.data;
-        const displayName = liveData.business_name || `Tenant: ${liveData.tenant_id.substring(0, 8)}...`;
-        const activeTenantId = liveData.tenant_id || 'test-tenant-123';
-        const daily = liveData.defensible_daily_leakage || 1500;
+        const activeTenantId = liveData?.tenant_id || 'test-tenant-123';
+        const displayName = liveData?.business_name || `Tenant: ${activeTenantId.substring(0, 8)}...`;
+        const daily = Number(liveData?.defensible_daily_leakage) || 1500;
 
         setFinancialData({
           tenantId: activeTenantId,
           businessName: displayName,
-          projectedQuarterlyLeakage: liveData.projected_quarterly_leakage || 0,
+          projectedQuarterlyLeakage: Number(liveData?.projected_quarterly_leakage) || 0,
           dailyLeakage: daily,
         });
 
@@ -61,11 +60,11 @@ export default function BoardroomDashboard() {
         const perSecondRate = daily / 86400;
         setLiveBleedAmount(Math.floor(secondsIntoDay * perSecondRate));
 
-        const elementId = liveData.friction_element_id || 'button#checkout-mobile';
-        const rageClicks = liveData.rage_clicks || 42;
-        const apiEndpoint = liveData.api_endpoint || '/api/cart/sync';
-        const latencyMs = liveData.latency_ms || 1205;
-        const recentEvents = liveData.recent_events || [];
+        const elementId = liveData?.friction_element_id || 'button#checkout-mobile';
+        const rageClicks = Number(liveData?.rage_clicks) || 42;
+        const apiEndpoint = liveData?.api_endpoint || '/api/cart/sync';
+        const latencyMs = Number(liveData?.latency_ms) || 1205;
+        const recentEvents = Array.isArray(liveData?.recent_events) ? liveData.recent_events : [];
 
         setFrictionData({
           elementId,
@@ -80,14 +79,14 @@ export default function BoardroomDashboard() {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             businessName: displayName,
-            projectedQuarterlyLeakage: liveData.projected_quarterly_leakage,
+            projectedQuarterlyLeakage: liveData?.projected_quarterly_leakage || 0,
             dailyLeakage: daily,
             primaryFriction: `${rageClicks} rage-taps on the '${elementId}' element, and ${latencyMs}ms latency bottlenecks on the ${apiEndpoint} endpoint`
           })
         });
         
         const aiData = await aiResponse.json();
-        if (aiData.success) {
+        if (aiData?.success && aiData?.briefing) {
           setBriefing(aiData.briefing);
         } else {
           setBriefing("Error generating AI briefing.");
@@ -113,7 +112,7 @@ export default function BoardroomDashboard() {
     return () => clearInterval(interval);
   }, [financialData]);
 
-  // Generate a random number matrix for the aesthetics (Expanded for full width)
+  // Generate a random number matrix for the aesthetics
   const numberMatrix = Array.from({ length: 128 }, () => Math.floor(Math.random() * 9));
 
   return (
@@ -158,7 +157,6 @@ export default function BoardroomDashboard() {
         
         {/* MODULE 1: FINANCIALS & LIVE BLEED */}
         <div className="w-full border border-cyan-900/40 bg-black/40 p-4 md:p-8 relative shadow-[0_0_15px_rgba(6,182,212,0.05)]">
-          {/* Top Right Logo Graphic */}
           <div className="absolute top-4 right-4 flex items-center justify-center opacity-50 md:opacity-100">
             <div className="w-16 h-16 md:w-20 md:h-20 rounded-full border border-red-500/50 flex flex-col items-center justify-center bg-black/50">
                <span className="text-2xl md:text-3xl text-red-500 font-bold leading-none tracking-tighter">CS</span>
@@ -170,10 +168,9 @@ export default function BoardroomDashboard() {
             <div className="flex-1">
               <h3 className="text-cyan-700 text-[10px] md:text-xs mb-2 border-b border-cyan-900/50 pb-1">Q_LEAKAGE // PROJECTED</h3>
               <div className="text-4xl md:text-6xl font-normal text-white tracking-[0.1em] drop-shadow-[0_0_8px_rgba(255,255,255,0.4)] mt-2">
-                 {financialData ? `£${financialData.projectedQuarterlyLeakage.toLocaleString()}` : '0000000'}
+                 {financialData ? `£${(financialData.projectedQuarterlyLeakage || 0).toLocaleString()}` : '£0'}
               </div>
 
-              {/* Number Matrix Array */}
               <div className="grid grid-cols-8 sm:grid-cols-16 gap-1 mt-6 text-[8px] text-cyan-800 leading-none opacity-80 max-w-2xl">
                  {numberMatrix.map((num, i) => (
                     <span key={i} className={i % 7 === 0 ? 'text-cyan-500' : ''}>{num}</span>
@@ -184,10 +181,9 @@ export default function BoardroomDashboard() {
             <div className="flex-1 border-l-2 border-red-600/80 pl-4 md:pl-6 py-2 flex flex-col justify-center">
               <h3 className="text-red-700 text-[10px] md:text-xs mb-2">LIVE_BLEED_DETECTION</h3>
               <div className="text-3xl md:text-5xl font-bold text-red-500 tabular-nums drop-shadow-[0_0_8px_rgba(239,68,68,0.5)]">
-                 £{liveBleedAmount.toLocaleString('en-GB', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                 £{(liveBleedAmount || 0).toLocaleString('en-GB', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
               </div>
               
-              {/* Sequence Status Bars */}
               <div className="space-y-3 pt-6 w-full max-w-md">
                  <div className="flex items-center gap-3">
                    <span className="text-cyan-700 w-4 text-[9px]">S1</span>
@@ -215,7 +211,6 @@ export default function BoardroomDashboard() {
         {/* MODULE 2: DIAGNOSTICS & FRICTION */}
         <div className="w-full border border-cyan-900/40 bg-black/40 p-4 md:p-8 relative flex flex-col lg:flex-row gap-8 shadow-[0_0_15px_rgba(6,182,212,0.05)]">
           
-          {/* Left Side: System Info & AI Briefing */}
           <div className="flex-1 flex flex-col justify-between border-b lg:border-b-0 lg:border-r border-cyan-900/30 pb-6 lg:pb-0 lg:pr-8">
             <div>
               <h2 className="text-xl md:text-2xl text-cyan-200 tracking-[0.2em] mb-4">R02/01</h2>
@@ -233,7 +228,6 @@ export default function BoardroomDashboard() {
                   {briefing}
                 </div>
                 
-                {/* Neural Pathway Trace Toggle & Timeline */}
                 {!isLoading && (
                   <div className="mt-6 pt-4 border-t border-cyan-900/30">
                     <button 
@@ -260,7 +254,6 @@ export default function BoardroomDashboard() {
             </div>
           </div>
 
-          {/* Right Side: Raw Friction Feed */}
           <div className="flex-1 flex flex-col justify-start pt-4 lg:pt-0">
              <h3 className="text-cyan-700 text-[10px] md:text-xs mb-4">RAW_STREAM_DATA</h3>
              
@@ -291,8 +284,6 @@ export default function BoardroomDashboard() {
 
         {/* MODULE 3: MAP & REMEDIATION TERMINAL */}
         <div className="w-full border border-cyan-900/40 bg-black/40 p-4 md:p-8 relative min-h-[500px] flex flex-col items-center shadow-[0_0_15px_rgba(6,182,212,0.05)]">
-          
-          {/* Global Map SVG (Positioned absolutely behind the terminal) */}
           <div className="absolute inset-0 flex items-start justify-center opacity-30 pt-8 pointer-events-none overflow-hidden">
              <svg viewBox="0 0 800 400" className="w-full max-w-4xl drop-shadow-[0_0_5px_rgba(6,182,212,0.8)]">
                <g stroke="currentColor" strokeWidth="0.5" fill="none" className="text-cyan-600">
@@ -314,9 +305,8 @@ export default function BoardroomDashboard() {
             </p>
           </div>
           
-          {/* Remediation Terminal (Now cleanly stacked below the map text, taking full width) */}
           <div className="relative z-20 w-full max-w-5xl mx-auto flex-1 flex flex-col">
-            {financialData && (
+            {financialData?.tenantId && (
               <RemediationTerminal tenantId={financialData.tenantId} />
             )}
           </div>
