@@ -10,6 +10,7 @@ export default function BoardroomDashboard() {
   const [showDetailedExplanation, setShowDetailedExplanation] = useState(false);
   const [briefing, setBriefing] = useState('Fetching live database metrics and generating briefing...');
   const [isLoading, setIsLoading] = useState(true);
+  const [mounted, setMounted] = useState(false);
   
   // Financial State
   const [financialData, setFinancialData] = useState<{
@@ -31,7 +32,15 @@ export default function BoardroomDashboard() {
   // Live Bleeding Revenue Counter State
   const [liveBleedAmount, setLiveBleedAmount] = useState<number>(0);
 
+  // Stable Number Matrix State (Hydration Safe)
+  const [numberMatrix, setNumberMatrix] = useState<number[]>(() => Array(128).fill(0));
+  const [sysTime, setSysTime] = useState<string>('');
+
   useEffect(() => {
+    setMounted(true);
+    setSysTime(new Date().toISOString());
+    setNumberMatrix(Array.from({ length: 128 }, () => Math.floor(Math.random() * 9)));
+
     async function loadLiveDashboard() {
       try {
         const dbResponse = await fetch('/api/financials');
@@ -111,9 +120,6 @@ export default function BoardroomDashboard() {
     }, 100);
     return () => clearInterval(interval);
   }, [financialData]);
-
-  // Generate a random number matrix for the aesthetics
-  const numberMatrix = Array.from({ length: 128 }, () => Math.floor(Math.random() * 9));
 
   return (
     <div className="min-h-screen bg-[#020612] text-cyan-500 font-mono uppercase overflow-hidden relative flex flex-col p-3 md:p-6 selection:bg-cyan-900 selection:text-white text-[10px] md:text-xs tracking-widest w-full">
@@ -217,7 +223,7 @@ export default function BoardroomDashboard() {
               <div className="text-[9px] md:text-[10px] text-cyan-700 mb-6 leading-relaxed">
                 <p>■ T_ID: {financialData?.tenantId || 'LOADING...'}</p>
                 <p>■ CLIENT: {financialData?.businessName || 'UNKNOWN'}</p>
-                <p>■ SYS.TIME: {new Date().toISOString()}</p>
+                <p>■ SYS.TIME: {mounted ? sysTime : 'SYNCING...'}</p>
                 <p className="mt-2 text-cyan-800">TUVWXYZ ABC DEFG</p>
               </div>
 
@@ -322,8 +328,8 @@ export default function BoardroomDashboard() {
                 key={i} 
                 className="w-1 bg-cyan-700/60"
                 style={{
-                  height: `${Math.max(20, Math.random() * 100)}%`,
-                  animation: `pulse ${1 + Math.random()}s infinite alternate`
+                  height: `${Math.max(20, ((i * 37) % 80))}%`,
+                  animation: `pulse ${1 + (i % 2)}s infinite alternate`
                 }}
              ></div>
            ))}
