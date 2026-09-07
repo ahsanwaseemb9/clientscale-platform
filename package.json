@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@ai-sdk/openai": "^4.0.43",
+    "@react-three/fiber": "^9.7.0",
     "@supabase/supabase-js": "^2.110.3",
     "ai": "^7.0.68",
     "cheerio": "^1.2.0",
@@ -20,6 +21,7 @@
     "react": "^19.2.4",
     "react-dom": "^19.2.4",
     "stripe": "^22.5.0",
+    "three": "^0.185.1",
     "wapalyzer-core": "^6.11.0",
     "zod": "^4.4.3"
   },
