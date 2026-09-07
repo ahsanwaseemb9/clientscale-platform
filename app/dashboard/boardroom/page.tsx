@@ -262,8 +262,13 @@ export default function BoardroomDashboard() {
       <div className="flex-1 flex flex-col gap-6 md:gap-8 relative z-10 w-full">
         
         <div className="w-full border border-cyan-900/40 bg-black/40 p-4 md:p-8 relative shadow-[0_0_15px_rgba(6,182,212,0.05)] rounded-xl">
-          <div className="absolute top-4 right-4 flex items-center justify-center opacity-70 md:opacity-100 z-10">
-            <div className="w-14 h-14 md:w-20 md:h-20 rounded-full border border-red-500/50 flex flex-col items-center justify-center bg-black/80 md:bg-black/50">
+          {/* Mobile Header Block with clear separating border line */}
+          <div className="flex justify-between items-start border-b border-cyan-900/50 pb-3 mb-4 md:border-b-0 md:pb-0 md:mb-0 md:absolute md:top-4 md:right-4 z-10">
+            <div className="block md:hidden">
+              <span className="text-[9px] text-cyan-500 block leading-tight">CAPITAL CONCENTRATION // PROFIT DRAG</span>
+              <span className="text-[8px] text-cyan-700 block mt-0.5">90-DAY PROJECTION</span>
+            </div>
+            <div className="w-14 h-14 md:w-20 md:h-20 rounded-full border border-red-500/50 flex flex-col items-center justify-center bg-black/80 md:bg-black/50 shrink-0">
                <span className="text-xl md:text-3xl text-red-500 font-bold leading-none tracking-tighter">CS</span>
                <span className="text-[4px] md:text-[6px] text-red-400 tracking-[0.4em] mt-1">CAPITAL</span>
             </div>
@@ -271,11 +276,11 @@ export default function BoardroomDashboard() {
 
           <div className="flex flex-col lg:flex-row gap-6 md:gap-8 lg:gap-16">
             <div className="flex-1 relative z-10 w-full">
-              <h3 className="text-cyan-700 text-[9px] md:text-xs mb-2 border-b border-cyan-900/50 pb-2 flex flex-col md:flex-row justify-between pr-16 md:pr-0 gap-1 md:gap-0">
+              <h3 className="hidden md:flex text-cyan-700 text-[9px] md:text-xs mb-2 border-b border-cyan-900/50 pb-2 justify-between">
                 <span className="whitespace-normal break-words leading-snug">CAPITAL CONCENTRATION // PROFIT DRAG</span>
                 <span className="text-cyan-500">90-DAY PROJECTION</span>
               </h3>
-              <div className="text-3xl sm:text-4xl md:text-6xl font-normal text-white tracking-[0.05em] md:tracking-[0.1em] drop-shadow-[0_0_8px_rgba(255,255,255,0.4)] mt-2">
+              <div className="text-3xl sm:text-4xl md:text-6xl font-normal text-white tracking-[0.05em] md:tracking-[0.1em] drop-shadow-[0_0_8px_rgba(255,255,255,0.4)] mt-1 md:mt-2">
                  {financialData ? `£${(financialData.projectedQuarterlyLeakage || 0).toLocaleString()}` : '£0'}
               </div>
 
