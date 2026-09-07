@@ -15,16 +15,14 @@ const DataConstellation = ({ rageClicks, latency }: { rageClicks: number, latenc
 
   const particleCount = 350;
   
-  // Re-calculate the geometry only when live telemetry data changes
   const { positions, colors, indices } = useMemo(() => {
     const positions = new Float32Array(particleCount * 3);
     const colors = new Float32Array(particleCount * 3);
     const indices = [];
 
-    const colorHealthy = new THREE.Color('#22d3ee'); // Bright Cyan
-    const colorFriction = new THREE.Color('#ff2a2a'); // Neon Red
+    const colorHealthy = new THREE.Color('#22d3ee'); 
+    const colorFriction = new THREE.Color('#ff2a2a'); 
 
-    // Visually amplify rage clicks slightly so they command attention in a 350-node matrix
     const targetFrictionNodes = Math.min(rageClicks * 1.5, particleCount * 0.8);
     let assignedFrictionNodes = 0;
 
@@ -39,7 +37,6 @@ const DataConstellation = ({ rageClicks, latency }: { rageClicks: number, latenc
       positions[i * 3 + 1] = y;
       positions[i * 3 + 2] = z;
 
-      // Assign red nodes strictly based on the live rage click data
       let isFriction = false;
       if (assignedFrictionNodes < targetFrictionNodes && Math.random() > 0.4) {
         isFriction = true;
@@ -76,7 +73,6 @@ const DataConstellation = ({ rageClicks, latency }: { rageClicks: number, latenc
   useFrame((state) => {
     const time = state.clock.getElapsedTime();
     if (pointsRef.current && linesRef.current) {
-      // Base rotation speed amplified by structural latency bottlenecks
       const speedMultiplier = 0.04 + (latency * 0.00004); 
       
       pointsRef.current.rotation.y = time * speedMultiplier;
@@ -127,7 +123,6 @@ export default function BoardroomDashboard() {
   const [isLoading, setIsLoading] = useState(true);
   const [mounted, setMounted] = useState(false);
   
-  // Financial State
   const [financialData, setFinancialData] = useState<{
     tenantId: string;
     businessName: string;
@@ -135,7 +130,6 @@ export default function BoardroomDashboard() {
     dailyLeakage: number;
   } | null>(null);
 
-  // Dynamic Telemetry State
   const [frictionData, setFrictionData] = useState<{
     elementId: string;
     rageClicks: number;
@@ -144,7 +138,6 @@ export default function BoardroomDashboard() {
     recentEvents: any[];
   } | null>(null);
 
-  // Live Bleeding Revenue Counter State
   const [liveBleedAmount, setLiveBleedAmount] = useState<number>(0);
   const [sysTime, setSysTime] = useState<string>('');
 
@@ -175,7 +168,6 @@ export default function BoardroomDashboard() {
           dailyLeakage: daily,
         });
 
-        // Initialize live ticker counter based on current time of day
         const secondsIntoDay = (Date.now() % 86400000) / 1000;
         const perSecondRate = daily / 86400;
         setLiveBleedAmount(Math.floor(secondsIntoDay * perSecondRate));
@@ -222,7 +214,6 @@ export default function BoardroomDashboard() {
     loadLiveDashboard();
   }, []);
 
-  // Tick revenue upward smoothly every 100ms based on daily leakage rate
   useEffect(() => {
     if (!financialData) return;
     const perSecondRate = financialData.dailyLeakage / 86400;
@@ -233,21 +224,19 @@ export default function BoardroomDashboard() {
   }, [financialData]);
 
   return (
-    <div className="min-h-screen bg-[#020612] text-cyan-500 font-mono uppercase overflow-hidden relative flex flex-col p-3 md:p-6 selection:bg-cyan-900 selection:text-white text-[10px] md:text-xs tracking-widest w-full">
+    <div className="min-h-screen bg-[#020612] text-cyan-500 font-mono uppercase overflow-x-hidden relative flex flex-col p-3 md:p-6 selection:bg-cyan-900 selection:text-white text-[10px] md:text-xs tracking-widest w-full">
       
-      {/* Background Volumetric Glow & CRT Effect */}
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_30%,rgba(6,182,212,0.05),transparent_70%)] pointer-events-none z-0"></div>
       <div className="absolute inset-0 bg-[linear-gradient(rgba(0,0,0,0)_50%,rgba(0,0,0,0.25)_50%),linear-gradient(90deg,rgba(255,0,0,0.06),rgba(0,255,0,0.02),rgba(0,0,255,0.06))] bg-[length:100%_4px,3px_100%] pointer-events-none z-0 mix-blend-overlay"></div>
       
-      {/* TOP EXECUTIVE RULER */}
       <header className="border-b border-cyan-800/40 pb-3 mb-6 shrink-0 flex flex-col md:flex-row justify-between items-start md:items-end w-full relative z-10 gap-4">
-        <div className="flex items-center gap-4 md:gap-6">
-          <h1 className="text-lg md:text-2xl font-bold tracking-[0.2em] text-cyan-300 drop-shadow-[0_0_5px_rgba(103,232,249,0.5)]">
-            CAPITAL EXPOSURE // OPERATIONAL RISK
+        <div className="flex flex-col md:flex-row md:items-center gap-3 md:gap-6 w-full md:w-auto">
+          <h1 className="text-base sm:text-lg md:text-2xl font-bold tracking-[0.1em] md:tracking-[0.2em] text-cyan-300 drop-shadow-[0_0_5px_rgba(103,232,249,0.5)] whitespace-normal break-words pr-12 md:pr-0 leading-tight">
+            CAPITAL EXPOSURE // <br className="md:hidden" />OPERATIONAL RISK
           </h1>
-          <div className="flex items-center gap-2">
-            <div className="w-6 h-6 md:w-8 md:h-8 rounded-full border border-cyan-600 flex items-center justify-center text-[8px] md:text-[9px] text-cyan-300 shadow-[0_0_8px_rgba(34,211,238,0.4)]">95%</div>
-            <div className="w-6 h-6 md:w-8 md:h-8 rounded-full border border-red-800 flex items-center justify-center text-[8px] md:text-[9px] text-red-500 animate-pulse">5%</div>
+          <div className="flex items-center gap-2 absolute md:relative top-0 right-0 md:top-auto md:right-auto">
+            <div className="w-6 h-6 md:w-8 md:h-8 rounded-full border border-cyan-600 flex items-center justify-center text-[8px] md:text-[9px] text-cyan-300 shadow-[0_0_8px_rgba(34,211,238,0.4)] shrink-0">95%</div>
+            <div className="w-6 h-6 md:w-8 md:h-8 rounded-full border border-red-800 flex items-center justify-center text-[8px] md:text-[9px] text-red-500 animate-pulse shrink-0">5%</div>
           </div>
         </div>
         
@@ -262,38 +251,35 @@ export default function BoardroomDashboard() {
           </div>
         </div>
         
-        <div className="text-left md:text-right flex flex-col items-start md:items-end w-full md:w-auto">
-          <p className="text-cyan-700 text-[8px] md:text-[9px] leading-tight md:text-right">
+        <div className="text-left md:text-right flex flex-col items-start md:items-end w-full md:w-auto mt-2 md:mt-0">
+          <p className="text-cyan-700 text-[8px] md:text-[9px] leading-tight md:text-right w-full">
              PORTFOLIO REVENUE BURN<br/>
              SYSTEM AUDIT: VERIFIED ACTIVE
           </p>
         </div>
       </header>
 
-      {/* MAIN STACKED LAYOUT (Fully Expanded Vertically) */}
       <div className="flex-1 flex flex-col gap-6 md:gap-8 relative z-10 w-full">
         
-        {/* MODULE 1: VOLUMETRIC SCATTER PLOT & PULSING HEARTBEAT */}
         <div className="w-full border border-cyan-900/40 bg-black/40 p-4 md:p-8 relative shadow-[0_0_15px_rgba(6,182,212,0.05)] rounded-xl">
-          <div className="absolute top-4 right-4 flex items-center justify-center opacity-50 md:opacity-100 z-10">
-            <div className="w-16 h-16 md:w-20 md:h-20 rounded-full border border-red-500/50 flex flex-col items-center justify-center bg-black/50">
-               <span className="text-2xl md:text-3xl text-red-500 font-bold leading-none tracking-tighter">CS</span>
-               <span className="text-[5px] md:text-[6px] text-red-400 tracking-[0.4em] mt-1">CAPITAL</span>
+          <div className="absolute top-4 right-4 flex items-center justify-center opacity-70 md:opacity-100 z-10">
+            <div className="w-14 h-14 md:w-20 md:h-20 rounded-full border border-red-500/50 flex flex-col items-center justify-center bg-black/80 md:bg-black/50">
+               <span className="text-xl md:text-3xl text-red-500 font-bold leading-none tracking-tighter">CS</span>
+               <span className="text-[4px] md:text-[6px] text-red-400 tracking-[0.4em] mt-1">CAPITAL</span>
             </div>
           </div>
 
-          <div className="flex flex-col lg:flex-row gap-8 lg:gap-16">
-            <div className="flex-1 relative z-10">
-              <h3 className="text-cyan-700 text-[10px] md:text-xs mb-2 border-b border-cyan-900/50 pb-1 flex justify-between">
-                <span>CAPITAL CONCENTRATION // PROFIT DRAG</span>
+          <div className="flex flex-col lg:flex-row gap-6 md:gap-8 lg:gap-16">
+            <div className="flex-1 relative z-10 w-full">
+              <h3 className="text-cyan-700 text-[9px] md:text-xs mb-2 border-b border-cyan-900/50 pb-2 flex flex-col md:flex-row justify-between pr-16 md:pr-0 gap-1 md:gap-0">
+                <span className="whitespace-normal break-words leading-snug">CAPITAL CONCENTRATION // PROFIT DRAG</span>
                 <span className="text-cyan-500">90-DAY PROJECTION</span>
               </h3>
-              <div className="text-4xl md:text-6xl font-normal text-white tracking-[0.1em] drop-shadow-[0_0_8px_rgba(255,255,255,0.4)] mt-2">
+              <div className="text-3xl sm:text-4xl md:text-6xl font-normal text-white tracking-[0.05em] md:tracking-[0.1em] drop-shadow-[0_0_8px_rgba(255,255,255,0.4)] mt-2">
                  {financialData ? `£${(financialData.projectedQuarterlyLeakage || 0).toLocaleString()}` : '£0'}
               </div>
 
-              {/* Data Constellation WebGL Canvas Wired to Telemetry */}
-              <div className="h-48 md:h-64 w-full mt-6 relative max-w-2xl bg-black/40 border border-cyan-900/40 rounded-xl overflow-hidden shadow-[inset_0_0_20px_rgba(6,182,212,0.1)]">
+              <div className="h-36 sm:h-48 md:h-64 w-full mt-4 md:mt-6 relative bg-black/40 border border-cyan-900/40 rounded-xl overflow-hidden shadow-[inset_0_0_20px_rgba(6,182,212,0.1)]">
                 <Canvas camera={{ position: [0, 1.5, 5.5], fov: 50 }}>
                   {frictionData ? (
                     <DataConstellation 
@@ -302,39 +288,39 @@ export default function BoardroomDashboard() {
                     />
                   ) : null}
                 </Canvas>
-                <div className="absolute bottom-3 left-4 text-cyan-600 text-[8px] pointer-events-none tracking-widest flex items-center gap-2">
+                <div className="absolute bottom-2 md:bottom-3 left-2 md:left-4 text-cyan-600 text-[7px] md:text-[8px] pointer-events-none tracking-widest flex items-center gap-1.5 md:gap-2 bg-black/50 px-2 py-1 rounded">
                   <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse shadow-[0_0_8px_#22d3ee]"></span>
-                  LIVE NODE TOPOGRAPHY // TELEMETRY SYNCED
+                  LIVE NODE TOPOGRAPHY // SYNCED
                 </div>
               </div>
             </div>
 
-            <div className="flex-1 border-l-2 border-red-600/80 pl-4 md:pl-8 py-2 flex flex-col justify-center relative bg-gradient-to-r from-red-950/10 to-transparent">
-              <div className="absolute left-[-6px] top-8 w-2 h-2 rounded-full bg-red-500 shadow-[0_0_10px_rgba(239,68,68,1)] animate-ping"></div>
+            <div className="flex-1 border-t-2 md:border-t-0 md:border-l-2 border-red-600/80 pt-4 md:pt-0 pl-0 md:pl-8 py-2 flex flex-col justify-center relative bg-gradient-to-b md:bg-gradient-to-r from-red-950/10 to-transparent w-full">
+              <div className="absolute left-1/2 -top-[3px] md:left-[-6px] md:top-8 w-1.5 h-1.5 md:w-2 md:h-2 rounded-full bg-red-500 shadow-[0_0_10px_rgba(239,68,68,1)] animate-ping -translate-x-1/2 md:translate-x-0"></div>
               
-              <h3 className="text-red-500 text-[10px] md:text-xs mb-2 font-bold tracking-widest">
+              <h3 className="text-red-500 text-[9px] md:text-xs mb-2 font-bold tracking-widest text-center md:text-left mt-2 md:mt-0">
                 URGENT OPERATIONAL HEARTBEAT
               </h3>
-              <div className="text-4xl md:text-6xl font-black text-red-500 tabular-nums drop-shadow-[0_0_15px_rgba(239,68,68,0.6)]">
+              <div className="text-3xl sm:text-4xl md:text-6xl font-black text-red-500 tabular-nums drop-shadow-[0_0_15px_rgba(239,68,68,0.6)] text-center md:text-left">
                  £{(liveBleedAmount || 0).toLocaleString('en-GB', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
               </div>
-              <p className="text-red-400/60 text-[9px] mt-2">LIVE REVENUE BLEED // COST OF DELAY IN REAL-TIME</p>
+              <p className="text-red-400/60 text-[8px] md:text-[9px] mt-1 md:mt-2 text-center md:text-left whitespace-normal break-words">LIVE REVENUE BLEED // COST OF DELAY IN REAL-TIME</p>
               
-              <div className="space-y-3 pt-8 w-full max-w-md">
-                 <div className="flex items-center gap-3">
-                   <span className="text-cyan-700 w-16 text-[9px]">PIPELINE 1</span>
+              <div className="space-y-3 pt-6 md:pt-8 w-full max-w-md mx-auto md:mx-0">
+                 <div className="flex items-center gap-2 md:gap-3">
+                   <span className="text-cyan-700 w-12 md:w-16 text-[8px] md:text-[9px]">PIPELINE 1</span>
                    <div className="h-[2px] flex-1 bg-cyan-950 relative overflow-hidden">
                       <div className="absolute left-0 top-0 h-full bg-cyan-600 w-3/4"></div>
                    </div>
                  </div>
-                 <div className="flex items-center gap-3">
-                   <span className="text-cyan-700 w-16 text-[9px]">CHECKOUT</span>
+                 <div className="flex items-center gap-2 md:gap-3">
+                   <span className="text-cyan-700 w-12 md:w-16 text-[8px] md:text-[9px]">CHECKOUT</span>
                    <div className="h-[2px] flex-1 bg-cyan-950 relative overflow-hidden">
                       <div className="absolute left-0 top-0 h-full bg-red-600 w-1/2"></div>
                    </div>
                  </div>
-                 <div className="flex items-center gap-3">
-                   <span className="text-cyan-700 w-16 text-[9px]">RETENTION</span>
+                 <div className="flex items-center gap-2 md:gap-3">
+                   <span className="text-cyan-700 w-12 md:w-16 text-[8px] md:text-[9px]">RETENTION</span>
                    <div className="h-[2px] flex-1 bg-cyan-950 relative overflow-hidden">
                       <div className="absolute left-0 top-0 h-full bg-cyan-800 w-11/12"></div>
                    </div>
@@ -344,31 +330,30 @@ export default function BoardroomDashboard() {
           </div>
         </div>
 
-        {/* MODULE 2: FRICTION MESH & EXECUTIVE RISK */}
-        <div className="w-full border border-cyan-900/40 bg-black/40 p-4 md:p-8 relative flex flex-col lg:flex-row gap-8 shadow-[0_0_15px_rgba(6,182,212,0.05)] rounded-xl">
+        <div className="w-full border border-cyan-900/40 bg-black/40 p-4 md:p-8 relative flex flex-col lg:flex-row gap-6 md:gap-8 shadow-[0_0_15px_rgba(6,182,212,0.05)] rounded-xl">
           
-          <div className="flex-1 flex flex-col justify-between border-b lg:border-b-0 lg:border-r border-cyan-900/30 pb-6 lg:pb-0 lg:pr-8">
+          <div className="flex-1 flex flex-col justify-between border-b lg:border-b-0 lg:border-r border-cyan-900/30 pb-6 lg:pb-0 lg:pr-8 w-full">
             <div>
-              <h2 className="text-xl md:text-2xl text-cyan-200 tracking-[0.2em] mb-4">EXECUTIVE RISK SUMMARY</h2>
-              <div className="text-[9px] md:text-[10px] text-cyan-700 mb-6 leading-relaxed">
-                <p>■ TENANT ID: {financialData?.tenantId || 'LOADING...'}</p>
-                <p>■ ENTERPRISE CLIENT: {financialData?.businessName || 'UNKNOWN'}</p>
-                <p>■ REPORT TIMESTAMP: {mounted ? sysTime : 'SYNCING...'}</p>
-                <p className="mt-2 text-cyan-800 font-bold">AUDIT PROTOCOL: DEFENSIVE REVENUE PRESERVATION</p>
+              <h2 className="text-lg md:text-2xl text-cyan-200 tracking-[0.1em] md:tracking-[0.2em] mb-4 whitespace-normal break-words">EXECUTIVE RISK SUMMARY</h2>
+              <div className="text-[8px] md:text-[10px] text-cyan-700 mb-4 md:mb-6 leading-relaxed w-full">
+                <p className="whitespace-normal break-words">■ TENANT ID: {financialData?.tenantId || 'LOADING...'}</p>
+                <p className="whitespace-normal break-words">■ ENTERPRISE CLIENT: {financialData?.businessName || 'UNKNOWN'}</p>
+                <p className="whitespace-normal break-words">■ REPORT TIMESTAMP: {mounted ? sysTime : 'SYNCING...'}</p>
+                <p className="mt-2 text-cyan-800 font-bold whitespace-normal break-words">AUDIT PROTOCOL: DEFENSIVE REVENUE PRESERVATION</p>
               </div>
 
-              <div className="border border-cyan-900/40 bg-cyan-950/10 p-4 relative">
+              <div className="border border-cyan-900/40 bg-cyan-950/10 p-3 md:p-4 relative">
                 <div className="absolute top-0 left-0 w-2 h-2 border-t border-l border-cyan-500"></div>
-                <h3 className="text-[10px] md:text-xs text-cyan-500 mb-3 border-b border-cyan-900/50 pb-2">PROFITABILITY & OPERATIONAL HEALTH</h3>
-                <div className={`text-[10px] md:text-xs text-cyan-400/80 leading-loose text-justify ${isLoading ? 'animate-pulse' : ''}`}>
+                <h3 className="text-[9px] md:text-xs text-cyan-500 mb-2 md:mb-3 border-b border-cyan-900/50 pb-2 whitespace-normal break-words">PROFITABILITY & OPERATIONAL HEALTH</h3>
+                <div className={`text-[9px] md:text-xs text-cyan-400/80 leading-loose text-justify whitespace-normal break-words ${isLoading ? 'animate-pulse' : ''}`}>
                   {briefing}
                 </div>
                 
                 {!isLoading && (
-                  <div className="mt-6 pt-4 border-t border-cyan-900/30">
+                  <div className="mt-4 md:mt-6 pt-4 border-t border-cyan-900/30">
                     <button 
                       onClick={() => setShowDetailedExplanation(!showDetailedExplanation)}
-                      className="text-cyan-600 hover:text-cyan-300 transition-colors cursor-pointer"
+                      className="text-cyan-600 hover:text-cyan-300 transition-colors cursor-pointer text-[8px] md:text-[10px] whitespace-normal break-words text-left"
                     >
                       {showDetailedExplanation ? "[ HIDE STRUCTURAL INCIDENT TIMELINE ]" : "[ VIEW STRUCTURAL INCIDENT TIMELINE ]"}
                     </button>
@@ -382,48 +367,46 @@ export default function BoardroomDashboard() {
               </div>
             </div>
 
-            <div className="mt-8 flex gap-4 items-end">
-              <div className="text-5xl md:text-6xl text-cyan-400 font-black tracking-tighter leading-none">ROI</div>
-              <div className="border border-yellow-500/50 bg-yellow-500/10 text-yellow-500 px-3 py-1 font-bold tracking-widest text-[10px] md:text-xs">
+            <div className="mt-6 md:mt-8 flex gap-3 md:gap-4 items-end justify-between md:justify-start">
+              <div className="text-4xl md:text-6xl text-cyan-400 font-black tracking-tighter leading-none">ROI</div>
+              <div className="border border-yellow-500/50 bg-yellow-500/10 text-yellow-500 px-2 py-1 md:px-3 md:py-1 font-bold tracking-widest text-[8px] md:text-xs text-center">
                 EXECUTIVE PRIORITY: HIGH
               </div>
             </div>
           </div>
 
-          <div className="flex-1 flex flex-col justify-start pt-4 lg:pt-0">
-             <h3 className="text-cyan-700 text-[10px] md:text-xs mb-4">STRUCTURAL RESISTANCE // MARKET FRICTION</h3>
+          <div className="flex-1 flex flex-col justify-start pt-2 md:pt-4 lg:pt-0 w-full overflow-hidden">
+             <h3 className="text-cyan-700 text-[9px] md:text-xs mb-3 md:mb-4 whitespace-normal break-words">STRUCTURAL RESISTANCE // MARKET FRICTION</h3>
              
              {frictionData && (
-              <div className="space-y-3 text-[10px] md:text-xs mb-6 bg-cyan-950/5 p-4 border border-cyan-900/30">
-                <div className="flex gap-3 items-center">
-                   <div className="bg-cyan-800 text-black px-2 py-0.5">ACQUISITION NODE</div>
-                   <div className="border border-cyan-900/50 px-2 py-0.5 text-cyan-500 flex-1 overflow-hidden whitespace-nowrap overflow-ellipsis">
+              <div className="space-y-2 md:space-y-3 text-[8px] md:text-xs mb-4 md:mb-6 bg-cyan-950/5 p-3 md:p-4 border border-cyan-900/30 w-full">
+                <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 items-start sm:items-center">
+                   <div className="bg-cyan-800 text-black px-1.5 py-0.5 md:px-2 whitespace-nowrap">ACQUISITION NODE</div>
+                   <div className="border border-cyan-900/50 px-2 py-0.5 text-cyan-500 w-full overflow-hidden whitespace-nowrap overflow-ellipsis">
                      {frictionData.elementId}
                    </div>
-                   <div className="text-red-400 font-bold">{frictionData.rageClicks} ABANDONED</div>
+                   <div className="text-red-400 font-bold whitespace-nowrap">{frictionData.rageClicks} ABANDONED</div>
                 </div>
-                <div className="flex gap-3 items-center">
-                   <div className="bg-cyan-800 text-black px-2 py-0.5">STRUCTURAL BLOCK</div>
-                   <div className="border border-cyan-900/50 px-2 py-0.5 text-cyan-500 flex-1 overflow-hidden whitespace-nowrap overflow-ellipsis">
+                <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 items-start sm:items-center">
+                   <div className="bg-cyan-800 text-black px-1.5 py-0.5 md:px-2 whitespace-nowrap">STRUCTURAL BLOCK</div>
+                   <div className="border border-cyan-900/50 px-2 py-0.5 text-cyan-500 w-full overflow-hidden whitespace-nowrap overflow-ellipsis">
                      {frictionData.apiEndpoint}
                    </div>
-                   <div className="text-purple-400 font-bold">{frictionData.latencyMs}ms DELAY</div>
+                   <div className="text-purple-400 font-bold whitespace-nowrap">{frictionData.latencyMs}ms DELAY</div>
                 </div>
               </div>
             )}
 
-             <div className="opacity-80 hover:opacity-100 transition-opacity w-full">
+             <div className="opacity-80 hover:opacity-100 transition-opacity w-full overflow-hidden">
                <LiveBleedTicker events={frictionData?.recentEvents || []} />
              </div>
           </div>
         </div>
 
-        {/* MODULE 3: TOPOGRAPHIC MESH GRID & REMEDIATION TERMINAL */}
-        <div className="w-full border border-cyan-900/40 bg-black/40 p-4 md:p-8 relative min-h-[500px] flex flex-col items-center shadow-[0_0_15px_rgba(6,182,212,0.05)] overflow-hidden rounded-xl">
+        <div className="w-full border border-cyan-900/40 bg-black/40 p-4 md:p-8 relative min-h-[400px] md:min-h-[500px] flex flex-col items-center shadow-[0_0_15px_rgba(6,182,212,0.05)] overflow-hidden rounded-xl">
           
-          {/* Topographic Mesh Grid Overlay */}
           <div className="absolute inset-0 flex items-end justify-center opacity-40 pointer-events-none">
-             <svg viewBox="0 0 1000 400" className="w-full h-full drop-shadow-[0_0_15px_rgba(34,211,238,0.5)]">
+             <svg viewBox="0 0 1000 400" className="w-full h-full drop-shadow-[0_0_15px_rgba(34,211,238,0.5)]" preserveAspectRatio="xMidYMax slice">
                <defs>
                  <linearGradient id="grid-fade" x1="0%" y1="0%" x2="0%" y2="100%">
                    <stop offset="0%" stopColor="#0891b2" stopOpacity="0.8" />
@@ -436,7 +419,6 @@ export default function BoardroomDashboard() {
                  <path d="M0,350 Q400,200 800,380 T1100,300" strokeWidth="0.5" />
                </g>
                
-               {/* Glowing Market Friction Nodes */}
                <circle cx="280" cy="140" r="4" fill="#ef4444" className="animate-ping" />
                <circle cx="280" cy="140" r="2" fill="#fff" />
                
@@ -447,8 +429,8 @@ export default function BoardroomDashboard() {
              </svg>
           </div>
 
-          <div className="z-10 bg-black/70 px-6 py-2 border border-cyan-900/50 backdrop-blur-sm text-center mb-8 inline-block shadow-[0_0_10px_rgba(34,211,238,0.2)]">
-            <p className="text-cyan-500 text-[9px] md:text-[10px] tracking-[0.3em] font-bold">
+          <div className="z-10 bg-black/70 px-4 py-1.5 md:px-6 md:py-2 border border-cyan-900/50 backdrop-blur-sm text-center mb-6 md:mb-8 inline-block shadow-[0_0_10px_rgba(34,211,238,0.2)]">
+            <p className="text-cyan-500 text-[8px] md:text-[10px] tracking-[0.2em] md:tracking-[0.3em] font-bold whitespace-nowrap">
                MACRO VIEW // MARKET FRICTION TOPOGRAPHY
             </p>
           </div>
@@ -462,7 +444,6 @@ export default function BoardroomDashboard() {
 
       </div>
 
-      {/* BOTTOM WAVEFORMS & RULER */}
       <footer className="mt-8 pt-4 border-t border-cyan-900/40 flex justify-between items-end shrink-0 relative z-10 hidden md:flex w-full">
         <div className="flex items-end gap-1 h-6">
            {[...Array(30)].map((_, i) => (
