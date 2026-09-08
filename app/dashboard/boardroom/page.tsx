@@ -9,7 +9,7 @@ import IncidentTimeline from '../../components/IncidentTimeline';
 import RemediationTerminal from '../../components/RemediationTerminal';
 
 // WebGL 3D Scatter Plot & Constellation Mesh
-const DataConstellation = ({ rageClicks, latency }: { rageClicks: number, latency: number }) => {
+const DataConstellation = ({ rageClicks, latency }: { rageClicks: number; latency: number }) => {
   const pointsRef = useRef<THREE.Points>(null);
   const linesRef = useRef<THREE.LineSegments>(null);
 
@@ -18,7 +18,7 @@ const DataConstellation = ({ rageClicks, latency }: { rageClicks: number, latenc
   const { positions, colors, indices } = useMemo(() => {
     const positions = new Float32Array(particleCount * 3);
     const colors = new Float32Array(particleCount * 3);
-    const indices = [];
+    const indices: number[] = [];
 
     const colorHealthy = new THREE.Color('#22d3ee'); 
     const colorFriction = new THREE.Color('#ff2a2a'); 
@@ -298,7 +298,6 @@ export default function BoardroomDashboard() {
                  {financialData ? `£${(financialData.projectedQuarterlyLeakage || 0).toLocaleString()}` : '£0'}
               </div>
 
-              {/* Expanded 3D Canvas height for widescreen viewports */}
               <div className="h-48 sm:h-64 md:h-80 lg:h-[350px] w-full mt-4 md:mt-6 relative bg-black/40 border border-cyan-900/40 rounded-xl overflow-hidden shadow-[inset_0_0_20px_rgba(6,182,212,0.1)]">
                 {mounted && (
                   <Canvas camera={{ position: [0, 1.5, 5.5], fov: 50 }}>
