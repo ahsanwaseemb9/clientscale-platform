@@ -1,15 +1,15 @@
+// app/components/RemediationTerminal.tsx
 'use client';
 
 import { useEffect, useState } from 'react';
 import { createClient } from '@supabase/supabase-js';
-import { Terminal, Play, CheckCircle2, RefreshCw } from 'lucide-react';
+import { Terminal, Play, CheckCircle2 } from 'lucide-react';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
-const supabase = createClient(
-  supabaseUrl || 'https://placeholder.supabase.co', 
-  supabaseAnonKey || 'placeholder'
-);
+const supabase = (supabaseUrl && supabaseAnonKey) 
+  ? createClient(supabaseUrl, supabaseAnonKey) 
+  : null;
 
 const MOCK_PATCH = {
   id: 'mock-patch-01',
@@ -29,81 +29,58 @@ export async function POST(req: Request) {
 };
 
 export default function RemediationTerminal({ tenantId }: { tenantId?: string }) {
-  const [patches, setPatches] = useState<any[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [patches, setPatches] = useState<any[]>([MOCK_PATCH]);
   const [deployingId, setDeployingId] = useState<string | null>(null);
-  const [fetchError, setFetchError] = useState<string | null>(null);
-
-  const fetchPatches = async () => {
-    setIsLoading(true);
-    try {
-      if (!supabaseUrl || !supabaseAnonKey) {
-        setPatches([MOCK_PATCH]);
-        setIsLoading(false);
-        return;
-      }
-
-      // Race Supabase query against a 2.5s timeout to prevent hanging on mobile/slow networks
-      const fetchPromise = supabase
-        .from('autonomous_patches')
-        .select('*')
-        .order('created_at', { ascending: false });
-
-      const timeoutPromise = new Promise((_, reject) => 
-        setTimeout(() => reject(new Error('Supabase request timeout')), 2500)
-      );
-
-      const result: any = await Promise.race([fetchPromise, timeoutPromise]);
-      const { data, error } = result;
-      
-      if (error) {
-        console.error('[Terminal Fetch Error]:', error.message);
-        setFetchError(error.message);
-        setPatches([MOCK_PATCH]);
-      } else if (data && data.length > 0) {
-        setPatches(data);
-      } else {
-        setPatches([MOCK_PATCH]);
-      }
-    } catch (err: any) {
-      console.error('[Terminal Exception / Timeout]:', err);
-      setPatches([MOCK_PATCH]);
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
   useEffect(() => {
-    fetchPatches();
+    if (!supabase) return;
 
-    if (supabaseUrl && supabaseAnonKey) {
+    async function fetchPatches() {
       try {
-        const channel = supabase
-          .channel('realtime-patches-all')
-          .on(
-            'postgres_changes',
-            { event: 'INSERT', schema: 'public', table: 'autonomous_patches' },
-            (payload) => {
-              console.log('[Realtime Patch Caught]:', payload.new);
-              setPatches((current) => [payload.new, ...current]);
-            }
-          )
-          .subscribe();
+        let query = supabase!
+          .from('autonomous_patches')
+          .select('*')
+          .order('created_at', { ascending: false });
 
-        return () => { 
-          try { supabase.removeChannel(channel); } catch (e) {} 
-        };
-      } catch (e) {
-        console.error('[Realtime Setup Error]:', e);
+        if (tenantId) {
+          query = query.eq('tenant_id', tenantId);
+        }
+
+        const { data, error } = await query;
+        
+        if (!error && data && data.length > 0) {
+          setPatches(data);
+        }
+      } catch (err) {
+        console.error('[Terminal Fetch Error]:', err);
       }
     }
-  }, []);
+
+    fetchPatches();
+
+    const channel = supabase
+      .channel('realtime-patches-all')
+      .on(
+        'postgres_changes',
+        { event: 'INSERT', schema: 'public', table: 'autonomous_patches' },
+        (payload) => {
+          if (!tenantId || payload.new.tenant_id === tenantId) {
+            setPatches((current) => [payload.new, ...current]);
+          }
+        }
+      )
+      .subscribe();
+
+    return () => { 
+      supabase.removeChannel(channel); 
+    };
+  }, [tenantId]);
 
   const handleDeploy = async (patchId: string) => {
     setDeployingId(patchId);
     
     setTimeout(async () => {
-      if (!patchId.startsWith('mock-') && supabaseUrl && supabaseAnonKey) {
+      if (!patchId.startsWith('mock-') && supabase) {
         try {
           await supabase.from('autonomous_patches').update({ status: 'deployed' }).eq('id', patchId);
         } catch (e) {
@@ -114,15 +91,6 @@ export default function RemediationTerminal({ tenantId }: { tenantId?: string })
       setDeployingId(null);
     }, 2000);
   };
-
-  if (isLoading) {
-    return (
-      <div className="w-full bg-black/40 border border-cyan-900/40 rounded-xl p-6 font-mono text-sm text-cyan-500 flex items-center justify-center gap-3 shadow-inner mt-4">
-        <RefreshCw size={16} className="animate-spin text-cyan-400" />
-        <span className="tracking-widest uppercase text-xs">Loading Autonomous Healing Terminal...</span>
-      </div>
-    );
-  }
 
   return (
     <div className="space-y-6 mt-4 pb-6">
