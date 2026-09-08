@@ -50,7 +50,8 @@ export default function RemediationTerminal({ tenantId }: { tenantId?: string })
           .select('*')
           .order('created_at', { ascending: false });
 
-        if (tenantId) {
+        // Only filter by tenantId if it's a valid real UUID and not the placeholder
+        if (tenantId && tenantId !== 'test-tenant-123') {
           query = query.eq('tenant_id', tenantId);
         }
 
@@ -58,8 +59,9 @@ export default function RemediationTerminal({ tenantId }: { tenantId?: string })
         
         if (!isMounted) return;
 
-        if (!error && data && Array.isArray(data) && data.length > 0) {
-          setPatches(data);
+        if (!error && data) {
+          // If database records exist, replace patches with real data
+          setPatches(data.length > 0 ? data : [MOCK_PATCH]);
         }
       } catch (err) {
         console.error('[Terminal Fetch Error]:', err);
@@ -80,8 +82,11 @@ export default function RemediationTerminal({ tenantId }: { tenantId?: string })
             { event: 'INSERT', schema: 'public', table: 'autonomous_patches' },
             (payload: any) => {
               if (!isMounted || !payload?.new) return;
-              if (!tenantId || payload.new.tenant_id === tenantId) {
-                setPatches((current) => [payload.new, ...(Array.isArray(current) ? current : [])]);
+              if (!tenantId || tenantId === 'test-tenant-123' || payload.new.tenant_id === tenantId) {
+                setPatches((current) => {
+                  const filtered = (Array.isArray(current) ? current : []).filter(p => p.id !== 'mock-patch-01');
+                  return [payload.new, ...filtered];
+                });
               }
             }
           )
@@ -125,7 +130,9 @@ export default function RemediationTerminal({ tenantId }: { tenantId?: string })
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>
             <span className="relative inline-flex rounded-full h-3 w-3 bg-cyan-500"></span>
           </div>
-          <h2 className="text-xs sm:text-sm md:text-base font-semibold text-cyan-200 tracking-wider">Autonomous Healing Required</h2>
+          <h2 className="text-xs sm:text-sm md:text-base font-semibold text-cyan-200 tracking-wider">
+            Autonomous Healing Required ({patches.length})
+          </h2>
         </div>
 
         {isLoading && patches.length === 0 && (
@@ -143,7 +150,7 @@ export default function RemediationTerminal({ tenantId }: { tenantId?: string })
               <div className="bg-[#090d16] border-b border-cyan-900/40 px-3 sm:px-4 py-3 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
                 <div className="flex items-center gap-2 text-[10px] sm:text-xs text-cyan-400 font-mono w-full sm:w-auto overflow-hidden">
                   <Terminal size={14} className="text-cyan-400 shrink-0" />
-                  <span className="truncate">client_scale_remediation_agent.sh</span>
+                  <span className="truncate">client_scale_remediation_agent.sh // ID: {patch.id?.substring(0, 8)}...</span>
                 </div>
                 <span className="text-[9px] sm:text-[10px] uppercase tracking-widest bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 px-2 py-0.5 rounded shrink-0">
                   {patch.status || 'Ready to Push'}
