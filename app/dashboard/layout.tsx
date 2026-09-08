@@ -25,14 +25,16 @@ export default function DashboardLayout({
   return (
     <div className="flex h-[100dvh] bg-[#09090b] text-gray-200 font-sans selection:bg-cyan-500/30 overflow-hidden relative">
       
-      {/* Universal Floating Menu Trigger */}
-      <button 
-        onClick={() => setIsDrawerOpen(true)}
-        className="fixed top-4 left-4 md:top-6 md:left-6 z-40 p-2.5 bg-[#0f0f12]/90 backdrop-blur-md border border-gray-800 rounded-lg text-gray-400 hover:text-cyan-400 hover:border-cyan-900/50 shadow-[0_0_15px_rgba(0,0,0,0.5)] transition-all group"
-        aria-label="Open Navigation"
-      >
-        <Menu size={20} className="transition-transform group-active:scale-95" />
-      </button>
+      {/* Universal Floating Menu Trigger (Hidden when healing drawer is open) */}
+      {!isHealingDrawerOpen && (
+        <button 
+          onClick={() => setIsDrawerOpen(true)}
+          className="fixed top-4 left-4 md:top-6 md:left-6 z-40 p-2.5 bg-[#0f0f12]/90 backdrop-blur-md border border-gray-800 rounded-lg text-gray-400 hover:text-cyan-400 hover:border-cyan-900/50 shadow-[0_0_15px_rgba(0,0,0,0.5)] transition-all group"
+          aria-label="Open Navigation"
+        >
+          <Menu size={20} className="transition-transform group-active:scale-95" />
+        </button>
+      )}
 
       {/* Backdrop Overlay (closes drawer when clicking outside) */}
       {isDrawerOpen && (
