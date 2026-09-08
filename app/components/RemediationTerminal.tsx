@@ -1,4 +1,3 @@
-// app/components/RemediationTerminal.tsx
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -7,7 +6,10 @@ import { Terminal, Play, CheckCircle2, RefreshCw } from 'lucide-react';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
-const supabase = createClient(supabaseUrl, supabaseAnonKey);
+const supabase = createClient(
+  supabaseUrl || 'https://placeholder.supabase.co', 
+  supabaseAnonKey || 'placeholder'
+);
 
 const MOCK_PATCH = {
   id: 'mock-patch-01',
@@ -41,10 +43,18 @@ export default function RemediationTerminal({ tenantId }: { tenantId?: string })
         return;
       }
 
-      const { data, error } = await supabase
+      // Race Supabase query against a 2.5s timeout to prevent hanging on mobile/slow networks
+      const fetchPromise = supabase
         .from('autonomous_patches')
         .select('*')
         .order('created_at', { ascending: false });
+
+      const timeoutPromise = new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('Supabase request timeout')), 2500)
+      );
+
+      const result: any = await Promise.race([fetchPromise, timeoutPromise]);
+      const { data, error } = result;
       
       if (error) {
         console.error('[Terminal Fetch Error]:', error.message);
@@ -56,7 +66,7 @@ export default function RemediationTerminal({ tenantId }: { tenantId?: string })
         setPatches([MOCK_PATCH]);
       }
     } catch (err: any) {
-      console.error('[Terminal Exception]:', err);
+      console.error('[Terminal Exception / Timeout]:', err);
       setPatches([MOCK_PATCH]);
     } finally {
       setIsLoading(false);
@@ -67,19 +77,25 @@ export default function RemediationTerminal({ tenantId }: { tenantId?: string })
     fetchPatches();
 
     if (supabaseUrl && supabaseAnonKey) {
-      const channel = supabase
-        .channel('realtime-patches-all')
-        .on(
-          'postgres_changes',
-          { event: 'INSERT', schema: 'public', table: 'autonomous_patches' },
-          (payload) => {
-            console.log('[Realtime Patch Caught]:', payload.new);
-            setPatches((current) => [payload.new, ...current]);
-          }
-        )
-        .subscribe();
+      try {
+        const channel = supabase
+          .channel('realtime-patches-all')
+          .on(
+            'postgres_changes',
+            { event: 'INSERT', schema: 'public', table: 'autonomous_patches' },
+            (payload) => {
+              console.log('[Realtime Patch Caught]:', payload.new);
+              setPatches((current) => [payload.new, ...current]);
+            }
+          )
+          .subscribe();
 
-      return () => { supabase.removeChannel(channel); };
+        return () => { 
+          try { supabase.removeChannel(channel); } catch (e) {} 
+        };
+      } catch (e) {
+        console.error('[Realtime Setup Error]:', e);
+      }
     }
   }, []);
 
@@ -88,7 +104,11 @@ export default function RemediationTerminal({ tenantId }: { tenantId?: string })
     
     setTimeout(async () => {
       if (!patchId.startsWith('mock-') && supabaseUrl && supabaseAnonKey) {
-        await supabase.from('autonomous_patches').update({ status: 'deployed' }).eq('id', patchId);
+        try {
+          await supabase.from('autonomous_patches').update({ status: 'deployed' }).eq('id', patchId);
+        } catch (e) {
+          console.error('[Deploy Error]:', e);
+        }
       }
       setPatches((current) => current.filter(p => p.id !== patchId));
       setDeployingId(null);
@@ -130,7 +150,9 @@ export default function RemediationTerminal({ tenantId }: { tenantId?: string })
           <div className="p-4 sm:p-6 space-y-4">
             <div className="flex items-start gap-3">
               <CheckCircle2 size={18} className="text-cyan-400 shrink-0 mt-0.5" />
-              <p className="text-xs sm:text-sm text-gray-300 leading-relaxed font-sans">{patch.patch_description}</p>
+              <p className="text-xs sm:text-sm text-gray-300 leading-relaxed font-sans">
+                {patch.patch_description || patch.path_description}
+              </p>
             </div>
             
             <div className="bg-[#02060f] p-4 rounded-lg border border-cyan-950 overflow-x-auto shadow-inner">
