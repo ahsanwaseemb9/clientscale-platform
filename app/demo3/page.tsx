@@ -4,9 +4,9 @@
 import { useState, useEffect, useRef, useMemo } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
-import LiveBleedTicker from '../../components/LiveBleedTicker';
-import IncidentTimeline from '../../components/IncidentTimeline';
-import RemediationTerminal from '../../components/RemediationTerminal';
+import LiveBleedTicker from './../components/LiveBleedTicker';
+import IncidentTimeline from './../components/IncidentTimeline';
+import RemediationTerminal from './../components/RemediationTerminal';
 
 // WebGL 3D Scatter Plot & Constellation Mesh
 const DataConstellation = ({ rageClicks, latency }: { rageClicks: number, latency: number }) => {
@@ -103,7 +103,7 @@ const DataConstellation = ({ rageClicks, latency }: { rageClicks: number, latenc
         <bufferGeometry>
           <bufferAttribute attach="attributes-position" count={positions.length / 3} array={positions} itemSize={3} />
           <bufferAttribute attach="attributes-color" count={colors.length / 3} array={colors} itemSize={3} />
-          <bufferAttribute attach="index" array={indices} itemSize={1} count={indices.length} />
+          <bufferAttribute attach="index" array={indices} itemSize={1} />
         </bufferGeometry>
         <lineBasicMaterial 
           vertexColors 
@@ -143,7 +143,6 @@ export default function BoardroomDashboard() {
   const [sysTime, setSysTime] = useState<string>('');
 
   useEffect(() => {
-    let isSubscribed = true;
     setMounted(true);
     setSysTime(new Date().toISOString());
 
@@ -151,8 +150,6 @@ export default function BoardroomDashboard() {
       try {
         const dbResponse = await fetch('/api/financials');
         const dbResult = await dbResponse.json();
-
-        if (!isSubscribed) return;
 
         if (!dbResult?.success || !dbResult?.data) {
           setBriefing("Awaiting baseline data. Deploy the telemetry pixel to visualize market friction.");
@@ -202,8 +199,6 @@ export default function BoardroomDashboard() {
         });
         
         const aiData = await aiResponse.json();
-        if (!isSubscribed) return;
-
         if (aiData?.success && aiData?.briefing) {
           setBriefing(aiData.briefing);
         } else {
@@ -211,21 +206,13 @@ export default function BoardroomDashboard() {
         }
       } catch (error) {
         console.error("Dashboard Load Error:", error);
-        if (isSubscribed) {
-          setBriefing("Failed to connect to the capital intelligence stream.");
-        }
+        setBriefing("Failed to connect to the capital intelligence stream.");
       } finally {
-        if (isSubscribed) {
-          setIsLoading(false);
-        }
+        setIsLoading(false);
       }
     }
 
     loadLiveDashboard();
-
-    return () => {
-      isSubscribed = false;
-    };
   }, []);
 
   useEffect(() => {
@@ -255,9 +242,9 @@ export default function BoardroomDashboard() {
         </div>
         
         <div className="flex-1 w-full mx-4 lg:mx-8 hidden md:block">
-          <div className="flex justify-between text-cyan-800 text-[9px] border-b border-cyan-900/50 pb-1 relative w-full">
-             {[100, 110, 120, 125, 130, 135, 140, 145, 150, 155, 160, 165, 170, 175, 180, 185, 190, 200].map((num) => (
-                <div key={num} className="relative flex flex-col items-center flex-1">
+          <div className="flex justify-between text-cyan-800 text-[9px] border-b border-cyan-900/50 pb-1 relative">
+             {[100, 125, 130, 135, 140, 145, 150, 155, 160, 165, 170, 175, 180].map((num) => (
+                <div key={num} className="relative flex flex-col items-center">
                   <span>{num}</span>
                   <div className="w-px h-2 bg-cyan-800 absolute -bottom-1"></div>
                 </div>
@@ -275,8 +262,8 @@ export default function BoardroomDashboard() {
 
       <div className="flex-1 flex flex-col gap-6 md:gap-8 relative z-10 w-full">
         
-        {/* MAIN EXECUTIVE DASHBOARD CARD */}
         <div className="w-full border border-cyan-900/40 bg-black/40 p-4 md:p-8 relative shadow-[0_0_15px_rgba(6,182,212,0.05)] rounded-xl">
+          {/* Mobile Header Block with clear separating border line */}
           <div className="flex justify-between items-start border-b border-cyan-900/50 pb-3 mb-4 md:border-b-0 md:pb-0 md:mb-0 md:absolute md:top-4 md:right-4 z-10">
             <div className="block md:hidden">
               <span className="text-[9px] text-cyan-500 block leading-tight">CAPITAL CONCENTRATION // PROFIT DRAG</span>
@@ -288,28 +275,25 @@ export default function BoardroomDashboard() {
             </div>
           </div>
 
-          <div className="flex flex-col lg:flex-row gap-6 md:gap-8 lg:gap-12 w-full">
+          <div className="flex flex-col lg:flex-row gap-6 md:gap-8 lg:gap-16">
             <div className="flex-1 relative z-10 w-full">
               <h3 className="hidden md:flex text-cyan-700 text-[9px] md:text-xs mb-2 border-b border-cyan-900/50 pb-2 justify-between">
                 <span className="whitespace-normal break-words leading-snug">CAPITAL CONCENTRATION // PROFIT DRAG</span>
                 <span className="text-cyan-500">90-DAY PROJECTION</span>
               </h3>
-              <div className="text-3xl sm:text-5xl md:text-7xl font-normal text-white tracking-[0.05em] md:tracking-[0.1em] drop-shadow-[0_0_8px_rgba(255,255,255,0.4)] mt-1 md:mt-2">
+              <div className="text-3xl sm:text-4xl md:text-6xl font-normal text-white tracking-[0.05em] md:tracking-[0.1em] drop-shadow-[0_0_8px_rgba(255,255,255,0.4)] mt-1 md:mt-2">
                  {financialData ? `£${(financialData.projectedQuarterlyLeakage || 0).toLocaleString()}` : '£0'}
               </div>
 
-              {/* Expanded 3D Canvas height for widescreen viewports */}
-              <div className="h-48 sm:h-64 md:h-80 lg:h-[350px] w-full mt-4 md:mt-6 relative bg-black/40 border border-cyan-900/40 rounded-xl overflow-hidden shadow-[inset_0_0_20px_rgba(6,182,212,0.1)]">
-                {mounted && (
-                  <Canvas camera={{ position: [0, 1.5, 5.5], fov: 50 }}>
-                    {frictionData ? (
-                      <DataConstellation 
-                        rageClicks={frictionData.rageClicks} 
-                        latency={frictionData.latencyMs} 
-                      />
-                    ) : null}
-                  </Canvas>
-                )}
+              <div className="h-36 sm:h-48 md:h-64 w-full mt-4 md:mt-6 relative bg-black/40 border border-cyan-900/40 rounded-xl overflow-hidden shadow-[inset_0_0_20px_rgba(6,182,212,0.1)]">
+                <Canvas camera={{ position: [0, 1.5, 5.5], fov: 50 }}>
+                  {frictionData ? (
+                    <DataConstellation 
+                      rageClicks={frictionData.rageClicks} 
+                      latency={frictionData.latencyMs} 
+                    />
+                  ) : null}
+                </Canvas>
                 <div className="absolute bottom-2 md:bottom-3 left-2 md:left-4 text-cyan-600 text-[7px] md:text-[8px] pointer-events-none tracking-widest flex items-center gap-1.5 md:gap-2 bg-black/50 px-2 py-1 rounded">
                   <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse shadow-[0_0_8px_#22d3ee]"></span>
                   LIVE NODE TOPOGRAPHY // SYNCED
@@ -317,34 +301,33 @@ export default function BoardroomDashboard() {
               </div>
             </div>
 
-            <div className="flex-1 border-t-2 md:border-t-0 md:border-l-2 border-red-600/80 pt-4 md:pt-0 pl-0 md:pl-8 lg:pl-12 py-2 flex flex-col justify-center relative bg-gradient-to-b md:bg-gradient-to-r from-red-950/10 to-transparent w-full">
+            <div className="flex-1 border-t-2 md:border-t-0 md:border-l-2 border-red-600/80 pt-4 md:pt-0 pl-0 md:pl-8 py-2 flex flex-col justify-center relative bg-gradient-to-b md:bg-gradient-to-r from-red-950/10 to-transparent w-full">
               <div className="absolute left-1/2 -top-[3px] md:left-[-6px] md:top-8 w-1.5 h-1.5 md:w-2 md:h-2 rounded-full bg-red-500 shadow-[0_0_10px_rgba(239,68,68,1)] animate-ping -translate-x-1/2 md:translate-x-0"></div>
               
               <h3 className="text-red-500 text-[9px] md:text-xs mb-2 font-bold tracking-widest text-center md:text-left mt-2 md:mt-0">
                 URGENT OPERATIONAL HEARTBEAT
               </h3>
-              <div className="text-3xl sm:text-5xl md:text-7xl font-black text-red-500 tabular-nums drop-shadow-[0_0_15px_rgba(239,68,68,0.6)] text-center md:text-left">
+              <div className="text-3xl sm:text-4xl md:text-6xl font-black text-red-500 tabular-nums drop-shadow-[0_0_15px_rgba(239,68,68,0.6)] text-center md:text-left">
                  £{(liveBleedAmount || 0).toLocaleString('en-GB', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
               </div>
               <p className="text-red-400/60 text-[8px] md:text-[9px] mt-1 md:mt-2 text-center md:text-left whitespace-normal break-words">LIVE REVENUE BLEED // COST OF DELAY IN REAL-TIME</p>
               
-              {/* Removed max-w-md constraint to allow full width fill */}
-              <div className="space-y-4 pt-6 md:pt-8 w-full">
-                 <div className="flex items-center gap-2 md:gap-4">
-                   <span className="text-cyan-700 w-16 md:w-24 text-[8px] md:text-[10px]">PIPELINE</span>
-                   <div className="h-[3px] flex-1 bg-cyan-950 relative overflow-hidden rounded-full">
+              <div className="space-y-3 pt-6 md:pt-8 w-full max-w-md mx-auto md:mx-0">
+                 <div className="flex items-center gap-2 md:gap-3">
+                   <span className="text-cyan-700 w-12 md:w-16 text-[8px] md:text-[9px]">PIPELINE 1</span>
+                   <div className="h-[2px] flex-1 bg-cyan-950 relative overflow-hidden">
                       <div className="absolute left-0 top-0 h-full bg-cyan-600 w-3/4"></div>
                    </div>
                  </div>
-                 <div className="flex items-center gap-2 md:gap-4">
-                   <span className="text-cyan-700 w-16 md:w-24 text-[8px] md:text-[10px]">CHECKOUT</span>
-                   <div className="h-[3px] flex-1 bg-cyan-950 relative overflow-hidden rounded-full">
-                      <div className="absolute left-0 top-0 h-red-600 w-1/2 bg-red-600"></div>
+                 <div className="flex items-center gap-2 md:gap-3">
+                   <span className="text-cyan-700 w-12 md:w-16 text-[8px] md:text-[9px]">CHECKOUT</span>
+                   <div className="h-[2px] flex-1 bg-cyan-950 relative overflow-hidden">
+                      <div className="absolute left-0 top-0 h-full bg-red-600 w-1/2"></div>
                    </div>
                  </div>
-                 <div className="flex items-center gap-2 md:gap-4">
-                   <span className="text-cyan-700 w-16 md:w-24 text-[8px] md:text-[10px]">RETENTION</span>
-                   <div className="h-[3px] flex-1 bg-cyan-950 relative overflow-hidden rounded-full">
+                 <div className="flex items-center gap-2 md:gap-3">
+                   <span className="text-cyan-700 w-12 md:w-16 text-[8px] md:text-[9px]">RETENTION</span>
+                   <div className="h-[2px] flex-1 bg-cyan-950 relative overflow-hidden">
                       <div className="absolute left-0 top-0 h-full bg-cyan-800 w-11/12"></div>
                    </div>
                  </div>
@@ -353,7 +336,6 @@ export default function BoardroomDashboard() {
           </div>
         </div>
 
-        {/* RISK & FRICTION SUMMARY ROW */}
         <div className="w-full border border-cyan-900/40 bg-black/40 p-4 md:p-8 relative flex flex-col lg:flex-row gap-6 md:gap-8 shadow-[0_0_15px_rgba(6,182,212,0.05)] rounded-xl">
           
           <div className="flex-1 flex flex-col justify-between border-b lg:border-b-0 lg:border-r border-cyan-900/30 pb-6 lg:pb-0 lg:pr-8 w-full">
@@ -366,7 +348,7 @@ export default function BoardroomDashboard() {
                 <p className="mt-2 text-cyan-800 font-bold whitespace-normal break-words">AUDIT PROTOCOL: DEFENSIVE REVENUE PRESERVATION</p>
               </div>
 
-              <div className="border border-cyan-900/40 bg-cyan-950/10 p-4 md:p-6 relative">
+              <div className="border border-cyan-900/40 bg-cyan-950/10 p-3 md:p-4 relative">
                 <div className="absolute top-0 left-0 w-2 h-2 border-t border-l border-cyan-500"></div>
                 <h3 className="text-[9px] md:text-xs text-cyan-500 mb-2 md:mb-3 border-b border-cyan-900/50 pb-2 whitespace-normal break-words">PROFITABILITY & OPERATIONAL HEALTH</h3>
                 <div className={`text-[9px] md:text-xs text-cyan-400/80 leading-loose text-justify whitespace-normal break-words ${isLoading ? 'animate-pulse' : ''}`}>
@@ -427,7 +409,7 @@ export default function BoardroomDashboard() {
           </div>
         </div>
 
-        {/* DESKTOP VIEW: FULL WIDE INLINE TERMINAL */}
+        {/* DESKTOP VIEW: MACRO VIEW // MARKET FRICTION TOPOGRAPHY (UNTOUCHED) */}
         <div className="hidden md:flex w-full border border-cyan-900/40 bg-black/40 p-8 relative min-h-[500px] flex-col items-center shadow-[0_0_15px_rgba(6,182,212,0.05)] overflow-hidden rounded-xl">
           <div className="absolute inset-0 flex items-end justify-center opacity-40 pointer-events-none">
              <svg viewBox="0 0 1000 400" className="w-full h-full drop-shadow-[0_0_15px_rgba(34,211,238,0.5)]" preserveAspectRatio="xMidYMax slice">
@@ -456,15 +438,14 @@ export default function BoardroomDashboard() {
             </p>
           </div>
           
-          {/* Removed max-w-5xl constraint to expand terminal across 100% of available space */}
-          <div className="relative z-20 w-full flex-1 flex flex-col">
+          <div className="relative z-20 w-full max-w-5xl mx-auto flex-1 flex flex-col">
             {financialData?.tenantId && (
               <RemediationTerminal tenantId={financialData.tenantId} />
             )}
           </div>
         </div>
 
-        {/* MOBILE VIEW: BOTTOM DRAWER TRIGGER CARD */}
+        {/* MOBILE VIEW: SLEEK BOTTOM DRAWER TRIGGER CARD & SLIDE-UP TERMINAL DRAWER */}
         <div className="block md:hidden w-full border border-cyan-900/40 bg-black/40 p-4 relative shadow-[0_0_15px_rgba(6,182,212,0.05)] rounded-xl overflow-hidden">
           <div className="flex items-center justify-between mb-3 border-b border-cyan-900/40 pb-2">
             <div className="flex items-center gap-2">
