@@ -4,7 +4,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Activity, Zap, Cpu, Search, ShieldCheck, Brain, Menu, X } from 'lucide-react'; 
+import { Activity, Zap, Cpu, Search, ShieldCheck, Brain, LayoutGrid, X } from 'lucide-react'; 
 
 export default function DashboardLayout({
   children,
@@ -15,7 +15,7 @@ export default function DashboardLayout({
   const [isHealingDrawerOpen, setIsHealingDrawerOpen] = useState(false);
   const pathname = usePathname() || '';
 
-  // Synchronize drawer state across components to hide/show the hamburger menu
+  // Synchronize drawer state across components to hide/show the navigation trigger
   useEffect(() => {
     const handleHealingState = (e: CustomEvent<{ isOpen: boolean }>) => {
       setIsHealingDrawerOpen(e.detail.isOpen);
@@ -30,14 +30,14 @@ export default function DashboardLayout({
   return (
     <div className="flex h-[100dvh] bg-[#09090b] text-gray-200 font-sans selection:bg-cyan-500/30 overflow-hidden relative">
       
-      {/* Universal Floating Menu Trigger (Hidden when the healing terminal drawer is open) */}
+      {/* Universal Floating Matrix Trigger (Hidden when the healing terminal drawer is open) */}
       {!isHealingDrawerOpen && (
         <button 
           onClick={() => setIsDrawerOpen(true)}
-          className="fixed top-4 left-4 md:top-6 md:left-6 z-40 p-2.5 bg-[#0f0f12]/90 backdrop-blur-md border border-gray-800 rounded-lg text-gray-400 hover:text-cyan-400 hover:border-cyan-900/50 shadow-[0_0_15px_rgba(0,0,0,0.5)] transition-all group"
-          aria-label="Open Navigation"
+          className="fixed top-4 left-4 md:top-6 md:left-6 z-40 p-2.5 bg-[#090d16]/90 backdrop-blur-md border border-cyan-900/40 rounded-lg text-cyan-400 hover:border-cyan-500/50 shadow-[0_0_15px_rgba(6,182,212,0.15)] transition-all group cursor-pointer"
+          aria-label="Open System Matrix"
         >
-          <Menu size={20} className="transition-transform group-active:scale-95" />
+          <LayoutGrid size={20} className="transition-transform group-active:scale-95" />
         </button>
       )}
 
@@ -72,7 +72,7 @@ export default function DashboardLayout({
           </div>
           <button 
             onClick={() => setIsDrawerOpen(false)} 
-            className="text-gray-500 hover:text-white p-1 transition-colors rounded-md hover:bg-gray-800"
+            className="text-gray-500 hover:text-white p-1 transition-colors rounded-md hover:bg-gray-800 cursor-pointer"
           >
             <X size={20} />
           </button>
@@ -94,7 +94,7 @@ export default function DashboardLayout({
 
         {/* Admin/User Footer */}
         <div className="p-4 border-t border-gray-800 bg-[#0f0f12] shrink-0">
-           <button className="w-full py-2.5 px-4 bg-gray-900 text-gray-300 border border-gray-700 rounded-md hover:bg-gray-800 hover:text-white transition-all text-sm font-medium flex items-center justify-center space-x-2">
+           <button className="w-full py-2.5 px-4 bg-gray-900 text-gray-300 border border-gray-700 rounded-md hover:bg-gray-800 hover:text-white transition-all text-sm font-medium flex items-center justify-center space-x-2 cursor-pointer">
              <span>System Settings</span>
            </button>
         </div>
