@@ -122,6 +122,7 @@ export default function BoardroomDashboard() {
   const [briefing, setBriefing] = useState('Synthesizing operational risk and capital concentration nodes...');
   const [isLoading, setIsLoading] = useState(true);
   const [mounted, setMounted] = useState(false);
+  const [isHealingDrawerOpen, setIsHealingDrawerOpen] = useState(false);
   
   const [financialData, setFinancialData] = useState<{
     tenantId: string;
@@ -145,6 +146,9 @@ export default function BoardroomDashboard() {
     let isSubscribed = true;
     setMounted(true);
     setSysTime(new Date().toISOString());
+
+    const handleOpenDrawer = () => setIsHealingDrawerOpen(true);
+    window.addEventListener('open-healing-drawer', handleOpenDrawer);
 
     async function loadLiveDashboard() {
       try {
@@ -224,6 +228,7 @@ export default function BoardroomDashboard() {
 
     return () => {
       isSubscribed = false;
+      window.removeEventListener('open-healing-drawer', handleOpenDrawer);
     };
   }, []);
 
@@ -455,9 +460,7 @@ export default function BoardroomDashboard() {
           </div>
           
           <div className="relative z-20 w-full flex-1 flex flex-col">
-            {financialData?.tenantId && (
-              <RemediationTerminal tenantId={financialData.tenantId} />
-            )}
+            <RemediationTerminal tenantId={financialData?.tenantId || 'test-tenant-123'} />
           </div>
         </div>
 
@@ -478,7 +481,7 @@ export default function BoardroomDashboard() {
           </p>
 
           <button
-            onClick={() => window.dispatchEvent(new CustomEvent('open-healing-drawer'))}
+            onClick={() => setIsHealingDrawerOpen(true)}
             className="w-full py-3 px-4 bg-cyan-950/80 hover:bg-cyan-900/80 border border-cyan-500/60 text-cyan-300 font-bold text-[9px] tracking-[0.2em] rounded-lg flex items-center justify-center gap-2 shadow-[0_0_12px_rgba(6,182,212,0.25)] transition-all active:scale-[0.98]"
           >
             <span>[ OPEN AUTONOMOUS HEALING DRAWER ]</span>
@@ -487,6 +490,30 @@ export default function BoardroomDashboard() {
         </div>
 
       </div>
+
+      {/* MOBILE AUTONOMOUS HEALING DRAWER MODAL */}
+      {isHealingDrawerOpen && (
+        <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex flex-col justify-end md:hidden animate-fade-in">
+          <div className="bg-[#020612] border-t-2 border-cyan-500/80 rounded-t-2xl p-4 max-h-[85vh] overflow-y-auto shadow-[0_-10px_30px_rgba(6,182,212,0.3)]">
+            <div className="flex items-center justify-between pb-3 border-b border-cyan-900/50 mb-4 sticky top-0 bg-[#020612] z-10">
+              <div className="flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span>
+                <span className="text-xs font-bold text-cyan-300 tracking-wider">AUTONOMOUS HEALING TERMINAL</span>
+              </div>
+              <button
+                onClick={() => setIsHealingDrawerOpen(false)}
+                className="bg-cyan-950/90 border border-cyan-700/60 text-cyan-300 hover:text-white px-3 py-1 rounded text-[10px] tracking-widest font-bold cursor-pointer"
+              >
+                [ CLOSE × ]
+              </button>
+            </div>
+            
+            <div className="pb-6">
+              <RemediationTerminal tenantId={financialData?.tenantId || 'test-tenant-123'} />
+            </div>
+          </div>
+        </div>
+      )}
 
       <footer className="mt-8 pt-4 border-t border-cyan-900/40 flex justify-between items-end shrink-0 relative z-10 hidden md:flex w-full">
         <div className="flex items-end gap-1 h-6">
