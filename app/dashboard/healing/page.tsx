@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import RemediationTerminal from '@/components/RemediationTerminal';
+import RemediationTerminal from '../../components/RemediationTerminal';
 
 export default function AutonomousHealingPage() {
   const router = useRouter();
