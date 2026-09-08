@@ -1,6 +1,7 @@
+// app/dashboard/layout.tsx
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Activity, Zap, Cpu, Search, ShieldCheck, Brain, Menu, X } from 'lucide-react'; 
@@ -11,7 +12,15 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [isHealingDrawerOpen, setIsHealingDrawerOpen] = useState(false);
   const pathname = usePathname() || ''; // Retrieves the current URL path
+
+  // Listen for the custom event from the boardroom page to open the mobile healing drawer reliably
+  useEffect(() => {
+    const handleOpenHealing = () => setIsHealingDrawerOpen(true);
+    window.addEventListener('open-healing-drawer', handleOpenHealing);
+    return () => window.removeEventListener('open-healing-drawer', handleOpenHealing);
+  }, []);
 
   return (
     <div className="flex h-[100dvh] bg-[#09090b] text-gray-200 font-sans selection:bg-cyan-500/30 overflow-hidden relative">
@@ -86,11 +95,38 @@ export default function DashboardLayout({
 
       {/* Main Forensic Data Canvas - Expanded to full width */}
       <main className="flex-1 overflow-y-auto bg-[url('/grid-pattern.svg')] bg-repeat bg-center relative z-0 w-full">
-        {/* Removed max-w-6xl and mx-auto constraints, added w-full for full-screen expansion */}
         <div className="w-full p-4 md:p-8 pt-16 md:pt-20">
             {children}
         </div>
       </main>
+
+      {/* GLOBAL LAYOUT-LEVEL MOBILE HEALING DRAWER */}
+      {isHealingDrawerOpen && (
+        <div className="fixed inset-0 z-[100] flex flex-col justify-end bg-black/80 backdrop-blur-md transition-opacity duration-300 md:hidden">
+          <div className="flex-1" onClick={() => setIsHealingDrawerOpen(false)} />
+          
+          <div className="w-full bg-[#020714] border-t-2 border-cyan-500 rounded-t-2xl p-4 max-h-[85vh] flex flex-col shadow-[0_-10px_30px_rgba(6,182,212,0.3)] relative overflow-hidden">
+            <div className="w-12 h-1 bg-cyan-800/80 rounded-full mx-auto mb-3 shrink-0" />
+            
+            <div className="flex justify-between items-center mb-3 pb-2 border-b border-cyan-900/60 shrink-0">
+              <div className="flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span>
+                <h4 className="text-[10px] text-cyan-300 font-bold tracking-widest">AUTONOMOUS HEALING TERMINAL</h4>
+              </div>
+              <button
+                onClick={() => setIsHealingDrawerOpen(false)}
+                className="text-cyan-400 hover:text-white text-[9px] px-2.5 py-1 border border-cyan-800 rounded bg-cyan-950/60 active:bg-cyan-900"
+              >
+                [ CLOSE ✕ ]
+              </button>
+            </div>
+
+            <div className="flex-1 overflow-y-auto pr-1 text-cyan-400 text-xs">
+              <p className="p-4 text-center">Loading Autonomous Healing Terminal...</p>
+            </div>
+          </div>
+        </div>
+      )}
       
     </div>
   );

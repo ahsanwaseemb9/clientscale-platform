@@ -119,7 +119,6 @@ const DataConstellation = ({ rageClicks, latency }: { rageClicks: number, latenc
 
 export default function BoardroomDashboard() {
   const [showDetailedExplanation, setShowDetailedExplanation] = useState(false);
-  const [isMobileDrawerOpen, setIsMobileDrawerOpen] = useState(false);
   const [briefing, setBriefing] = useState('Synthesizing operational risk and capital concentration nodes...');
   const [isLoading, setIsLoading] = useState(true);
   const [mounted, setMounted] = useState(false);
@@ -328,7 +327,6 @@ export default function BoardroomDashboard() {
               </div>
               <p className="text-red-400/60 text-[8px] md:text-[9px] mt-1 md:mt-2 text-center md:text-left whitespace-normal break-words">LIVE REVENUE BLEED // COST OF DELAY IN REAL-TIME</p>
               
-              {/* Removed max-w-md constraint to allow full width fill */}
               <div className="space-y-4 pt-6 md:pt-8 w-full">
                  <div className="flex items-center gap-2 md:gap-4">
                    <span className="text-cyan-700 w-16 md:w-24 text-[8px] md:text-[10px]">PIPELINE</span>
@@ -456,7 +454,6 @@ export default function BoardroomDashboard() {
             </p>
           </div>
           
-          {/* Removed max-w-5xl constraint to expand terminal across 100% of available space */}
           <div className="relative z-20 w-full flex-1 flex flex-col">
             {financialData?.tenantId && (
               <RemediationTerminal tenantId={financialData.tenantId} />
@@ -481,43 +478,13 @@ export default function BoardroomDashboard() {
           </p>
 
           <button
-            onClick={() => setIsMobileDrawerOpen(true)}
+            onClick={() => window.dispatchEvent(new CustomEvent('open-healing-drawer'))}
             className="w-full py-3 px-4 bg-cyan-950/80 hover:bg-cyan-900/80 border border-cyan-500/60 text-cyan-300 font-bold text-[9px] tracking-[0.2em] rounded-lg flex items-center justify-center gap-2 shadow-[0_0_12px_rgba(6,182,212,0.25)] transition-all active:scale-[0.98]"
           >
             <span>[ OPEN AUTONOMOUS HEALING DRAWER ]</span>
             <span className="text-cyan-400 text-xs">▲</span>
           </button>
         </div>
-
-        {/* MOBILE SLIDE-UP DRAWER MODAL */}
-        {isMobileDrawerOpen && (
-          <div className="fixed inset-0 z-50 flex flex-col justify-end bg-black/80 backdrop-blur-md transition-opacity duration-300 md:hidden">
-            <div className="flex-1" onClick={() => setIsMobileDrawerOpen(false)} />
-            
-            <div className="w-full bg-[#020714] border-t-2 border-cyan-500 rounded-t-2xl p-4 max-h-[85vh] flex flex-col shadow-[0_-10px_30px_rgba(6,182,212,0.3)] relative overflow-hidden">
-              <div className="w-12 h-1 bg-cyan-800/80 rounded-full mx-auto mb-3 shrink-0" />
-              
-              <div className="flex justify-between items-center mb-3 pb-2 border-b border-cyan-900/60 shrink-0">
-                <div className="flex items-center gap-2">
-                  <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span>
-                  <h4 className="text-[10px] text-cyan-300 font-bold tracking-widest">AUTONOMOUS HEALING TERMINAL</h4>
-                </div>
-                <button
-                  onClick={() => setIsMobileDrawerOpen(false)}
-                  className="text-cyan-400 hover:text-white text-[9px] px-2.5 py-1 border border-cyan-800 rounded bg-cyan-950/60 active:bg-cyan-900"
-                >
-                  [ CLOSE ✕ ]
-                </button>
-              </div>
-
-              <div className="flex-1 overflow-y-auto pr-1">
-                {financialData?.tenantId && (
-                  <RemediationTerminal tenantId={financialData.tenantId} />
-                )}
-              </div>
-            </div>
-          </div>
-        )}
 
       </div>
 
