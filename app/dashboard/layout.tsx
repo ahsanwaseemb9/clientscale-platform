@@ -13,19 +13,17 @@ export default function DashboardLayout({
 }) {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [isHealingDrawerOpen, setIsHealingDrawerOpen] = useState(false);
-  const pathname = usePathname() || ''; // Retrieves the current URL path
+  const pathname = usePathname() || '';
 
-  // Listen for custom events from the boardroom page to toggle the hamburger icon visibility cleanly
+  // Synchronize drawer state across components to hide/show the hamburger menu
   useEffect(() => {
-    const handleOpenHealing = () => setIsHealingDrawerOpen(true);
-    const handleCloseHealing = () => setIsHealingDrawerOpen(false);
+    const handleHealingState = (e: CustomEvent<{ isOpen: boolean }>) => {
+      setIsHealingDrawerOpen(e.detail.isOpen);
+    };
 
-    window.addEventListener('open-healing-drawer', handleOpenHealing);
-    window.addEventListener('close-healing-drawer', handleCloseHealing);
-
+    window.addEventListener('healing-drawer-state', handleHealingState as EventListener);
     return () => {
-      window.removeEventListener('open-healing-drawer', handleOpenHealing);
-      window.removeEventListener('close-healing-drawer', handleCloseHealing);
+      window.removeEventListener('healing-drawer-state', handleHealingState as EventListener);
     };
   }, []);
 

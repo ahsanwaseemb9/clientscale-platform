@@ -147,7 +147,10 @@ export default function BoardroomDashboard() {
     setMounted(true);
     setSysTime(new Date().toISOString());
 
-    const handleOpenDrawer = () => setIsHealingDrawerOpen(true);
+    const handleOpenDrawer = () => {
+      setIsHealingDrawerOpen(true);
+      window.dispatchEvent(new CustomEvent('open-healing-drawer'));
+    };
     window.addEventListener('open-healing-drawer', handleOpenDrawer);
 
     async function loadLiveDashboard() {
@@ -342,7 +345,7 @@ export default function BoardroomDashboard() {
                  <div className="flex items-center gap-2 md:gap-4">
                    <span className="text-cyan-700 w-16 md:w-24 text-[8px] md:text-[10px]">CHECKOUT</span>
                    <div className="h-[3px] flex-1 bg-cyan-950 relative overflow-hidden rounded-full">
-                      <div className="absolute left-0 top-0 h-red-600 w-1/2 bg-red-600"></div>
+                      <div className="absolute left-0 top-0 h-full w-1/2 bg-red-600"></div>
                    </div>
                  </div>
                  <div className="flex items-center gap-2 md:gap-4">
@@ -409,14 +412,14 @@ export default function BoardroomDashboard() {
               <div className="space-y-2 md:space-y-3 text-[8px] md:text-xs mb-4 md:mb-6 bg-cyan-950/5 p-3 md:p-4 border border-cyan-900/30 w-full">
                 <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 items-start sm:items-center">
                    <div className="bg-cyan-800 text-black px-1.5 py-0.5 md:px-2 whitespace-nowrap">ACQUISITION NODE</div>
-                   <div className="border border-cyan-900/50 px-2 py-0.5 text-cyan-500 w-full overflow-hidden whitespace-nowrap overflow-ellipsis">
+                   <div className="border border-cyan-900/50 px-2 py-0.5 text-cyan-500 w-full overflow-hidden whitespace-nowrap text-ellipsis">
                      {frictionData.elementId}
                    </div>
                    <div className="text-red-400 font-bold whitespace-nowrap">{frictionData.rageClicks} ABANDONED</div>
                 </div>
                 <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 items-start sm:items-center">
                    <div className="bg-cyan-800 text-black px-1.5 py-0.5 md:px-2 whitespace-nowrap">STRUCTURAL BLOCK</div>
-                   <div className="border border-cyan-900/50 px-2 py-0.5 text-cyan-500 w-full overflow-hidden whitespace-nowrap overflow-ellipsis">
+                   <div className="border border-cyan-900/50 px-2 py-0.5 text-cyan-500 w-full overflow-hidden whitespace-nowrap text-ellipsis">
                      {frictionData.apiEndpoint}
                    </div>
                    <div className="text-purple-400 font-bold whitespace-nowrap">{frictionData.latencyMs}ms DELAY</div>
@@ -481,7 +484,10 @@ export default function BoardroomDashboard() {
           </p>
 
           <button
-            onClick={() => setIsHealingDrawerOpen(true)}
+            onClick={() => {
+              setIsHealingDrawerOpen(true);
+              window.dispatchEvent(new CustomEvent('open-healing-drawer'));
+            }}
             className="w-full py-3 px-4 bg-cyan-950/80 hover:bg-cyan-900/80 border border-cyan-500/60 text-cyan-300 font-bold text-[9px] tracking-[0.2em] rounded-lg flex items-center justify-center gap-2 shadow-[0_0_12px_rgba(6,182,212,0.25)] transition-all active:scale-[0.98]"
           >
             <span>[ OPEN AUTONOMOUS HEALING DRAWER ]</span>
@@ -493,15 +499,27 @@ export default function BoardroomDashboard() {
 
       {/* MOBILE AUTONOMOUS HEALING DRAWER MODAL */}
       {isHealingDrawerOpen && (
-        <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex flex-col justify-end md:hidden animate-fade-in">
-          <div className="bg-[#020612] border-t-2 border-cyan-500/80 rounded-t-2xl p-4 max-h-[85vh] overflow-y-auto shadow-[0_-10px_30px_rgba(6,182,212,0.3)]">
+        <div 
+          className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex flex-col justify-end md:hidden animate-fade-in"
+          onClick={() => {
+            setIsHealingDrawerOpen(false);
+            window.dispatchEvent(new CustomEvent('close-healing-drawer'));
+          }}
+        >
+          <div 
+            className="bg-[#020612] border-t-2 border-cyan-500/80 rounded-t-2xl p-4 max-h-[85vh] overflow-y-auto shadow-[0_-10px_30px_rgba(6,182,212,0.3)]"
+            onClick={(e) => e.stopPropagation()}
+          >
             <div className="flex items-center justify-between pb-3 border-b border-cyan-900/50 mb-4 sticky top-0 bg-[#020612] z-10">
               <div className="flex items-center gap-2">
                 <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span>
                 <span className="text-xs font-bold text-cyan-300 tracking-wider">AUTONOMOUS HEALING TERMINAL</span>
               </div>
               <button
-                onClick={() => setIsHealingDrawerOpen(false)}
+                onClick={() => {
+                  setIsHealingDrawerOpen(false);
+                  window.dispatchEvent(new CustomEvent('close-healing-drawer'));
+                }}
                 className="bg-cyan-950/90 border border-cyan-700/60 text-cyan-300 hover:text-white px-3 py-1 rounded text-[10px] tracking-widest font-bold cursor-pointer"
               >
                 [ CLOSE × ]
