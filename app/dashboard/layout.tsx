@@ -4,7 +4,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Activity, Zap, Cpu, Search, ShieldCheck, Brain, LayoutGrid, X } from 'lucide-react'; 
+import { Activity, Zap, Cpu, Search, ShieldCheck, Brain, Hexagon, X } from 'lucide-react'; 
 
 export default function DashboardLayout({
   children,
@@ -30,14 +30,15 @@ export default function DashboardLayout({
   return (
     <div className="flex h-[100dvh] bg-[#09090b] text-gray-200 font-sans selection:bg-cyan-500/30 overflow-hidden relative">
       
-      {/* Universal Floating Matrix Trigger (Hidden when the healing terminal drawer is open) */}
+      {/* Universal Floating Tactical Node Trigger (Hidden when the healing terminal drawer is open) */}
       {!isHealingDrawerOpen && (
         <button 
           onClick={() => setIsDrawerOpen(true)}
-          className="fixed top-4 left-4 md:top-6 md:left-6 z-40 p-2.5 bg-[#090d16]/90 backdrop-blur-md border border-cyan-900/40 rounded-lg text-cyan-400 hover:border-cyan-500/50 shadow-[0_0_15px_rgba(6,182,212,0.15)] transition-all group cursor-pointer"
-          aria-label="Open System Matrix"
+          className="fixed top-4 left-4 md:top-6 md:left-6 z-40 p-2.5 bg-[#090d16]/90 backdrop-blur-md border border-cyan-900/40 rounded-lg text-cyan-400 hover:border-cyan-500/50 shadow-[0_0_15px_rgba(6,182,212,0.15)] transition-all group cursor-pointer relative"
+          aria-label="Open Tactical Node"
         >
-          <LayoutGrid size={20} className="transition-transform group-active:scale-95" />
+          <span className="absolute -top-0.5 -right-0.5 w-2 h-2 bg-red-500 rounded-full animate-pulse shadow-[0_0_8px_rgba(239,68,68,0.8)]" />
+          <Hexagon size={20} className="transition-transform group-active:scale-95" />
         </button>
       )}
 
