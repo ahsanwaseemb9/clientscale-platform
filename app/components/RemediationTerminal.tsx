@@ -119,17 +119,17 @@ export default function RemediationTerminal({ tenantId }: { tenantId?: string })
 
   try {
     return (
-      <div className="space-y-6 mt-4 pb-6 w-full">
-        <div className="flex items-center gap-3 mb-2">
-          <div className="relative flex h-3 w-3">
+      <div className="space-y-4 sm:space-y-6 mt-2 sm:mt-4 pb-6 w-full max-w-full overflow-hidden">
+        <div className="flex items-center gap-3 mb-2 px-1">
+          <div className="relative flex h-3 w-3 shrink-0">
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>
             <span className="relative inline-flex rounded-full h-3 w-3 bg-cyan-500"></span>
           </div>
-          <h2 className="text-sm md:text-base font-semibold text-cyan-200 tracking-wider">Autonomous Healing Required</h2>
+          <h2 className="text-xs sm:text-sm md:text-base font-semibold text-cyan-200 tracking-wider">Autonomous Healing Required</h2>
         </div>
 
         {isLoading && patches.length === 0 && (
-          <div className="flex items-center gap-2 text-cyan-500 text-xs py-4">
+          <div className="flex items-center gap-2 text-cyan-500 text-xs py-4 px-1">
             <RefreshCw size={14} className="animate-spin" />
             <span>Syncing live patch nodes...</span>
           </div>
@@ -140,35 +140,35 @@ export default function RemediationTerminal({ tenantId }: { tenantId?: string })
           return (
             <div key={patch.id || Math.random()} className="w-full bg-black/80 border border-cyan-900/50 rounded-xl overflow-hidden shadow-[0_0_30px_rgba(6,182,212,0.1)]">
               
-              <div className="bg-[#090d16] border-b border-cyan-900/40 px-4 py-3 flex items-center justify-between">
-                <div className="flex items-center gap-2 text-xs text-cyan-400 font-mono">
-                  <Terminal size={14} className="text-cyan-400" />
-                  <span>client_scale_remediation_agent.sh</span>
+              <div className="bg-[#090d16] border-b border-cyan-900/40 px-3 sm:px-4 py-3 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
+                <div className="flex items-center gap-2 text-[10px] sm:text-xs text-cyan-400 font-mono w-full sm:w-auto overflow-hidden">
+                  <Terminal size={14} className="text-cyan-400 shrink-0" />
+                  <span className="truncate">client_scale_remediation_agent.sh</span>
                 </div>
-                <span className="text-[10px] uppercase tracking-widest bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 px-2 py-0.5 rounded">
+                <span className="text-[9px] sm:text-[10px] uppercase tracking-widest bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 px-2 py-0.5 rounded shrink-0">
                   {patch.status || 'Ready to Push'}
                 </span>
               </div>
               
-              <div className="p-4 sm:p-6 space-y-4">
-                <div className="flex items-start gap-3">
-                  <CheckCircle2 size={18} className="text-cyan-400 shrink-0 mt-0.5" />
-                  <p className="text-xs sm:text-sm text-gray-300 leading-relaxed font-sans">
+              <div className="p-3 sm:p-6 space-y-4">
+                <div className="flex items-start gap-2.5 sm:gap-3">
+                  <CheckCircle2 size={16} className="text-cyan-400 shrink-0 mt-0.5 sm:w-[18px] sm:h-[18px]" />
+                  <p className="text-[11px] sm:text-xs md:text-sm text-gray-300 leading-relaxed font-sans">
                     {patch.patch_description || patch.path_description || 'Autonomous patch generated for system optimization.'}
                   </p>
                 </div>
                 
-                <div className="bg-[#02060f] p-4 rounded-lg border border-cyan-950 overflow-x-auto shadow-inner">
-                  <pre className="text-xs text-cyan-300 font-mono leading-relaxed">
+                <div className="bg-[#02060f] p-3 sm:p-4 rounded-lg border border-cyan-950 overflow-x-auto shadow-inner max-w-full">
+                  <pre className="text-[10px] sm:text-xs text-cyan-300 font-mono leading-relaxed whitespace-pre">
                     <code>{patch.code_snippet || '// No code snippet provided'}</code>
                   </pre>
                 </div>
 
-                <div className="flex justify-end pt-2">
+                <div className="flex justify-end pt-2 w-full">
                   <button 
                     onClick={() => handleDeploy(patch.id)}
                     disabled={deployingId === patch.id}
-                    className="bg-cyan-600 hover:bg-cyan-500 text-black font-bold px-5 py-2.5 rounded-lg text-xs uppercase tracking-widest flex items-center gap-2 transition-all disabled:opacity-50 shadow-[0_0_15px_rgba(6,182,212,0.4)] cursor-pointer"
+                    className="w-full sm:w-auto bg-cyan-600 hover:bg-cyan-500 text-black font-bold px-4 sm:px-5 py-2.5 rounded-lg text-[10px] sm:text-xs uppercase tracking-widest flex items-center justify-center gap-2 transition-all disabled:opacity-50 shadow-[0_0_15px_rgba(6,182,212,0.4)] cursor-pointer"
                   >
                     {deployingId === patch.id ? (
                       <span className="animate-pulse">Pushing to Edge...</span>
