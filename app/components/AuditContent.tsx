@@ -260,7 +260,7 @@ export default function AuditContent() {
               </h2>
             </div>
           </div>
-          <div className="text-left md:text-right text-cyan-800 text-[9px] sm:text-[10px] w-full md:w-auto leading-relaxed">
+          <div className="text-left md:text-right text-cyan-800 text-[9px] sm:text-[10px] w-full md:w-auto leading-relaxed whitespace-nowrap">
             TARGET DOMAIN: <span className="text-cyan-600">{targetUrl}</span><br />
             STATUS: SECURE // {new Date().toISOString().split('T')[0]}
           </div>
