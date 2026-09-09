@@ -2,7 +2,18 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
-import DecryptedLogo from './DecryptedLogo';
+
+// Types for our digital traffic
+interface DataVehicle {
+  id: number;
+  x: number;
+  y: number;
+  speed: number;
+  lane: number;
+  type: 'organic' | 'paid' | 'direct';
+  intent: 'high' | 'low' | 'unknown';
+  scanned: boolean;
+}
 
 export default function AuditContent() {
   const searchParams = useSearchParams();
@@ -10,12 +21,14 @@ export default function AuditContent() {
   
   const targetUrl = searchParams.get('url') || 'your domain';
   
-  const [logs, setLogs] = useState<string[]>(['INITIALIZING_CORE_DIAGNOSTICS...']);
-  const [isComplete, setIsComplete] = useState(false);
+  // Core State
   const [auditData, setAuditData] = useState<any>(null); 
-
-  const hasRun = useRef(false);
-  const scrollRef = useRef<HTMLDivElement>(null);
+  const [progress, setProgress] = useState(0);
+  const [loadingPhase, setLoadingPhase] = useState('INITIALIZING DIAGNOSTIC ENGINE...');
+  const [logs, setLogs] = useState<string[]>([]);
+  const [isComplete, setIsComplete] = useState(false);
+  
+  const canvasRef = useRef<HTMLCanvasElement>(null);
 
   // 1. Fetch the actual audit data in the background
   useEffect(() => {
@@ -27,129 +40,299 @@ export default function AuditContent() {
       .catch((err) => console.error("Failed to fetch audit data:", err));
   }, [targetUrl]);
 
-  // 2. Telemetry Animation Logic
+  // 2. Text rotation and progress logic
   useEffect(() => {
-    if (hasRun.current) return;
-    hasRun.current = true;
-
-    const steps = [
-      { msg: `TARGETING_FACILITY_DOMAIN: ${targetUrl}`, delay: 500 },
-      { msg: 'ESTABLISHING_LOCAL_TRAFFIC_PIPELINE...', delay: 1200 },
-      { msg: 'NURTURE_SEQUENCE: VERIFYING_DMARC_SPF_RECORDS..', delay: 1800},
-      { msg: 'PARSING_FRONTEND_BOOKING_ARCHITECTURE...', delay: 2500 },
-      { msg: 'META_GRAPH: EXTRACTING_SOCIAL_PREVIEW_DATA...', delay: 3100 },
-      { msg: 'LOCAL_SEO_LATENCY: EVALUATING_TBT_INP...', delay: 3800 },
-      { msg: 'CRM_FINGERPRINTING: STACK_TECHNOLOGY_IDENTIFIED...', delay: 4600 },
-      { msg: 'GHOST_LEAD_ANALYSIS: LEAKAGE_POINTS_DETECTED...', delay: 5400 },
-      { msg: 'COMPILING_FACILITY_SCALING_BLUEPRINT...', delay: 6100 },
-      { msg: '>>> PIPELINE_DIAGNOSTIC_COMPLETE', delay: 6800 }
+    const phases = [
+      `MAPPING TOPOGRAPHY FOR: ${targetUrl}`,
+      'DEPLOYING COMPUTER VISION SCANNERS...',
+      'ANALYZING FUNNEL VELOCITY...',
+      'DETECTING GROWTH BOTTLENECKS...',
+      'CALCULATING REVENUE LEAKAGE...',
+      'COMPILING PIPELINE BLUEPRINT...'
     ];
 
-    steps.forEach((step) => {
-      setTimeout(() => {
-        setLogs((prev) => [...prev, step.msg]);
-        if (step.msg.includes('>>>')) setIsComplete(true);
-      }, step.delay);
-    });
+    let currentPhase = 0;
+    
+    const interval = setInterval(() => {
+      setProgress((prev) => {
+        // Random progress jump to feel "organic"
+        const next = prev + (Math.random() * 1.5 + 0.5);
+        if (next >= 100) {
+          clearInterval(interval);
+          setIsComplete(true);
+          return 100;
+        }
+        
+        // Update phases based on progress percentage
+        const expectedPhase = Math.floor((next / 100) * phases.length);
+        if (expectedPhase > currentPhase && expectedPhase < phases.length) {
+          currentPhase = expectedPhase;
+          setLoadingPhase(phases[currentPhase]);
+          
+          setLogs(prevLogs => {
+            const newLogs = [`> SYS_UPDATE: ${phases[currentPhase]}`, ...prevLogs];
+            return newLogs.slice(0, 4); // Keep last 4 logs for the UI
+          });
+        }
+        
+        return next;
+      });
+    }, 100);
+
+    return () => clearInterval(interval);
   }, [targetUrl]);
 
-  // Auto-scroll the log container
+  // 3. Traffic Scanning Canvas Animation (Mobile Optimized)
   useEffect(() => {
-    if (scrollRef.current) scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
-  }, [logs]);
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
 
-  // 3. The Transition Handler
+    // Handle Resize & Device Pixel Ratio for sharp rendering on mobile
+    const resize = () => {
+      const parent = canvas.parentElement;
+      if (!parent) return;
+      
+      const dpr = window.devicePixelRatio || 1;
+      const rect = parent.getBoundingClientRect();
+      
+      canvas.width = rect.width * dpr;
+      canvas.height = rect.height * dpr;
+      
+      ctx.scale(dpr, dpr);
+      canvas.style.width = `${rect.width}px`;
+      canvas.style.height = `${rect.height}px`;
+    };
+    
+    resize();
+    window.addEventListener('resize', resize);
+
+    let animationFrameId: number;
+    let vehicles: DataVehicle[] = [];
+    let frameCount = 0;
+
+    const render = () => {
+      frameCount++;
+      const rect = canvas.getBoundingClientRect();
+      const logicalWidth = rect.width;
+      const logicalHeight = rect.height;
+
+      ctx.clearRect(0, 0, logicalWidth, logicalHeight);
+
+      // Dynamic Lane Positioning based on height
+      const lanes = [
+        logicalHeight * 0.25, 
+        logicalHeight * 0.5, 
+        logicalHeight * 0.75
+      ];
+
+      // Draw Grid / Roadway
+      ctx.strokeStyle = 'rgba(6, 182, 212, 0.15)';
+      ctx.lineWidth = 1;
+      
+      ctx.beginPath();
+      ctx.moveTo(0, logicalHeight * 0.375); ctx.lineTo(logicalWidth, logicalHeight * 0.375);
+      ctx.moveTo(0, logicalHeight * 0.625); ctx.lineTo(logicalWidth, logicalHeight * 0.625);
+      ctx.stroke();
+
+      // Scanner Zone (Center) - Scales down on mobile
+      const scannerX = logicalWidth / 2;
+      const scannerWidth = Math.min(150, logicalWidth * 0.4); 
+      
+      ctx.fillStyle = 'rgba(6, 182, 212, 0.05)';
+      ctx.fillRect(scannerX - scannerWidth/2, 0, scannerWidth, logicalHeight);
+      
+      ctx.strokeStyle = 'rgba(34, 211, 238, 0.8)';
+      ctx.setLineDash([4, 4]);
+      ctx.beginPath();
+      ctx.moveTo(scannerX - scannerWidth/2, 0); ctx.lineTo(scannerX - scannerWidth/2, logicalHeight);
+      ctx.moveTo(scannerX + scannerWidth/2, 0); ctx.lineTo(scannerX + scannerWidth/2, logicalHeight);
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      // Spawn new vehicles (traffic) - Spawn slightly less often on smaller screens
+      const spawnRate = logicalWidth < 500 ? 25 : 15;
+      if (frameCount % spawnRate === 0 && Math.random() > 0.3) {
+        const typeRand = Math.random();
+        vehicles.push({
+          id: Math.random(),
+          x: -30,
+          y: lanes[Math.floor(Math.random() * lanes.length)] + (Math.random() * 6 - 3),
+          speed: (logicalWidth < 500 ? 1.5 : 2) + Math.random() * 2.5,
+          lane: Math.floor(Math.random() * 3),
+          type: typeRand > 0.6 ? 'organic' : typeRand > 0.3 ? 'paid' : 'direct',
+          intent: Math.random() > 0.7 ? 'high' : Math.random() > 0.4 ? 'low' : 'unknown',
+          scanned: false
+        });
+      }
+
+      // Update and Draw Vehicles
+      vehicles.forEach((v) => {
+        v.x += v.speed;
+        const inScanner = v.x > scannerX - scannerWidth/2 && v.x < scannerX + scannerWidth/2;
+        if (inScanner) v.scanned = true;
+
+        // Draw basic vehicle node
+        ctx.fillStyle = v.type === 'organic' ? '#22d3ee' : v.type === 'paid' ? '#a855f7' : '#94a3b8';
+        
+        // Scale vehicles slightly smaller on mobile
+        const vSizeX = logicalWidth < 500 ? 12 : 16;
+        const vSizeY = logicalWidth < 500 ? 6 : 8;
+        ctx.fillRect(v.x, v.y - (vSizeY/2), vSizeX, vSizeY);
+
+        // Draw AI Bounding Box if scanned
+        if (inScanner) {
+          ctx.strokeStyle = v.intent === 'high' ? '#4ade80' : v.intent === 'low' ? '#ef4444' : '#facc15';
+          ctx.lineWidth = 1.5;
+          const boxPadding = logicalWidth < 500 ? 16 : 24;
+          const yOffset = logicalWidth < 500 ? 8 : 12;
+          
+          ctx.strokeRect(v.x - 4, v.y - yOffset, boxPadding, boxPadding);
+
+          // Object Detection Corners
+          const cornerLength = 4;
+          ctx.beginPath();
+          ctx.moveTo(v.x - 4, v.y - yOffset + cornerLength); ctx.lineTo(v.x - 4, v.y - yOffset); ctx.lineTo(v.x - 4 + cornerLength, v.y - yOffset);
+          ctx.moveTo(v.x + (boxPadding-4), v.y + yOffset - cornerLength); ctx.lineTo(v.x + (boxPadding-4), v.y + yOffset); ctx.lineTo(v.x + (boxPadding-4) - cornerLength, v.y + yOffset);
+          ctx.stroke();
+
+          // Label
+          ctx.fillStyle = ctx.strokeStyle;
+          ctx.font = logicalWidth < 500 ? '6px monospace' : '8px monospace';
+          ctx.fillText(`INTENT:${v.intent.toUpperCase()}`, v.x - 4, v.y - (yOffset + 4));
+          
+          // Random scan line
+          if (Math.random() > 0.5) {
+            ctx.fillStyle = 'rgba(255,255,255,0.8)';
+            ctx.fillRect(v.x - 4, v.y - yOffset + (Math.random() * boxPadding), boxPadding, 1);
+          }
+        }
+      });
+
+      // Cleanup
+      vehicles = vehicles.filter(v => v.x < logicalWidth + 50);
+      animationFrameId = requestAnimationFrame(render);
+    };
+
+    render();
+
+    return () => {
+      window.removeEventListener('resize', resize);
+      cancelAnimationFrame(animationFrameId);
+    };
+  }, []);
+
+  // 4. The Transition Handler
   const handleViewResults = () => {
     if (auditData) {
       sessionStorage.setItem('clientScale_auditData', JSON.stringify(auditData));
     } else {
       sessionStorage.setItem('clientScale_auditData', JSON.stringify({ targetUrl, status: 'processing_delayed' }));
     }
-    
     router.push('/dashboard/report');
   };
 
   return (
-    // Changed to min-h-[100dvh] for perfect mobile vertical centering
-    <main className="flex min-h-[100dvh] w-full flex-col items-center justify-center bg-[#020205] text-white antialiased selection:bg-cyan-500/30 selection:text-cyan-200 overflow-hidden relative p-4">
+    <main className="flex min-h-[100dvh] w-full flex-col items-center justify-center bg-[#020205] text-white antialiased selection:bg-cyan-500/30 selection:text-cyan-200 overflow-hidden relative p-4 sm:p-6">
 
-      {/* --- SPACE AGENCY TELEMETRY LAYERS --- */}
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_-20%,rgba(16,24,48,0.85),rgba(2,2,5,1)_65%)] pointer-events-none z-0" />
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(6,182,212,0.12),transparent_45%)] pointer-events-none z-0 mix-blend-screen" />
-      <div className="absolute top-[30%] left-[10%] right-[10%] h-[500px] bg-[radial-gradient(circle_at_center,rgba(59,130,246,0.04),transparent_50%)] pointer-events-none z-0 mix-blend-screen" />
-      <div className="absolute inset-0 bg-[linear-gradient(to_right,#262d3d_1px,transparent_1px),linear-gradient(to_bottom,#262d3d_1px,transparent_1px)] bg-[size:3.5rem_3.5rem] opacity-100 blur-[1px] pointer-events-none z-0" />
-      <div className="absolute inset-0 bg-[radial-gradient(1px_1px_at_20px_30px,#fff,transparent_100%),radial-gradient(1px_1px_at_75px_140px,rgba(255,255,255,0.7),transparent_100%),radial-gradient(1.5px_1.5px_at_120px_50px,#fff,transparent_100%),radial-gradient(1px_1px_at_240px_320px,rgba(255,255,255,0.5),transparent_100%)] bg-[size:300px_300px] opacity-40 pointer-events-none z-0 animate-pulse [animation-duration:8s]" />
-      <div className="absolute inset-0 bg-[radial-gradient(1.5px_1.5px_at_45px_210px,#fff,transparent_100%),radial-gradient(1px_1px_at_180px_80px,rgba(255,255,255,0.8),transparent_100%),radial-gradient(1px_1px_at_290px_190px,#fff,transparent_100%)] bg-[size:400px_400px] opacity-25 pointer-events-none z-0 animate-pulse [animation-duration:12s]" />
+      {/* --- BACKGROUND LAYERS --- */}
+      <div className="absolute inset-0 bg-[linear-gradient(rgba(0,0,0,0)_50%,rgba(0,0,0,0.25)_50%),linear-gradient(90deg,rgba(255,0,0,0.03),rgba(0,255,0,0.01),rgba(0,0,255,0.03))] bg-[length:100%_4px,3px_100%] pointer-events-none mix-blend-overlay z-0" />
+      <div className="absolute top-[30%] left-[10%] right-[10%] h-[500px] bg-[radial-gradient(circle_at_center,rgba(6,182,212,0.05),transparent_50%)] pointer-events-none z-0 mix-blend-screen" />
 
-      {/* --- TELEMETRY DASHBOARD CONTAINER --- */}
-      {/* Added my-auto to explicitly force vertical centering */}
-      <div className="relative w-full max-w-4xl mx-auto my-auto bg-[#07070f]/80 border border-zinc-800/80 p-6 sm:p-10 shadow-[0_0_40px_rgba(6,182,212,0.1)] backdrop-blur-2xl rounded-2xl flex flex-col z-10 animate-fade-in">
+      {/* --- MAIN DASHBOARD CONTAINER --- */}
+      <div className="relative w-full max-w-4xl mx-auto my-auto flex flex-col gap-6 sm:gap-8 z-10 animate-fade-in">
         
-        {/* Header Module */}
-        <div className="flex flex-col items-center mb-6 sm:mb-8 border-b border-zinc-800/50 pb-6 w-full">
-          {/* Forced whitespace-nowrap and tightened mobile scaling (scale-[0.60]) */}
-          <div className="w-full flex justify-center whitespace-nowrap transform scale-[0.60] sm:scale-100 origin-center mb-2">
-            <DecryptedLogo text="DIAGNOSTIC ENGINE ACTIVE" />
-          </div>
-
-          <div className="w-full flex justify-between items-center mt-4">
-            <span className="text-[10px] sm:text-xs uppercase tracking-[0.2em] sm:tracking-[0.3em] font-bold text-zinc-500">
-              {isComplete ? 'PIPELINE SECURED' : 'INTERCEPTING DOMAIN DATA'}
-            </span>
-            <div className="flex items-center gap-2 bg-[#0d111c]/90 border border-zinc-800/80 rounded-lg px-3 py-1.5 font-mono text-[10px] tracking-widest uppercase transition-all duration-300">
-              <span className="relative flex h-1.5 w-1.5">
+        {/* HEADER */}
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-end border-b border-cyan-900/50 pb-4 gap-4">
+          <div className="w-full md:w-auto">
+            <h1 className="text-xl sm:text-2xl md:text-4xl font-bold tracking-[0.1em] sm:tracking-[0.2em] text-cyan-300 drop-shadow-[0_0_8px_rgba(34,211,238,0.4)] whitespace-normal break-words leading-tight">
+              GROWTH TRAFFIC<br className="block sm:hidden"/> INTELLIGENCE
+            </h1>
+            <div className="flex items-center gap-3 mt-2 sm:mt-3">
+              <span className="relative flex h-2 w-2">
                 <span className={`animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 ${isComplete ? 'bg-cyan-400' : 'bg-yellow-400'}`}></span>
-                <span className={`relative inline-flex rounded-full h-1.5 w-1.5 ${isComplete ? 'bg-cyan-500' : 'bg-yellow-500'}`}></span>
+                <span className={`relative inline-flex rounded-full h-2 w-2 ${isComplete ? 'bg-cyan-500' : 'bg-yellow-500'}`}></span>
               </span>
-              <span className={isComplete ? 'text-cyan-400' : 'text-yellow-500'}>
-                {isComplete ? 'READY' : 'SCANNING'}
-              </span>
+              <h2 className="text-[10px] sm:text-xs md:text-sm text-cyan-600 tracking-widest uppercase">
+                DIAGNOSTIC ENGINE : {isComplete ? 'COMPLETE' : 'ACTIVE'}
+              </h2>
             </div>
+          </div>
+          <div className="text-left md:text-right text-cyan-800 text-[9px] sm:text-[10px] w-full md:w-auto leading-relaxed">
+            TARGET DOMAIN: <span className="text-cyan-600">{targetUrl}</span><br />
+            STATUS: SECURE // {new Date().toISOString().split('T')[0]}
           </div>
         </div>
 
-        {/* Log Output Stream */}
-        <div ref={scrollRef} className="h-[45vh] overflow-y-auto pr-2 sm:pr-4 scrollbar-thin scrollbar-thumb-zinc-800 scrollbar-track-transparent flex flex-col font-mono text-xs sm:text-sm leading-relaxed">
-          {logs.map((log, i) => {
-            const isHighlight = log.includes('>>>');
-            return (
-              <div key={i} className="py-1.5 sm:py-2 flex flex-col sm:flex-row gap-1 sm:gap-4 border-b border-zinc-900/50 last:border-0">
-                <span className="text-zinc-600 select-none text-[10px] sm:text-xs whitespace-nowrap pt-0.5">
-                  [{new Date().toLocaleTimeString()}]
-                </span>
-                <span className={`animate-fade-in break-words ${isHighlight ? 'text-cyan-400 font-bold drop-shadow-[0_0_8px_rgba(34,211,238,0.5)]' : 'text-zinc-300'}`}>
-                  {log}
-                </span>
-              </div>
-            );
-          })}
-          {!isComplete && (
-            <div className="py-2 flex items-center gap-4">
-               <span className="text-zinc-600 text-[10px] sm:text-xs">[{new Date().toLocaleTimeString()}]</span>
-               <span className="animate-pulse text-cyan-500 font-bold">_</span>
-            </div>
-          )}
+        {/* AI TRAFFIC SCANNER VISUALIZATION */}
+        <div className="w-full h-[180px] sm:h-[220px] md:h-[250px] border border-cyan-900/40 bg-[#07070f]/80 relative rounded-xl overflow-hidden shadow-[inset_0_0_30px_rgba(6,182,212,0.08)] backdrop-blur-sm">
+          <canvas ref={canvasRef} className="w-full h-full block" />
+          <div className="absolute bottom-2 sm:bottom-3 right-2 sm:right-4 text-[8px] sm:text-[9px] text-cyan-700 tracking-widest flex items-center gap-2 bg-black/80 px-2 py-1 rounded">
+            <span className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-red-500 animate-pulse"></span>
+            LIVE ML OBJECT DETECTION
+          </div>
         </div>
 
-        {/* Action / Awaiting Block */}
-        <div className="mt-6 pt-6 border-t border-zinc-800/50 flex justify-center w-full min-h-[60px]">
-          {auditData ? (
-            <button 
-              onClick={handleViewResults}
-              className="w-full sm:w-auto bg-gradient-to-b from-zinc-900 to-zinc-950 border border-zinc-800 hover:border-cyan-500/50 active:border-cyan-500/50 text-zinc-300 hover:text-cyan-400 active:text-cyan-400 font-semibold px-6 sm:px-10 py-3.5 sm:py-4 rounded-xl transition-all duration-300 shadow-xl hover:shadow-[0_0_25px_rgba(6,182,212,0.22)] text-[11px] sm:text-sm tracking-widest uppercase active:scale-[0.98] animate-fade-in"
-            >
-              Access Pipeline Forensics
-            </button>
-          ) : (
-            <div className="w-full sm:w-auto bg-zinc-900/40 border border-zinc-800/50 text-zinc-500 font-semibold px-6 sm:px-10 py-3.5 sm:py-4 rounded-xl text-[11px] sm:text-sm tracking-widest uppercase flex items-center justify-center space-x-3 animate-fade-in cursor-not-allowed">
-              <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-cyan-500/50" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-              </svg>
-              <span>Compiling Payload...</span>
+        {/* PROGRESS & LOGS SECTION */}
+        {!isComplete ? (
+          <div className="flex flex-col md:flex-row gap-4 sm:gap-6 animate-fade-in">
+            {/* Progress Bar Area */}
+            <div className="flex-1 flex flex-col justify-center bg-[#07070f]/60 p-4 rounded-xl border border-cyan-900/30">
+              <div className="flex justify-between text-[10px] sm:text-xs mb-3 text-cyan-400 font-bold uppercase tracking-wider">
+                <span className="truncate pr-4">{loadingPhase}</span>
+                <span>{progress.toFixed(1)}%</span>
+              </div>
+              
+              <div className="h-2.5 sm:h-3 w-full bg-cyan-950/50 border border-cyan-900/50 rounded-full relative overflow-hidden">
+                <div 
+                  className="absolute top-0 left-0 h-full bg-gradient-to-r from-cyan-600 to-cyan-400 shadow-[0_0_10px_#22d3ee] transition-all duration-300 ease-out"
+                  style={{ width: `${progress}%` }}
+                >
+                  <div className="absolute top-0 right-0 w-8 h-full bg-white/40 blur-[2px] -skew-x-12 translate-x-4"></div>
+                </div>
+              </div>
             </div>
-          )}
-        </div>
+
+            {/* Terminal Logs Area */}
+            <div className="w-full md:w-[35%] border border-cyan-900/30 bg-[#05050a]/80 p-3 sm:p-4 h-24 sm:h-28 overflow-hidden rounded-xl relative shadow-[inset_0_0_15px_rgba(0,0,0,0.8)]">
+              <div className="absolute top-0 left-0 w-full h-4 bg-gradient-to-b from-[#05050a] to-transparent z-10"></div>
+              <div className="text-[8px] sm:text-[9px] text-cyan-700/80 space-y-1.5 flex flex-col justify-end h-full relative z-0">
+                {logs.map((log, i) => (
+                  <div key={i} className={`opacity-${100 - (i * 20)} transform translate-y-0 break-words leading-tight`}>
+                    {log}
+                  </div>
+                ))}
+                {logs.length === 0 && <div>&gt; AWAITING TELEMETRY...</div>}
+              </div>
+            </div>
+          </div>
+        ) : (
+          /* ACTION BLOCK - Renders when scanning is complete */
+          <div className="mt-2 flex justify-center w-full animate-fade-in">
+            {auditData ? (
+              <button 
+                onClick={handleViewResults}
+                className="w-full bg-cyan-950/40 hover:bg-cyan-900/60 border border-cyan-500/50 text-cyan-300 hover:text-cyan-100 font-bold px-6 py-4 sm:py-5 rounded-xl transition-all duration-300 shadow-[0_0_20px_rgba(6,182,212,0.15)] hover:shadow-[0_0_30px_rgba(6,182,212,0.3)] text-[11px] sm:text-sm tracking-[0.2em] uppercase active:scale-[0.98] flex flex-col items-center justify-center gap-1 group"
+              >
+                <span>[ ACCESS PIPELINE FORENSICS ]</span>
+                <span className="text-[9px] text-cyan-600 group-hover:text-cyan-400 font-normal tracking-widest transition-colors">
+                  SCAN COMPLETE // READY FOR REVIEW
+                </span>
+              </button>
+            ) : (
+              <div className="w-full bg-zinc-900/40 border border-zinc-800/50 text-zinc-500 font-semibold px-6 py-4 rounded-xl text-[11px] sm:text-sm tracking-widest uppercase flex items-center justify-center space-x-3">
+                <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-cyan-500/50" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                <span>Finalizing Payload...</span>
+              </div>
+            )}
+          </div>
+        )}
+
       </div>
     </main>
   );
