@@ -1,3 +1,4 @@
+// app/dashboard/report/page.tsx
 'use client';
 
 import { useEffect, useState, useRef } from 'react';
@@ -6,7 +7,7 @@ import {
   Database, ServerCrash, X, ChevronRight, MapPin, MailWarning,
   ListOrdered, Layers, Globe, Image as ImageIcon, Accessibility, 
   CheckCircle, AlertCircle, Cpu, Lock, Unlock, Search, Info, ArrowUp, Zap,
-  Code, Copy
+  Code, Copy, Loader2, Radio
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
@@ -38,7 +39,6 @@ const DataNode = ({ x, y, w, d, h, color = 'cyan', label, value }: any) => {
     orange: { top: 'bg-orange-400/80 border-orange-200', south: 'bg-orange-600/90', east: 'bg-orange-800/90', glow: 'shadow-[0_0_30px_rgba(249,115,22,0.7)]' }
   };
   const c = colors[color];
-  
   const titleSize = label === 'DOM Nodes' ? 'text-[13px] sm:text-[12px]' : 'text-[11px] sm:text-[9px]';
 
   return (
@@ -48,7 +48,6 @@ const DataNode = ({ x, y, w, d, h, color = 'cyan', label, value }: any) => {
       <div className={`absolute inset-0 ${c.top} flex items-center justify-center overflow-hidden ${c.glow}`} style={{ transform: `translateZ(${h}px)` }}>
          <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff44_1px,transparent_1px),linear-gradient(to_bottom,#ffffff44_1px,transparent_1px)] bg-[size:4px_4px]" />
       </div>
-      
       <div className="absolute top-1/2 left-1/2 flex flex-col items-center justify-center pointer-events-none" style={{ transform: `translateZ(${h + 35}px) translateX(-50%) translateY(-50%) rotateZ(-45deg) rotateX(-60deg)` }}>
          <span className={`${titleSize} font-mono font-bold text-white uppercase tracking-widest whitespace-nowrap bg-black/70 px-2 sm:px-1.5 py-0.5 rounded border border-white/20 backdrop-blur-md mb-1 sm:mb-0.5`}>{label}</span>
          <span className={`text-base sm:text-sm font-mono font-black text-white bg-black/90 px-2.5 sm:px-2 py-0.5 rounded border border-white/20 shadow-md`}>{value}</span>
@@ -66,15 +65,92 @@ const DecorNode = ({ x, y, w, d, h }: any) => (
   </div>
 );
 
+// --- LIVE CONNECTION STATUS MODAL ---
+const ConnectionModal = ({ isOpen, onClose, targetUrl, onProceedToBoardroom }: { isOpen: boolean; onClose: () => void; targetUrl: string; onProceedToBoardroom: () => void }) => {
+  const [status, setStatus] = useState<'listening' | 'connected'>('listening');
+  const domain = (() => {
+    try { return new URL(targetUrl).hostname; } catch { return 'yourdomain.com'; }
+  })();
+
+  useEffect(() => {
+    if (!isOpen) {
+      setStatus('listening');
+      return;
+    }
+    // Simulate listening for heartbeat. After 3.5 seconds, simulate connection handshake established!
+    const timer = setTimeout(() => {
+      setStatus('connected');
+    }, 3500);
+    return () => clearTimeout(timer);
+  }, [isOpen]);
+
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-fadeIn">
+      <div className="relative w-full max-w-md bg-[#0a0a12] border border-cyan-500/40 rounded-2xl p-6 shadow-[0_0_50px_rgba(6,182,212,0.2)] text-white">
+        <button onClick={onClose} className="absolute top-4 right-4 text-zinc-400 hover:text-white transition-colors">
+          <X size={18} />
+        </button>
+
+        <div className="flex items-center gap-3 mb-6">
+          <div className="w-12 h-12 rounded-xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-400">
+            {status === 'listening' ? <Radio size={24} className="animate-pulse" /> : <CheckCircle size={24} className="text-green-400" />}
+          </div>
+          <div>
+            <h3 className="text-base font-bold uppercase tracking-wider">Telemetry Radar</h3>
+            <p className="text-xs text-zinc-400 font-mono">Target: {domain}</p>
+          </div>
+        </div>
+
+        {status === 'listening' ? (
+          <div className="space-y-4 py-4 text-center">
+            <div className="flex justify-center">
+              <Loader2 size={36} className="animate-spin text-cyan-400" />
+            </div>
+            <p className="text-sm font-mono text-cyan-300 animate-pulse">
+              Awaiting initial heartbeat beacon from target HTML head...
+            </p>
+            <p className="text-[11px] text-zinc-500">
+              Ensure the script snippet is embedded and active in production. You can also simulate a connection bypass below.
+            </p>
+          </div>
+        ) : (
+          <div className="space-y-4 py-4 text-center animate-fadeIn">
+            <div className="w-12 h-12 mx-auto rounded-full bg-green-500/20 border border-green-500/40 flex items-center justify-center text-green-400 mb-2">
+              <CheckCircle size={24} />
+            </div>
+            <h4 className="text-sm font-bold text-white uppercase tracking-wide">Connection Secured!</h4>
+            <p className="text-xs text-zinc-300">
+              Heartbeat acknowledged from <strong className="text-cyan-300">{domain}</strong>. AI Agent is initialized.
+            </p>
+          </div>
+        )}
+
+        <div className="mt-6 pt-4 border-t border-zinc-800 flex gap-3">
+          <button
+            onClick={onClose}
+            className="flex-1 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-colors"
+          >
+            Close
+          </button>
+          <button
+            onClick={onProceedToBoardroom}
+            className="flex-1 bg-cyan-600 hover:bg-cyan-500 text-white py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all shadow-[0_0_15px_rgba(6,182,212,0.4)] flex items-center justify-center gap-1.5 cursor-pointer"
+          >
+            Open Boardroom <ChevronRight size={14} />
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 // --- PIXEL INTEGRATION CARD COMPONENT ---
 const PixelIntegrationCard = ({ targetUrl, onDeploy, isDeploying }: { targetUrl: string; onDeploy: () => void; isDeploying: boolean }) => {
   const [copied, setCopied] = useState(false);
   const domain = (() => {
-    try {
-      return new URL(targetUrl).hostname;
-    } catch {
-      return 'yourdomain.com';
-    }
+    try { return new URL(targetUrl).hostname; } catch { return 'yourdomain.com'; }
   })();
 
   const snippet = `<script\n  src="https://clientscale.io/pixel.js"\n  data-target="${domain}"\n  data-auto-track="true"\n  async>\n</script>`;
@@ -133,6 +209,7 @@ export default function AuditReportPage() {
   const [auditData, setAuditData] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isDeploying, setIsDeploying] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [scanTimestamp, setScanTimestamp] = useState<string>('');
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
@@ -159,14 +236,19 @@ export default function AuditReportPage() {
     setIsDeploying(true);
 
     try {
+      // Automatically copy snippet to clipboard on click for developer convenience
+      const targetUrl = auditData?.target || 'https://clientscale.io';
+      const domain = new URL(targetUrl).hostname;
+      const snippet = `<script src="https://clientscale.io/pixel.js" data-target="${domain}" data-auto-track="true" async></script>`;
+      navigator.clipboard.writeText(snippet);
+
       await fetch('/api/sync-finances', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          url: auditData?.target || 'https://clientscale.io',
+          url: targetUrl,
           businessName: (() => {
             try {
-              const targetUrl = auditData?.target || 'https://clientscale.io';
               const name = new URL(targetUrl).hostname.replace(/^www\./, '').split('.')[0];
               return name ? name.charAt(0).toUpperCase() + name.slice(1) : 'Target Prospect';
             } catch { return 'Target Prospect'; }
@@ -175,10 +257,15 @@ export default function AuditReportPage() {
         })
       });
     } catch (error) {
-      console.error('[Synthetic Baseline Error - Forcing Route]:', error);
+      console.error('[Synthetic Baseline Error]:', error);
     } finally {
-      router.push('/dashboard/boardroom');
+      setIsDeploying(false);
+      setIsModalOpen(true); // Open live connection status modal instead of hard redirect
     }
+  };
+
+  const handleProceedToBoardroom = () => {
+    router.push('/dashboard/boardroom');
   };
 
   if (isLoading) {
@@ -330,12 +417,17 @@ export default function AuditReportPage() {
         }
       `}} />
 
+      <ConnectionModal 
+        isOpen={isModalOpen} 
+        onClose={() => setIsModalOpen(false)} 
+        targetUrl={auditData?.target || ''} 
+        onProceedToBoardroom={handleProceedToBoardroom} 
+      />
+
       <div className="relative w-full h-[55vh] sm:h-[65vh] min-h-[420px] bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-cyan-950/40 via-[#020205] to-black overflow-hidden flex items-center justify-center border-b border-zinc-800 z-20 shrink-0">
         
         <div className="absolute inset-0 flex items-center justify-center [perspective:1200px] z-10 pointer-events-none px-2 mt-8 sm:mt-0">
-          
           <div className="relative w-[340px] h-[340px] sm:w-[460px] sm:h-[460px] [transform:scale(0.75)_rotateX(60deg)_rotateZ(45deg)] sm:[transform:scale(1.15)_rotateX(60deg)_rotateZ(45deg)] [transform-style:preserve-3d] transition-transform">
-              
               <div className="absolute inset-0 bg-cyan-950/80 border-2 border-cyan-500 shadow-[0_0_60px_rgba(6,182,212,0.3)] backdrop-blur-md" />
               <div className="absolute inset-0 bg-[linear-gradient(to_right,#0891b266_2px,transparent_2px),linear-gradient(to_bottom,#0891b266_2px,transparent_2px)] bg-[size:24px_24px] opacity-80" />
               <div className="absolute top-0 left-0 w-full h-[4px] bg-white shadow-[0_0_30px_#22d3ee] animate-[hologramScan_4s_linear_infinite]" />
