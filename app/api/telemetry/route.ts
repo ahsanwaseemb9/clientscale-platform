@@ -17,7 +17,7 @@ export async function POST(request: Request) {
 
     const { 
       event_type, element_id, rage_clicks, api_endpoint, 
-      latency_ms, url, tenant_id, timestamp, session_id 
+      latency_ms, url, tenant_id, timestamp, session_id, cart_value 
     } = payload;
 
     let resolvedTenantId = tenant_id;
@@ -52,8 +52,9 @@ export async function POST(request: Request) {
     const telemetryId = crypto.randomUUID();
     const currentSessionId = session_id || crypto.randomUUID();
     let frictionType = event_type === 'latency_spike' ? 'latency_spike' : 'rage_click';
+    const resolvedCartValue = Number(cart_value) || 0;
 
-    // 1. Insert Telemetry including the required session_id
+    // 1. Insert Telemetry including live scraped cart value
     if (frictionType === 'rage_click') {
       const { error: dbError } = await supabase
         .from('session_telemetry')
@@ -66,6 +67,7 @@ export async function POST(request: Request) {
           page_url: url || 'http://localhost:3000/demo1',
           friction_type: 'rage_click',
           recovered: false,
+          cart_value: resolvedCartValue,
           created_at: timestamp || new Date().toISOString(),
         });
 
@@ -82,19 +84,20 @@ export async function POST(request: Request) {
           page_url: url || 'http://localhost:3000/demo1',
           friction_type: 'latency_spike',
           recovered: false,
+          cart_value: resolvedCartValue,
           created_at: timestamp || new Date().toISOString(),
         });
 
       if (dbError) throw dbError;
     }
 
-    console.log(`\n[AI Pipeline] Telemetry caught (ID: ${telemetryId}). Generating fix...`);
+    console.log(`\n[AI Pipeline] Telemetry caught (ID: ${telemetryId}) | Cart Value: £${resolvedCartValue}. Generating fix...`);
 
     // 2. Autonomous Code Healing
     const systemPrompt = `You are an elite Next.js performance engineer. Output precise, drop-in code fixes for user friction. Return ONLY valid JSON with two keys: 'description' (1-sentence explanation) and 'code_patch' (the actual code block).`;
     const userMessage = frictionType === 'rage_click' 
-      ? `A user rage-clicked the element '${element_id || 'button#checkout-mobile'}' ${rage_clicks || 4} times on '${url || 'demo'}'. Generate the React/Tailwind code to fix this specific element, adding a proper disabled state, loading spinner, and ARIA attributes.`
-      : `The endpoint '${api_endpoint || 'api'}' experienced high latency. Generate a Next.js Edge API route or unstable_cache implementation to mitigate this bottleneck.`;
+      ? `A user rage-clicked the element '${element_id || 'button#checkout-mobile'}' ${rage_clicks || 4} times on cart value £${resolvedCartValue}. Generate the React/Tailwind code to fix this specific element, adding a proper disabled state, loading spinner, and ARIA attributes.`
+      : `The endpoint '${api_endpoint || 'api'}' experienced high latency affecting a £${resolvedCartValue} checkout. Generate a Next.js Edge API route or unstable_cache implementation to mitigate this bottleneck.`;
 
     const completion = await openai.chat.completions.create({
       model: "gpt-4o",
