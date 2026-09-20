@@ -10,6 +10,18 @@ const supabase = createClient(supabaseUrl, supabaseKey);
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
+// Handle CORS preflight requests from external prospect domains
+export async function OPTIONS() {
+  return NextResponse.json({}, {
+    status: 200,
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'POST, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type, X-Tenant-ID',
+    },
+  });
+}
+
 export async function POST(request: Request) {
   try {
     const rawBody = await request.text();
@@ -120,10 +132,29 @@ export async function POST(request: Request) {
       status: 'pending_approval'
     });
 
-    return NextResponse.json({ success: true, message: 'Telemetry logged and AI healed successfully' });
+    return NextResponse.json(
+      { success: true, message: 'Telemetry logged and AI healed successfully' },
+      {
+        headers: {
+          'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Methods': 'POST, OPTIONS',
+          'Access-Control-Allow-Headers': 'Content-Type, X-Tenant-ID',
+        }
+      }
+    );
 
   } catch (error: any) {
     console.error('[Telemetry API Error]:', error.message);
-    return NextResponse.json({ success: false, error: 'Internal server error' }, { status: 500 });
+    return NextResponse.json(
+      { success: false, error: 'Internal server error' },
+      { 
+        status: 500,
+        headers: {
+          'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Methods': 'POST, OPTIONS',
+          'Access-Control-Allow-Headers': 'Content-Type, X-Tenant-ID',
+        }
+      }
+    );
   }
 }
