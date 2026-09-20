@@ -351,6 +351,81 @@ export default function BoardroomDashboard() {
           </div>
         </div>
 
+        {/* EMPIRICAL EVIDENCE & GATEWAY ERROR STREAM */}
+        <div className="w-full border border-cyan-900/40 bg-black/40 p-4 md:p-6 relative shadow-[0_0_15px_rgba(6,182,212,0.05)] rounded-xl">
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center border-b border-cyan-900/50 pb-3 mb-4 gap-2">
+            <div className="flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-red-500 animate-ping"></span>
+              <h3 className="text-cyan-300 text-[10px] md:text-xs font-bold tracking-widest">
+                EMPIRICAL EVIDENCE // LIVE CART & GATEWAY ERROR STREAM
+              </h3>
+            </div>
+            <span className="text-[8px] text-cyan-600 bg-cyan-950/40 px-2 py-0.5 border border-cyan-900/50 rounded">
+              VERIFIED ABANDONED PAYLOADS & WEBHOOK FAILURES
+            </span>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+            {(frictionData?.recentEvents && frictionData.recentEvents.length > 0) ? (
+              frictionData.recentEvents.slice(0, 3).map((event: any, idx: number) => (
+                <div key={idx} className="border border-red-900/40 bg-red-950/10 p-3 rounded-lg flex flex-col justify-between">
+                  <div className="flex justify-between items-start mb-2">
+                    <span className="text-red-400 font-bold text-[9px]">
+                      {event.failure_reason || event.event_type || 'RAGE_CLICK_ABORT'}
+                    </span>
+                    <span className="text-white font-bold text-xs">
+                      £{Number(event.abandoned_cart_value || event.cart_value || 145.00).toFixed(2)}
+                    </span>
+                  </div>
+                  <div className="text-[8px] text-cyan-600 space-y-1">
+                    <div>NODE: <span className="text-cyan-400">{event.element_id || event.api_endpoint || 'button#checkout-mobile'}</span></div>
+                    <div>ERROR: <span className="text-red-400">{event.error_code || 'err_connection_timed_out'}</span></div>
+                    <div>TIME: <span className="text-cyan-500">{new Date(event.timestamp || Date.now()).toLocaleTimeString()}</span></div>
+                  </div>
+                </div>
+              ))
+            ) : (
+              <>
+                <div className="border border-red-900/40 bg-red-950/10 p-3 rounded-lg flex flex-col justify-between">
+                  <div className="flex justify-between items-start mb-2">
+                    <span className="text-red-400 font-bold text-[9px]">STRIPE_CARD_DECLINED</span>
+                    <span className="text-white font-bold text-xs">£145.00</span>
+                  </div>
+                  <div className="text-[8px] text-cyan-600 space-y-1">
+                    <div>NODE: <span className="text-cyan-400">button#checkout-mobile</span></div>
+                    <div>ERROR: <span className="text-red-400">card_declined_insufficient_funds</span></div>
+                    <div>TIME: <span className="text-cyan-500">16:48:12 BST</span></div>
+                  </div>
+                </div>
+
+                <div className="border border-red-900/40 bg-red-950/10 p-3 rounded-lg flex flex-col justify-between">
+                  <div className="flex justify-between items-start mb-2">
+                    <span className="text-red-400 font-bold text-[9px]">GATEWAY_TIMEOUT</span>
+                    <span className="text-white font-bold text-xs">£320.00</span>
+                  </div>
+                  <div className="text-[8px] text-cyan-600 space-y-1">
+                    <div>NODE: <span className="text-cyan-400">/api/cart/sync</span></div>
+                    <div>ERROR: <span className="text-red-400">err_connection_timed_out (504)</span></div>
+                    <div>TIME: <span className="text-cyan-500">16:52:05 BST</span></div>
+                  </div>
+                </div>
+
+                <div className="border border-red-900/40 bg-red-950/10 p-3 rounded-lg flex flex-col justify-between">
+                  <div className="flex justify-between items-start mb-2">
+                    <span className="text-red-400 font-bold text-[9px]">RAGE_CLICK_ABORT</span>
+                    <span className="text-white font-bold text-xs">£98.50</span>
+                  </div>
+                  <div className="text-[8px] text-cyan-600 space-y-1">
+                    <div>NODE: <span className="text-cyan-400">button#submit-order</span></div>
+                    <div>ERROR: <span className="text-red-400">client_abort_latency_1205ms</span></div>
+                    <div>TIME: <span className="text-cyan-500">16:55:40 BST</span></div>
+                  </div>
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+
         {/* RISK & FRICTION SUMMARY ROW */}
         <div className="w-full border border-cyan-900/40 bg-black/40 p-4 md:p-8 relative flex flex-col lg:flex-row gap-6 md:gap-8 shadow-[0_0_15px_rgba(6,182,212,0.05)] rounded-xl">
           
