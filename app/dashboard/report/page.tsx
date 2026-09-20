@@ -1,4 +1,3 @@
-// app/dashboard/report/page.tsx
 'use client';
 
 import { useEffect, useState, useRef } from 'react';
@@ -6,7 +5,8 @@ import {
   AlertTriangle, DollarSign, Ghost, ShieldAlert, Activity, 
   Database, ServerCrash, X, ChevronRight, MapPin, MailWarning,
   ListOrdered, Layers, Globe, Image as ImageIcon, Accessibility, 
-  CheckCircle, AlertCircle, Cpu, Lock, Unlock, Search, Info, ArrowUp, Zap
+  CheckCircle, AlertCircle, Cpu, Lock, Unlock, Search, Info, ArrowUp, Zap,
+  Code, Copy
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
@@ -65,6 +65,68 @@ const DecorNode = ({ x, y, w, d, h }: any) => (
     <div className="absolute inset-0 bg-cyan-800/40 border border-cyan-600/50" style={{ transform: `translateZ(${h}px)` }} />
   </div>
 );
+
+// --- PIXEL INTEGRATION CARD COMPONENT ---
+const PixelIntegrationCard = ({ targetUrl, onDeploy, isDeploying }: { targetUrl: string; onDeploy: () => void; isDeploying: boolean }) => {
+  const [copied, setCopied] = useState(false);
+  const domain = (() => {
+    try {
+      return new URL(targetUrl).hostname;
+    } catch {
+      return 'yourdomain.com';
+    }
+  })();
+
+  const snippet = `<script\n  src="https://clientscale.io/pixel.js"\n  data-target="${domain}"\n  data-auto-track="true"\n  async>\n</script>`;
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(snippet);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  return (
+    <div className="bg-gradient-to-br from-[#12121c] to-[#0a0a0f] border border-cyan-500/30 rounded-2xl p-6 sm:p-8 relative overflow-hidden shadow-2xl">
+      <div className="absolute top-0 right-0 w-64 h-64 bg-cyan-500/5 rounded-full blur-3xl pointer-events-none" />
+      
+      <div className="flex items-center gap-3 mb-4">
+        <div className="w-10 h-10 rounded-xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-400">
+          <Code size={20} />
+        </div>
+        <div>
+          <h3 className="text-sm sm:text-base font-bold text-white uppercase tracking-wider">ClientScale Telemetry Pixel</h3>
+          <p className="text-[11px] sm:text-xs text-zinc-400 font-mono">Embed snippet in your HTML &lt;head&gt; tag</p>
+        </div>
+      </div>
+
+      <div className="bg-black/70 border border-zinc-800 rounded-xl p-4 font-mono text-xs text-cyan-300 mb-4 relative overflow-x-auto">
+        <pre className="whitespace-pre-wrap">{snippet}</pre>
+        <button
+          onClick={handleCopy}
+          className="absolute top-3 right-3 bg-zinc-800 hover:bg-zinc-700 text-zinc-200 px-2.5 py-1.5 rounded-lg text-[10px] font-sans flex items-center gap-1.5 transition-colors cursor-pointer border border-zinc-700"
+        >
+          {copied ? <CheckCircle size={12} className="text-green-400" /> : <Copy size={12} />}
+          {copied ? 'Copied' : 'Copy Snippet'}
+        </button>
+      </div>
+
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-4 border-t border-zinc-800/80">
+        <div className="flex items-center gap-2 text-xs text-zinc-400">
+          <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse" />
+          <span>Listening for incoming heartbeat signals from <strong className="text-zinc-200">{domain}</strong></span>
+        </div>
+        <button
+          onClick={onDeploy}
+          disabled={isDeploying}
+          className="w-full sm:w-auto bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 disabled:opacity-50 text-white px-5 py-3 rounded-xl font-bold text-xs uppercase tracking-widest transition-all shadow-lg flex items-center justify-center gap-2 cursor-pointer"
+        >
+          <Zap size={14} />
+          {isDeploying ? 'Initializing Tracker...' : 'Deploy Telemetry Pixel (48 Hrs)'}
+        </button>
+      </div>
+    </div>
+  );
+};
 
 export default function AuditReportPage() {
   const router = useRouter();
@@ -411,20 +473,11 @@ export default function AuditReportPage() {
           </section>
 
           <section className="pt-6 border-t border-zinc-800">
-            <div className="bg-gradient-to-b from-zinc-900 to-black border border-zinc-700/80 rounded-2xl p-6 sm:p-8 text-center relative overflow-hidden shadow-2xl">
-                <Lock size={20} className="text-cyan-400 mx-auto mb-3" />
-                <h3 className="text-base sm:text-lg font-bold text-white mb-2">Verify The Damage</h3>
-                <p className="text-xs sm:text-sm text-zinc-400 mb-6 max-w-sm mx-auto leading-relaxed">
-                    Deploy the ClientScale tracker to capture actual user rage-taps and API failures from your live traffic.
-                </p>
-                <button 
-                  onClick={handleDeployPixel} 
-                  disabled={isDeploying}
-                  className="w-full bg-white hover:bg-gray-200 text-black py-3.5 sm:py-4 rounded-xl font-bold text-xs uppercase tracking-widest transition-all shadow-lg flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
-                >
-                  {isDeploying ? 'Initializing Tracker...' : 'Deploy Telemetry Pixel (48 Hrs)'}
-                </button>
-            </div>
+            <PixelIntegrationCard 
+              targetUrl={auditData.target} 
+              onDeploy={handleDeployPixel} 
+              isDeploying={isDeploying} 
+            />
           </section>
 
         </div>
